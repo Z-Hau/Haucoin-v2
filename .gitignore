@@ -120,3 +120,8 @@ contrib/devtools/split-debug.sh
 
 # Output from running db4 installation
 db4/
+*.ipch
+*.json
+*.sqlite
+*.db
+.vs/Haucoin-v1/v15/.suo
