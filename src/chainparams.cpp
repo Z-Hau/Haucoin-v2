@@ -153,7 +153,7 @@ public:
 
         checkpointData = {
             {
-                {};
+                {},
             }
         };
 
