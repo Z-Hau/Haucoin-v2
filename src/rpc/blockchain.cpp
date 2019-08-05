@@ -1333,7 +1333,7 @@ UniValue getchaintips(const JSONRPCRequest& request)
 
     /* Construct the output array.  */
     UniValue res(UniValue::VARR);
-    
+    int counter1 = 0;
     for (const CBlockIndex* block : setTips)
     {
         UniValue obj(UniValue::VOBJ);
@@ -1365,10 +1365,11 @@ UniValue getchaintips(const JSONRPCRequest& request)
         }
         obj.push_back(Pair("status", status));
         res.push_back(obj);
+        counter1 = counter1 + 1;
         
     }
     
-    return res;
+    return counter1;
 }
 
 UniValue mempoolInfoToJSON()
