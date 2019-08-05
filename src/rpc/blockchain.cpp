@@ -1366,8 +1366,8 @@ UniValue getchaintips(const JSONRPCRequest& request)
 
         res.push_back(obj);
     }
-
-    return res;
+    
+    return res.getValues;
 }
 
 UniValue mempoolInfoToJSON()
