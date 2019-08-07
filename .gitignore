@@ -118,3 +118,4 @@ libbitcoinconsensus.pc
 contrib/devtools/split-debug.sh
 *.bin
 *.ipch
+.vscode/settings.json
