@@ -2412,8 +2412,11 @@ CBlockIndex* CChainState::FindMostWorkChain() {
         CBlockIndex *pindexTest = pindexNew;
         bool fInvalidAncestor = false;
         while (pindexTest && !chainActive.Contains(pindexTest)) {
-            assert(pindexTest->nChainTx || pindexTest->nHeight == 0);
+            
+            std::cout << "pindexTest->nChainTx = " << pindexTest->nChainTx << std::endl;
+            std::cout << "pindexTest->nHeight = " << pindexTest->nHeight << std::endl;
 
+            assert(pindexTest->nChainTx || pindexTest->nHeight == 0);
             // Pruned nodes may have entries in setBlockIndexCandidates for
             // which block files have been deleted.  Remove those as candidates
             // for the most work chain if we come across them; we can't switch
