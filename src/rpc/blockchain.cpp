@@ -1338,8 +1338,7 @@ UniValue getchaintips(const JSONRPCRequest& request)
     {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("height", block->nHeight));
-        obj.push_back(Pair("hash", block->phashBlock->GetHex()));
-
+        obj.push_back(Pair("hash", block->phashBlock->GetHex()));     
         const int branchLen = block->nHeight - chainActive.FindFork(block)->nHeight;
         obj.push_back(Pair("branchlen", branchLen));
 
@@ -1364,12 +1363,13 @@ UniValue getchaintips(const JSONRPCRequest& request)
             status = "unknown";
         }
         obj.push_back(Pair("status", status));
+        obj.push_back(Pair("number",counter1));
         res.push_back(obj);
         counter1 = counter1 + 1;
         
     }
-    //return res;
-    return counter1;
+    return res;
+    //return counter1;
 }
 
 UniValue mempoolInfoToJSON()
