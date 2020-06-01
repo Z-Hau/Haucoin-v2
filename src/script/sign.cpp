@@ -15,9 +15,9 @@
 
 typedef std::vector<unsigned char> valtype;
 
-TransactionSignatureCreator::TransactionSignatureCreator( CKeyStore* keystoreIn,  CTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn, int nHashTypeIn) : BaseSignatureCreator(keystoreIn), txTo(txToIn), nIn(nInIn), nHashType(nHashTypeIn), amount(amountIn), checker(txTo, nIn, amountIn) {}
+TransactionSignatureCreator::TransactionSignatureCreator(const CKeyStore* keystoreIn, const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, int nHashTypeIn) : BaseSignatureCreator(keystoreIn), txTo(txToIn), nIn(nInIn), nHashType(nHashTypeIn), amount(amountIn), checker(txTo, nIn, amountIn) {}
 
-bool TransactionSignatureCreator::CreateSig(std::vector<unsigned char>& vchSig,  CKeyID& address,  CScript& scriptCode, SigVersion sigversion) 
+bool TransactionSignatureCreator::CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& address, const CScript& scriptCode, SigVersion sigversion) const
 {
     CKey key;
     if (!keystore->GetKey(address, key))
@@ -34,7 +34,7 @@ bool TransactionSignatureCreator::CreateSig(std::vector<unsigned char>& vchSig, 
     return true;
 }
 
-static bool Sign1( CKeyID& address,  BaseSignatureCreator& creator,  CScript& scriptCode, std::vector<valtype>& ret, SigVersion sigversion)
+static bool Sign1(const CKeyID& address, const BaseSignatureCreator& creator, const CScript& scriptCode, std::vector<valtype>& ret, SigVersion sigversion)
 {
     std::vector<unsigned char> vchSig;
     if (!creator.CreateSig(vchSig, address, scriptCode, sigversion))
@@ -43,13 +43,13 @@ static bool Sign1( CKeyID& address,  BaseSignatureCreator& creator,  CScript& sc
     return true;
 }
 
-static bool SignN( std::vector<valtype>& multisigdata,  BaseSignatureCreator& creator,  CScript& scriptCode, std::vector<valtype>& ret, SigVersion sigversion)
+static bool SignN(const std::vector<valtype>& multisigdata, const BaseSignatureCreator& creator, const CScript& scriptCode, std::vector<valtype>& ret, SigVersion sigversion)
 {
     int nSigned = 0;
     int nRequired = multisigdata.front()[0];
     for (unsigned int i = 1; i < multisigdata.size()-1 && nSigned < nRequired; i++)
     {
-         valtype& pubkey = multisigdata[i];
+        const valtype& pubkey = multisigdata[i];
         CKeyID keyID = CPubKey(pubkey).GetID();
         if (Sign1(keyID, creator, scriptCode, ret, sigversion))
             ++nSigned;
@@ -63,7 +63,7 @@ static bool SignN( std::vector<valtype>& multisigdata,  BaseSignatureCreator& cr
  * unless whichTypeRet is TX_SCRIPTHASH, in which case scriptSigRet is the redemption script.
  * Returns false if scriptPubKey could not be completely satisfied.
  */
-static bool SignStep( BaseSignatureCreator& creator,  CScript& scriptPubKey,
+static bool SignStep(const BaseSignatureCreator& creator, const CScript& scriptPubKey,
                      std::vector<valtype>& ret, txnouttype& whichTypeRet, SigVersion sigversion)
 {
     CScript scriptRet;
@@ -123,10 +123,10 @@ static bool SignStep( BaseSignatureCreator& creator,  CScript& scriptPubKey,
     }
 }
 
-static CScript PushAll( std::vector<valtype>& values)
+static CScript PushAll(const std::vector<valtype>& values)
 {
     CScript result;
-    for ( valtype& v : values) {
+    for (const valtype& v : values) {
         if (v.size() == 0) {
             result << OP_0;
         } else if (v.size() == 1 && v[0] >= 1 && v[0] <= 16) {
@@ -138,7 +138,7 @@ static CScript PushAll( std::vector<valtype>& values)
     return result;
 }
 
-bool ProduceSignature( BaseSignatureCreator& creator,  CScript& fromPubKey, SignatureData& sigdata)
+bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPubKey, SignatureData& sigdata)
 {
     CScript script = fromPubKey;
     std::vector<valtype> result;
@@ -186,7 +186,7 @@ bool ProduceSignature( BaseSignatureCreator& creator,  CScript& fromPubKey, Sign
     return solved && VerifyScript(sigdata.scriptSig, fromPubKey, &sigdata.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
 }
 
-SignatureData DataFromTransaction( CMutableTransaction& tx, unsigned int nIn)
+SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn)
 {
     SignatureData data;
     assert(tx.vin.size() > nIn);
@@ -195,14 +195,14 @@ SignatureData DataFromTransaction( CMutableTransaction& tx, unsigned int nIn)
     return data;
 }
 
-void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn,  SignatureData& data)
+void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data)
 {
     assert(tx.vin.size() > nIn);
     tx.vin[nIn].scriptSig = data.scriptSig;
     tx.vin[nIn].scriptWitness = data.scriptWitness;
 }
 
-bool SignSignature( CKeyStore &keystore,  CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn,  CAmount& amount, int nHashType)
+bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, const CAmount& amount, int nHashType)
 {
     assert(nIn < txTo.vin.size());
 
@@ -215,28 +215,28 @@ bool SignSignature( CKeyStore &keystore,  CScript& fromPubKey, CMutableTransacti
     return ret;
 }
 
-bool SignSignature( CKeyStore &keystore,  CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
+bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
 {
     assert(nIn < txTo.vin.size());
     CTxIn& txin = txTo.vin[nIn];
     assert(txin.prevout.n < txFrom.vout.size());
-     CTxOut& txout = txFrom.vout[txin.prevout.n];
+    const CTxOut& txout = txFrom.vout[txin.prevout.n];
 
     return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, txout.nValue, nHashType);
 }
 
-static std::vector<valtype> CombineMultisig( CScript& scriptPubKey,  BaseSignatureChecker& checker,
-                                std::vector<valtype>& vSolutions,
-                                std::vector<valtype>& sigs1,  std::vector<valtype>& sigs2, SigVersion sigversion)
+static std::vector<valtype> CombineMultisig(const CScript& scriptPubKey, const BaseSignatureChecker& checker,
+                               const std::vector<valtype>& vSolutions,
+                               const std::vector<valtype>& sigs1, const std::vector<valtype>& sigs2, SigVersion sigversion)
 {
     // Combine all the signatures we've got:
     std::set<valtype> allsigs;
-    for ( valtype& v : sigs1)
+    for (const valtype& v : sigs1)
     {
         if (!v.empty())
             allsigs.insert(v);
     }
-    for ( valtype& v : sigs2)
+    for (const valtype& v : sigs2)
     {
         if (!v.empty())
             allsigs.insert(v);
@@ -247,11 +247,11 @@ static std::vector<valtype> CombineMultisig( CScript& scriptPubKey,  BaseSignatu
     unsigned int nSigsRequired = vSolutions.front()[0];
     unsigned int nPubKeys = vSolutions.size()-2;
     std::map<valtype, valtype> sigs;
-    for ( valtype& sig : allsigs)
+    for (const valtype& sig : allsigs)
     {
         for (unsigned int i = 0; i < nPubKeys; i++)
         {
-             valtype& pubkey = vSolutions[i+1];
+            const valtype& pubkey = vSolutions[i+1];
             if (sigs.count(pubkey))
                 continue; // Already got a sig for this pubkey
 
@@ -288,12 +288,12 @@ struct Stacks
     std::vector<valtype> witness;
 
     Stacks() {}
-    explicit Stacks( std::vector<valtype>& scriptSigStack_) : script(scriptSigStack_), witness() {}
-    explicit Stacks( SignatureData& data) : witness(data.scriptWitness.stack) {
+    explicit Stacks(const std::vector<valtype>& scriptSigStack_) : script(scriptSigStack_), witness() {}
+    explicit Stacks(const SignatureData& data) : witness(data.scriptWitness.stack) {
         EvalScript(script, data.scriptSig, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), SIGVERSION_BASE);
     }
 
-    SignatureData Output()  {
+    SignatureData Output() const {
         SignatureData result;
         result.scriptSig = PushAll(script);
         result.scriptWitness.stack = witness;
@@ -302,8 +302,8 @@ struct Stacks
 };
 }
 
-static Stacks CombineSignatures( CScript& scriptPubKey,  BaseSignatureChecker& checker,
-                                  txnouttype txType,  std::vector<valtype>& vSolutions,
+static Stacks CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker,
+                                 const txnouttype txType, const std::vector<valtype>& vSolutions,
                                  Stacks sigs1, Stacks sigs2, SigVersion sigversion)
 {
     switch (txType)
@@ -377,8 +377,8 @@ static Stacks CombineSignatures( CScript& scriptPubKey,  BaseSignatureChecker& c
     }
 }
 
-SignatureData CombineSignatures( CScript& scriptPubKey,  BaseSignatureChecker& checker,
-                           SignatureData& scriptSig1,  SignatureData& scriptSig2)
+SignatureData CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker,
+                          const SignatureData& scriptSig1, const SignatureData& scriptSig2)
 {
     txnouttype txType;
     std::vector<std::vector<unsigned char> > vSolutions;
@@ -394,20 +394,20 @@ class DummySignatureChecker : public BaseSignatureChecker
 public:
     DummySignatureChecker() {}
 
-    bool CheckSig( std::vector<unsigned char>& scriptSig,  std::vector<unsigned char>& vchPubKey,  CScript& scriptCode, SigVersion sigversion)  override
+    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override
     {
         return true;
     }
 };
- DummySignatureChecker dummyChecker;
+const DummySignatureChecker dummyChecker;
 } // namespace
 
- BaseSignatureChecker& DummySignatureCreator::Checker() 
+const BaseSignatureChecker& DummySignatureCreator::Checker() const
 {
     return dummyChecker;
 }
 
-bool DummySignatureCreator::CreateSig(std::vector<unsigned char>& vchSig,  CKeyID& keyid,  CScript& scriptCode, SigVersion sigversion) 
+bool DummySignatureCreator::CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const
 {
     // Create a dummy signature that is a valid DER-encoding
     vchSig.assign(72, '\000');
@@ -423,7 +423,7 @@ bool DummySignatureCreator::CreateSig(std::vector<unsigned char>& vchSig,  CKeyI
     return true;
 }
 
-bool IsSolvable( CKeyStore& store,  CScript& script)
+bool IsSolvable(const CKeyStore& store, const CScript& script)
 {
     // This check is to make sure that the script we created can actually be solved for and signed by us
     // if we were to have the private keys. This is just to make sure that the script is valid and that,

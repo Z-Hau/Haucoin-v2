@@ -16,13 +16,13 @@ class UniValue;
  * @return A floating point number that is a multiple of the main net minimum
  * difficulty (4295032833 hashes).
  */
-double GetDifficulty( CBlockIndex* blockindex = nullptr);
+double GetDifficulty(const CBlockIndex* blockindex = nullptr);
 
 /** Callback for when block tip changed. */
-void RPCNotifyBlockChange(bool ibd,  CBlockIndex *);
+void RPCNotifyBlockChange(bool ibd, const CBlockIndex *);
 
 /** Block description to JSON */
-UniValue blockToJSON( CBlock& block,  CBlockIndex* blockindex, bool txDetails = false);
+UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false);
 
 /** Mempool information to JSON */
 UniValue mempoolInfoToJSON();
@@ -31,7 +31,7 @@ UniValue mempoolInfoToJSON();
 UniValue mempoolToJSON(bool fVerbose = false);
 
 /** Block header to JSON */
-UniValue blockheaderToJSON( CBlockIndex* blockindex);
+UniValue blockheaderToJSON(const CBlockIndex* blockindex);
 
 #endif
 

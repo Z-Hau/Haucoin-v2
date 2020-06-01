@@ -29,7 +29,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-WalletView::WalletView( PlatformStyle *_platformStyle, QWidget *parent):
+WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     QStackedWidget(parent),
     clientModel(0),
     walletModel(0),
@@ -149,7 +149,7 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
     }
 }
 
-void WalletView::processNewTransaction( QModelIndex& parent, int start, int /*end*/)
+void WalletView::processNewTransaction(const QModelIndex& parent, int start, int /*end*/)
 {
     // Prevent balloon-spam when initial block download is in progress
     if (!walletModel || !clientModel || clientModel->inInitialBlockDownload())
@@ -216,7 +216,7 @@ void WalletView::gotoVerifyMessageTab(QString addr)
         signVerifyMessageDialog->setAddress_VM(addr);
 }
 
-bool WalletView::handlePaymentRequest( SendCoinsRecipient& recipient)
+bool WalletView::handlePaymentRequest(const SendCoinsRecipient& recipient)
 {
     return sendCoinsPage->handlePaymentRequest(recipient);
 }
@@ -301,7 +301,7 @@ void WalletView::usedReceivingAddresses()
     usedReceivingAddressesPage->activateWindow();
 }
 
-void WalletView::showProgress( QString &title, int nProgress)
+void WalletView::showProgress(const QString &title, int nProgress)
 {
     if (nProgress == 0)
     {

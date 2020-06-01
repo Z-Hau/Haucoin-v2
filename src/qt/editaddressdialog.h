@@ -37,8 +37,8 @@ public:
     void setModel(AddressTableModel *model);
     void loadRow(int row);
 
-    QString getAddress() ;
-    void setAddress( QString &address);
+    QString getAddress() const;
+    void setAddress(const QString &address);
 
 public Q_SLOTS:
     void accept();

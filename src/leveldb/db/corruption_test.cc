@@ -22,7 +22,7 @@
 
 namespace leveldb {
 
-static  int kValueSize = 1000;
+static const int kValueSize = 1000;
 
 class CorruptionTest {
  public:
@@ -143,7 +143,7 @@ class CorruptionTest {
 
     struct stat sbuf;
     if (stat(fname.c_str(), &sbuf) != 0) {
-       char* msg = strerror(errno);
+      const char* msg = strerror(errno);
       ASSERT_TRUE(false) << fname << ": " << msg;
     }
 
@@ -173,7 +173,7 @@ class CorruptionTest {
     ASSERT_TRUE(s.ok()) << s.ToString();
   }
 
-  int Property( std::string& name) {
+  int Property(const std::string& name) {
     std::string property;
     int result;
     if (db_->GetProperty(name, &property) &&
@@ -219,7 +219,7 @@ TEST(CorruptionTest, RecoverWriteError) {
 TEST(CorruptionTest, NewFileErrorDuringWrite) {
   // Do enough writing to force minor compaction
   env_.writable_file_error_ = true;
-   int num = 3 + (Options().write_buffer_size / kValueSize);
+  const int num = 3 + (Options().write_buffer_size / kValueSize);
   std::string value_storage;
   Status s;
   for (int i = 0; s.ok() && i < num; i++) {
@@ -319,7 +319,7 @@ TEST(CorruptionTest, CompactionInputError) {
   Build(10);
   DBImpl* dbi = reinterpret_cast<DBImpl*>(db_);
   dbi->TEST_CompactMemTable();
-   int last = config::kMaxMemCompactLevel;
+  const int last = config::kMaxMemCompactLevel;
   ASSERT_EQ(1, Property("leveldb.num-files-at-level" + NumberToString(last)));
 
   Corrupt(kTableFile, 100, 1);

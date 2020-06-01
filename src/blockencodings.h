@@ -75,7 +75,7 @@ public:
     std::vector<CTransactionRef> txn;
 
     BlockTransactions() {}
-    explicit BlockTransactions( BlockTransactionsRequest& req) :
+    explicit BlockTransactions(const BlockTransactionsRequest& req) :
         blockhash(req.blockhash), txn(req.indexes.size()) {}
 
     ADD_SERIALIZE_METHODS;
@@ -133,11 +133,11 @@ private:
     mutable uint64_t shorttxidk0, shorttxidk1;
     uint64_t nonce;
 
-    void FillShortTxIDSelector() ;
+    void FillShortTxIDSelector() const;
 
     friend class PartiallyDownloadedBlock;
 
-    static  int SHORTTXIDS_LENGTH = 6;
+    static const int SHORTTXIDS_LENGTH = 6;
 protected:
     std::vector<uint64_t> shorttxids;
     std::vector<PrefilledTransaction> prefilledtxn;
@@ -148,11 +148,11 @@ public:
     // Dummy for deserialization
     CBlockHeaderAndShortTxIDs() {}
 
-    CBlockHeaderAndShortTxIDs( CBlock& block, bool fUseWTXID);
+    CBlockHeaderAndShortTxIDs(const CBlock& block, bool fUseWTXID);
 
-    uint64_t GetShortID( uint256& txhash) ;
+    uint64_t GetShortID(const uint256& txhash) const;
 
-    size_t BlockTxCount()  { return shorttxids.size() + prefilledtxn.size(); }
+    size_t BlockTxCount() const { return shorttxids.size() + prefilledtxn.size(); }
 
     ADD_SERIALIZE_METHODS;
 
@@ -201,9 +201,9 @@ public:
     explicit PartiallyDownloadedBlock(CTxMemPool* poolIn) : pool(poolIn) {}
 
     // extra_txn is a list of extra transactions to look at, in <witness hash, reference> form
-    ReadStatus InitData( CBlockHeaderAndShortTxIDs& cmpctblock,  std::vector<std::pair<uint256, CTransactionRef>>& extra_txn);
-    bool IsTxAvailable(size_t index) ;
-    ReadStatus FillBlock(CBlock& block,  std::vector<CTransactionRef>& vtx_missing);
+    ReadStatus InitData(const CBlockHeaderAndShortTxIDs& cmpctblock, const std::vector<std::pair<uint256, CTransactionRef>>& extra_txn);
+    bool IsTxAvailable(size_t index) const;
+    ReadStatus FillBlock(CBlock& block, const std::vector<CTransactionRef>& vtx_missing);
 };
 
 #endif

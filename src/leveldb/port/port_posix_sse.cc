@@ -29,7 +29,7 @@ namespace port {
 #if defined(LEVELDB_PLATFORM_POSIX_SSE)
 
 // Used to fetch a naturally-aligned 32-bit word in little endian byte-order
-static inline uint32_t LE_LOAD32( uint8_t *p) {
+static inline uint32_t LE_LOAD32(const uint8_t *p) {
   // SSE is x86 only, so ensured that |p| is always little-endian.
   uint32_t word;
   memcpy(&word, p, sizeof(word));
@@ -39,7 +39,7 @@ static inline uint32_t LE_LOAD32( uint8_t *p) {
 #if defined(_M_X64) || defined(__x86_64__)  // LE_LOAD64 is only used on x64.
 
 // Used to fetch a naturally-aligned 64-bit word in little endian byte-order
-static inline uint64_t LE_LOAD64( uint8_t *p) {
+static inline uint64_t LE_LOAD64(const uint8_t *p) {
   uint64_t dword;
   memcpy(&dword, p, sizeof(dword));
   return dword;
@@ -51,13 +51,13 @@ static inline uint64_t LE_LOAD64( uint8_t *p) {
 
 // For further improvements see Intel publication at:
 // http://download.intel.com/design/intarch/papers/323405.pdf
-uint32_t AcceleratedCRC32C(uint32_t crc,  char* buf, size_t size) {
+uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size) {
 #if !defined(LEVELDB_PLATFORM_POSIX_SSE)
   return 0;
 #else
 
-   uint8_t *p = reinterpret_cast< uint8_t *>(buf);
-   uint8_t *e = p + size;
+  const uint8_t *p = reinterpret_cast<const uint8_t *>(buf);
+  const uint8_t *e = p + size;
   uint32_t l = crc ^ 0xffffffffu;
 
 #define STEP1 do {                              \

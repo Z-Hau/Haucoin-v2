@@ -15,7 +15,7 @@
 #include <utilstrencodings.h>
 
 
-CAmount GetDustThreshold( CTxOut& txout,  CFeeRate& dustRelayFeeIn)
+CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 {
     // "Dust" is defined in terms of dustRelayFee,
     // which has units satoshis-per-kilobyte.
@@ -49,12 +49,12 @@ CAmount GetDustThreshold( CTxOut& txout,  CFeeRate& dustRelayFeeIn)
     return dustRelayFeeIn.GetFee(nSize);
 }
 
-bool IsDust( CTxOut& txout,  CFeeRate& dustRelayFeeIn)
+bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 {
     return (txout.nValue < GetDustThreshold(txout, dustRelayFeeIn));
 }
 
-bool IsStandard( CScript& scriptPubKey, txnouttype& whichType,  bool witnessEnabled)
+bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType, const bool witnessEnabled)
 {
     std::vector<std::vector<unsigned char> > vSolutions;
     if (!Solver(scriptPubKey, whichType, vSolutions))
@@ -79,7 +79,7 @@ bool IsStandard( CScript& scriptPubKey, txnouttype& whichType,  bool witnessEnab
     return whichType != TX_NONSTANDARD && whichType != TX_WITNESS_UNKNOWN;
 }
 
-bool IsStandardTx( CTransaction& tx, std::string& reason,  bool witnessEnabled)
+bool IsStandardTx(const CTransaction& tx, std::string& reason, const bool witnessEnabled)
 {
     if (tx.nVersion > CTransaction::MAX_STANDARD_VERSION || tx.nVersion < 1) {
         reason = "version";
@@ -96,7 +96,7 @@ bool IsStandardTx( CTransaction& tx, std::string& reason,  bool witnessEnabled)
         return false;
     }
 
-    for ( CTxIn& txin : tx.vin)
+    for (const CTxIn& txin : tx.vin)
     {
         // Biggest 'standard' txin is a 15-of-15 P2SH multisig with compressed
         // keys (remember the 520 byte limit on redeemScript size). That works
@@ -117,7 +117,7 @@ bool IsStandardTx( CTransaction& tx, std::string& reason,  bool witnessEnabled)
 
     unsigned int nDataOut = 0;
     txnouttype whichType;
-    for ( CTxOut& txout : tx.vout) {
+    for (const CTxOut& txout : tx.vout) {
         if (!::IsStandard(txout.scriptPubKey, whichType, witnessEnabled)) {
             reason = "scriptpubkey";
             return false;
@@ -159,19 +159,19 @@ bool IsStandardTx( CTransaction& tx, std::string& reason,  bool witnessEnabled)
  * expensive-to-check-upon-redemption script like:
  *   DUP CHECKSIG DROP ... repeated 100 times... OP_1
  */
-bool AreInputsStandard( CTransaction& tx,  CCoinsViewCache& mapInputs)
+bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
 {
     if (tx.IsCoinBase())
         return true; // Coinbases don't use vin normally
 
     for (unsigned int i = 0; i < tx.vin.size(); i++)
     {
-         CTxOut& prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
+        const CTxOut& prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
 
         std::vector<std::vector<unsigned char> > vSolutions;
         txnouttype whichType;
         // get the scriptPubKey corresponding to this input:
-         CScript& prevScript = prev.scriptPubKey;
+        const CScript& prevScript = prev.scriptPubKey;
         if (!Solver(prevScript, whichType, vSolutions))
             return false;
 
@@ -193,7 +193,7 @@ bool AreInputsStandard( CTransaction& tx,  CCoinsViewCache& mapInputs)
     return true;
 }
 
-bool IsWitnessStandard( CTransaction& tx,  CCoinsViewCache& mapInputs)
+bool IsWitnessStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
 {
     if (tx.IsCoinBase())
         return true; // Coinbases are skipped
@@ -205,7 +205,7 @@ bool IsWitnessStandard( CTransaction& tx,  CCoinsViewCache& mapInputs)
         if (tx.vin[i].scriptWitness.IsNull())
             continue;
 
-         CTxOut &prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
+        const CTxOut &prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
 
         // get the scriptPubKey corresponding to this input:
         CScript prevScript = prev.scriptPubKey;
@@ -254,7 +254,7 @@ int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost)
     return (std::max(nWeight, nSigOpCost * nBytesPerSigOp) + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;
 }
 
-int64_t GetVirtualTransactionSize( CTransaction& tx, int64_t nSigOpCost)
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost)
 {
     return GetVirtualTransactionSize(GetTransactionWeight(tx), nSigOpCost);
 }

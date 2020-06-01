@@ -29,10 +29,10 @@ class SCOPED_LOCKABLE MutexLock {
   ~MutexLock() UNLOCK_FUNCTION() { this->mu_->Unlock(); }
 
  private:
-  port::Mutex * mu_;
+  port::Mutex *const mu_;
   // No copying allowed
-  MutexLock( MutexLock&);
-  void operator=( MutexLock&);
+  MutexLock(const MutexLock&);
+  void operator=(const MutexLock&);
 };
 
 }  // namespace leveldb

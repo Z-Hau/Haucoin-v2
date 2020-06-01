@@ -328,15 +328,15 @@ void test_cache_generations()
         }
     };
 
-     uint32_t BLOCK_SIZE = 1000;
+    const uint32_t BLOCK_SIZE = 1000;
     // We expect window size 60 to perform reasonably given that each epoch
     // stores 45% of the cache size (~472k).
-     uint32_t WINDOW_SIZE = 60;
-     uint32_t POP_AMOUNT = (BLOCK_SIZE / WINDOW_SIZE) / 2;
-     double load = 10;
-     size_t megabytes = 4;
-     size_t bytes = megabytes * (1 << 20);
-     uint32_t n_insert = static_cast<uint32_t>(load * (bytes / sizeof(uint256)));
+    const uint32_t WINDOW_SIZE = 60;
+    const uint32_t POP_AMOUNT = (BLOCK_SIZE / WINDOW_SIZE) / 2;
+    const double load = 10;
+    const size_t megabytes = 4;
+    const size_t bytes = megabytes * (1 << 20);
+    const uint32_t n_insert = static_cast<uint32_t>(load * (bytes / sizeof(uint256)));
 
     std::vector<block_activity> hashes;
     Cache set{};

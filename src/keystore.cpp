@@ -7,11 +7,11 @@
 
 #include <util.h>
 
-bool CKeyStore::AddKey( CKey &key) {
+bool CKeyStore::AddKey(const CKey &key) {
     return AddKeyPubKey(key, key.GetPubKey());
 }
 
-void CBasicKeyStore::ImplicitlyLearnRelatedKeyScripts( CPubKey& pubkey)
+void CBasicKeyStore::ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey)
 {
     AssertLockHeld(cs_KeyStore);
     CKeyID key_id = pubkey.GetID();
@@ -36,7 +36,7 @@ void CBasicKeyStore::ImplicitlyLearnRelatedKeyScripts( CPubKey& pubkey)
     }
 }
 
-bool CBasicKeyStore::GetPubKey( CKeyID &address, CPubKey &vchPubKeyOut) 
+bool CBasicKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
 {
     CKey key;
     if (!GetKey(address, key)) {
@@ -52,7 +52,7 @@ bool CBasicKeyStore::GetPubKey( CKeyID &address, CPubKey &vchPubKeyOut)
     return true;
 }
 
-bool CBasicKeyStore::AddKeyPubKey( CKey& key,  CPubKey &pubkey)
+bool CBasicKeyStore::AddKeyPubKey(const CKey& key, const CPubKey &pubkey)
 {
     LOCK(cs_KeyStore);
     mapKeys[pubkey.GetID()] = key;
@@ -60,23 +60,23 @@ bool CBasicKeyStore::AddKeyPubKey( CKey& key,  CPubKey &pubkey)
     return true;
 }
 
-bool CBasicKeyStore::HaveKey( CKeyID &address) 
+bool CBasicKeyStore::HaveKey(const CKeyID &address) const
 {
     LOCK(cs_KeyStore);
     return mapKeys.count(address) > 0;
 }
 
-std::set<CKeyID> CBasicKeyStore::GetKeys() 
+std::set<CKeyID> CBasicKeyStore::GetKeys() const
 {
     LOCK(cs_KeyStore);
     std::set<CKeyID> set_address;
-    for ( auto& mi : mapKeys) {
+    for (const auto& mi : mapKeys) {
         set_address.insert(mi.first);
     }
     return set_address;
 }
 
-bool CBasicKeyStore::GetKey( CKeyID &address, CKey &keyOut) 
+bool CBasicKeyStore::GetKey(const CKeyID &address, CKey &keyOut) const
 {
     LOCK(cs_KeyStore);
     KeyMap::const_iterator mi = mapKeys.find(address);
@@ -87,7 +87,7 @@ bool CBasicKeyStore::GetKey( CKeyID &address, CKey &keyOut)
     return false;
 }
 
-bool CBasicKeyStore::AddCScript( CScript& redeemScript)
+bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 {
     if (redeemScript.size() > MAX_SCRIPT_ELEMENT_SIZE)
         return error("CBasicKeyStore::AddCScript(): redeemScripts > %i bytes are invalid", MAX_SCRIPT_ELEMENT_SIZE);
@@ -97,23 +97,23 @@ bool CBasicKeyStore::AddCScript( CScript& redeemScript)
     return true;
 }
 
-bool CBasicKeyStore::HaveCScript( CScriptID& hash) 
+bool CBasicKeyStore::HaveCScript(const CScriptID& hash) const
 {
     LOCK(cs_KeyStore);
     return mapScripts.count(hash) > 0;
 }
 
-std::set<CScriptID> CBasicKeyStore::GetCScripts() 
+std::set<CScriptID> CBasicKeyStore::GetCScripts() const
 {
     LOCK(cs_KeyStore);
     std::set<CScriptID> set_script;
-    for ( auto& mi : mapScripts) {
+    for (const auto& mi : mapScripts) {
         set_script.insert(mi.first);
     }
     return set_script;
 }
 
-bool CBasicKeyStore::GetCScript( CScriptID &hash, CScript& redeemScriptOut) 
+bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const
 {
     LOCK(cs_KeyStore);
     ScriptMap::const_iterator mi = mapScripts.find(hash);
@@ -125,7 +125,7 @@ bool CBasicKeyStore::GetCScript( CScriptID &hash, CScript& redeemScriptOut)
     return false;
 }
 
-static bool ExtractPubKey( CScript &dest, CPubKey& pubKeyOut)
+static bool ExtractPubKey(const CScript &dest, CPubKey& pubKeyOut)
 {
     //TODO: Use Solver to extract this?
     CScript::const_iterator pc = dest.begin();
@@ -141,7 +141,7 @@ static bool ExtractPubKey( CScript &dest, CPubKey& pubKeyOut)
     return true;
 }
 
-bool CBasicKeyStore::AddWatchOnly( CScript &dest)
+bool CBasicKeyStore::AddWatchOnly(const CScript &dest)
 {
     LOCK(cs_KeyStore);
     setWatchOnly.insert(dest);
@@ -153,7 +153,7 @@ bool CBasicKeyStore::AddWatchOnly( CScript &dest)
     return true;
 }
 
-bool CBasicKeyStore::RemoveWatchOnly( CScript &dest)
+bool CBasicKeyStore::RemoveWatchOnly(const CScript &dest)
 {
     LOCK(cs_KeyStore);
     setWatchOnly.erase(dest);
@@ -166,19 +166,19 @@ bool CBasicKeyStore::RemoveWatchOnly( CScript &dest)
     return true;
 }
 
-bool CBasicKeyStore::HaveWatchOnly( CScript &dest) 
+bool CBasicKeyStore::HaveWatchOnly(const CScript &dest) const
 {
     LOCK(cs_KeyStore);
     return setWatchOnly.count(dest) > 0;
 }
 
-bool CBasicKeyStore::HaveWatchOnly() 
+bool CBasicKeyStore::HaveWatchOnly() const
 {
     LOCK(cs_KeyStore);
     return (!setWatchOnly.empty());
 }
 
-CKeyID GetKeyForDestination( CKeyStore& store,  CTxDestination& dest)
+CKeyID GetKeyForDestination(const CKeyStore& store, const CTxDestination& dest)
 {
     // Only supports destinations which map to single public keys, i.e. P2PKH,
     // P2WPKH, and P2SH-P2WPKH.

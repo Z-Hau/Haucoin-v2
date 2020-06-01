@@ -14,33 +14,33 @@ class PlatformStyle
 {
 public:
     /** Get style associated with provided platform name, or 0 if not known */
-    static  PlatformStyle *instantiate( QString &platformId);
+    static const PlatformStyle *instantiate(const QString &platformId);
 
-     QString &getName()  { return name; }
+    const QString &getName() const { return name; }
 
-    bool getImagesOnButtons()  { return imagesOnButtons; }
-    bool getUseExtraSpacing()  { return useExtraSpacing; }
+    bool getImagesOnButtons() const { return imagesOnButtons; }
+    bool getUseExtraSpacing() const { return useExtraSpacing; }
 
-    QColor TextColor()  { return textColor; }
-    QColor SingleColor()  { return singleColor; }
+    QColor TextColor() const { return textColor; }
+    QColor SingleColor() const { return singleColor; }
 
     /** Colorize an image (given filename) with the icon color */
-    QImage SingleColorImage( QString& filename) ;
+    QImage SingleColorImage(const QString& filename) const;
 
     /** Colorize an icon (given filename) with the icon color */
-    QIcon SingleColorIcon( QString& filename) ;
+    QIcon SingleColorIcon(const QString& filename) const;
 
     /** Colorize an icon (given object) with the icon color */
-    QIcon SingleColorIcon( QIcon& icon) ;
+    QIcon SingleColorIcon(const QIcon& icon) const;
 
     /** Colorize an icon (given filename) with the text color */
-    QIcon TextColorIcon( QString& filename) ;
+    QIcon TextColorIcon(const QString& filename) const;
 
     /** Colorize an icon (given object) with the text color */
-    QIcon TextColorIcon( QIcon& icon) ;
+    QIcon TextColorIcon(const QIcon& icon) const;
 
 private:
-    PlatformStyle( QString &name, bool imagesOnButtons, bool colorizeIcons, bool useExtraSpacing);
+    PlatformStyle(const QString &name, bool imagesOnButtons, bool colorizeIcons, bool useExtraSpacing);
 
     QString name;
     bool imagesOnButtons;

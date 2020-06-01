@@ -27,42 +27,42 @@
  * Encode a byte sequence as a base58-encoded string.
  * pbegin and pend cannot be nullptr, unless both are.
  */
-std::string EncodeBase58( unsigned char* pbegin,  unsigned char* pend);
+std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend);
 
 /**
  * Encode a byte vector as a base58-encoded string
  */
-std::string EncodeBase58( std::vector<unsigned char>& vch);
+std::string EncodeBase58(const std::vector<unsigned char>& vch);
 
 /**
  * Decode a base58-encoded string (psz) into a byte vector (vchRet).
  * return true if decoding is successful.
  * psz cannot be nullptr.
  */
-bool DecodeBase58( char* psz, std::vector<unsigned char>& vchRet);
+bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet);
 
 /**
  * Decode a base58-encoded string (str) into a byte vector (vchRet).
  * return true if decoding is successful.
  */
-bool DecodeBase58( std::string& str, std::vector<unsigned char>& vchRet);
+bool DecodeBase58(const std::string& str, std::vector<unsigned char>& vchRet);
 
 /**
  * Encode a byte vector into a base58-encoded string, including checksum
  */
-std::string EncodeBase58Check( std::vector<unsigned char>& vchIn);
+std::string EncodeBase58Check(const std::vector<unsigned char>& vchIn);
 
 /**
  * Decode a base58-encoded string (psz) that includes a checksum into a byte
  * vector (vchRet), return true if decoding is successful
  */
-inline bool DecodeBase58Check( char* psz, std::vector<unsigned char>& vchRet);
+inline bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRet);
 
 /**
  * Decode a base58-encoded string (str) that includes a checksum into a byte
  * vector (vchRet), return true if decoding is successful
  */
-inline bool DecodeBase58Check( std::string& str, std::vector<unsigned char>& vchRet);
+inline bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRet);
 
 /**
  * Base class for all base58-encoded data
@@ -78,20 +78,20 @@ protected:
     vector_uchar vchData;
 
     CBase58Data();
-    void SetData( std::vector<unsigned char> &vchVersionIn,  void* pdata, size_t nSize);
-    void SetData( std::vector<unsigned char> &vchVersionIn,  unsigned char *pbegin,  unsigned char *pend);
+    void SetData(const std::vector<unsigned char> &vchVersionIn, const void* pdata, size_t nSize);
+    void SetData(const std::vector<unsigned char> &vchVersionIn, const unsigned char *pbegin, const unsigned char *pend);
 
 public:
-    bool SetString( char* psz, unsigned int nVersionBytes = 1);
-    bool SetString( std::string& str);
-    std::string ToString() ;
-    int CompareTo( CBase58Data& b58) ;
+    bool SetString(const char* psz, unsigned int nVersionBytes = 1);
+    bool SetString(const std::string& str);
+    std::string ToString() const;
+    int CompareTo(const CBase58Data& b58) const;
 
-    bool operator==( CBase58Data& b58)  { return CompareTo(b58) == 0; }
-    bool operator<=( CBase58Data& b58)  { return CompareTo(b58) <= 0; }
-    bool operator>=( CBase58Data& b58)  { return CompareTo(b58) >= 0; }
-    bool operator< ( CBase58Data& b58)  { return CompareTo(b58) <  0; }
-    bool operator> ( CBase58Data& b58)  { return CompareTo(b58) >  0; }
+    bool operator==(const CBase58Data& b58) const { return CompareTo(b58) == 0; }
+    bool operator<=(const CBase58Data& b58) const { return CompareTo(b58) <= 0; }
+    bool operator>=(const CBase58Data& b58) const { return CompareTo(b58) >= 0; }
+    bool operator< (const CBase58Data& b58) const { return CompareTo(b58) <  0; }
+    bool operator> (const CBase58Data& b58) const { return CompareTo(b58) >  0; }
 };
 
 /**
@@ -100,20 +100,20 @@ public:
 class CBitcoinSecret : public CBase58Data
 {
 public:
-    void SetKey( CKey& vchSecret);
+    void SetKey(const CKey& vchSecret);
     CKey GetKey();
-    bool IsValid() ;
-    bool SetString( char* pszSecret);
-    bool SetString( std::string& strSecret);
+    bool IsValid() const;
+    bool SetString(const char* pszSecret);
+    bool SetString(const std::string& strSecret);
 
-    CBitcoinSecret( CKey& vchSecret) { SetKey(vchSecret); }
+    CBitcoinSecret(const CKey& vchSecret) { SetKey(vchSecret); }
     CBitcoinSecret() {}
 };
 
 template<typename K, int Size, CChainParams::Base58Type Type> class CBitcoinExtKeyBase : public CBase58Data
 {
 public:
-    void SetKey( K &key) {
+    void SetKey(const K &key) {
         unsigned char vch[Size];
         key.Encode(vch);
         SetData(Params().Base58Prefix(Type), vch, vch+Size);
@@ -128,11 +128,11 @@ public:
         return ret;
     }
 
-    CBitcoinExtKeyBase( K &key) {
+    CBitcoinExtKeyBase(const K &key) {
         SetKey(key);
     }
 
-    CBitcoinExtKeyBase( std::string& strBase58c) {
+    CBitcoinExtKeyBase(const std::string& strBase58c) {
         SetString(strBase58c.c_str(), Params().Base58Prefix(Type).size());
     }
 
@@ -142,9 +142,9 @@ public:
 typedef CBitcoinExtKeyBase<CExtKey, BIP32_EXTKEY_SIZE, CChainParams::EXT_SECRET_KEY> CBitcoinExtKey;
 typedef CBitcoinExtKeyBase<CExtPubKey, BIP32_EXTKEY_SIZE, CChainParams::EXT_PUBLIC_KEY> CBitcoinExtPubKey;
 
-std::string EncodeDestination( CTxDestination& dest);
-CTxDestination DecodeDestination( std::string& str);
-bool IsValidDestinationString( std::string& str);
-bool IsValidDestinationString( std::string& str,  CChainParams& params);
+std::string EncodeDestination(const CTxDestination& dest);
+CTxDestination DecodeDestination(const std::string& str);
+bool IsValidDestinationString(const std::string& str);
+bool IsValidDestinationString(const std::string& str, const CChainParams& params);
 
 #endif // BITCOIN_BASE58_H

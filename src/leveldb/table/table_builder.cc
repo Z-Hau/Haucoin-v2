@@ -44,7 +44,7 @@ struct TableBuilder::Rep {
 
   std::string compressed_output;
 
-  Rep( Options& opt, WritableFile* f)
+  Rep(const Options& opt, WritableFile* f)
       : options(opt),
         index_block_options(opt),
         file(f),
@@ -60,7 +60,7 @@ struct TableBuilder::Rep {
   }
 };
 
-TableBuilder::TableBuilder( Options& options, WritableFile* file)
+TableBuilder::TableBuilder(const Options& options, WritableFile* file)
     : rep_(new Rep(options, file)) {
   if (rep_->filter_block != NULL) {
     rep_->filter_block->StartBlock(0);
@@ -73,7 +73,7 @@ TableBuilder::~TableBuilder() {
   delete rep_;
 }
 
-Status TableBuilder::ChangeOptions( Options& options) {
+Status TableBuilder::ChangeOptions(const Options& options) {
   // Note: if more fields are added to Options, update
   // this function to catch changes that should not be allowed to
   // change in the middle of building a Table.
@@ -89,7 +89,7 @@ Status TableBuilder::ChangeOptions( Options& options) {
   return Status::OK();
 }
 
-void TableBuilder::Add( Slice& key,  Slice& value) {
+void TableBuilder::Add(const Slice& key, const Slice& value) {
   Rep* r = rep_;
   assert(!r->closed);
   if (!ok()) return;
@@ -114,7 +114,7 @@ void TableBuilder::Add( Slice& key,  Slice& value) {
   r->num_entries++;
   r->data_block.Add(key, value);
 
-   size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
+  const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
   if (estimated_block_size >= r->options.block_size) {
     Flush();
   }
@@ -172,7 +172,7 @@ void TableBuilder::WriteBlock(BlockBuilder* block, BlockHandle* handle) {
   block->Reset();
 }
 
-void TableBuilder::WriteRawBlock( Slice& block_contents,
+void TableBuilder::WriteRawBlock(const Slice& block_contents,
                                  CompressionType type,
                                  BlockHandle* handle) {
   Rep* r = rep_;
@@ -192,7 +192,7 @@ void TableBuilder::WriteRawBlock( Slice& block_contents,
   }
 }
 
-Status TableBuilder::status()  {
+Status TableBuilder::status() const {
   return rep_->status;
 }
 
@@ -259,11 +259,11 @@ void TableBuilder::Abandon() {
   r->closed = true;
 }
 
-uint64_t TableBuilder::NumEntries()  {
+uint64_t TableBuilder::NumEntries() const {
   return rep_->num_entries;
 }
 
-uint64_t TableBuilder::FileSize()  {
+uint64_t TableBuilder::FileSize() const {
   return rep_->offset;
 }
 

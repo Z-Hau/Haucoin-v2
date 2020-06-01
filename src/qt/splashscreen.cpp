@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <QRadialGradient>
 
-SplashScreen::SplashScreen(Qt::WindowFlags f,  NetworkStyle *networkStyle) :
+SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) :
     QWidget(0, f), curAlignment(0)
 {
     // set reference point, paddings
@@ -71,7 +71,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f,  NetworkStyle *networkStyle) :
     // draw the bitcoin icon, expected size of PNG: 1024x1024
     QRect rectIcon(QPoint(-150,-122), QSize(430,430));
 
-     QSize requiredSize(1024,1024);
+    const QSize requiredSize(1024,1024);
     QPixmap icon(networkStyle->getAppIcon().pixmap(requiredSize));
 
     pixPaint.drawPixmap(rectIcon, icon);
@@ -103,8 +103,8 @@ SplashScreen::SplashScreen(Qt::WindowFlags f,  NetworkStyle *networkStyle) :
     // draw copyright stuff
     {
         pixPaint.setFont(QFont(font, 10*fontFactor));
-         int x = pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight;
-         int y = paddingTop+titleCopyrightVSpace;
+        const int x = pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight;
+        const int y = paddingTop+titleCopyrightVSpace;
         QRect copyrightRect(x, y, pixmap.width() - x - paddingRight, pixmap.height() - y);
         pixPaint.drawText(copyrightRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, copyrightText);
     }
@@ -161,7 +161,7 @@ void SplashScreen::slotFinish(QWidget *mainWin)
     deleteLater(); // No more need for this
 }
 
-static void InitMessage(SplashScreen *splash,  std::string &message)
+static void InitMessage(SplashScreen *splash, const std::string &message)
 {
     QMetaObject::invokeMethod(splash, "showMessage",
         Qt::QueuedConnection,
@@ -170,7 +170,7 @@ static void InitMessage(SplashScreen *splash,  std::string &message)
         Q_ARG(QColor, QColor(55,55,55)));
 }
 
-static void ShowProgress(SplashScreen *splash,  std::string &title, int nProgress, bool resume_possible)
+static void ShowProgress(SplashScreen *splash, const std::string &title, int nProgress, bool resume_possible)
 {
     InitMessage(splash, title + std::string("\n") +
             (resume_possible ? _("(press q to shutdown and continue later)")
@@ -202,13 +202,13 @@ void SplashScreen::unsubscribeFromCoreSignals()
     uiInterface.InitMessage.disconnect(boost::bind(InitMessage, this, _1));
     uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, _3));
 #ifdef ENABLE_WALLET
-    for (CWallet*  & pwallet : connectedWallets) {
+    for (CWallet* const & pwallet : connectedWallets) {
         pwallet->ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, false));
     }
 #endif
 }
 
-void SplashScreen::showMessage( QString &message, int alignment,  QColor &color)
+void SplashScreen::showMessage(const QString &message, int alignment, const QColor &color)
 {
     curMessage = message;
     curAlignment = alignment;

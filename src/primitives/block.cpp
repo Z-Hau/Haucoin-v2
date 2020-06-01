@@ -10,12 +10,12 @@
 #include <utilstrencodings.h>
 #include <crypto/common.h>
 
-uint256 CBlockHeader::GetHash() 
+uint256 CBlockHeader::GetHash() const
 {
     return SerializeHash(*this);
 }
 
-std::string CBlock::ToString() 
+std::string CBlock::ToString() const
 {
     std::stringstream s;
     s << strprintf("CBlock(hash=%s, ver=0x%08x, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
@@ -25,7 +25,7 @@ std::string CBlock::ToString()
         hashMerkleRoot.ToString(),
         nTime, nBits, nNonce,
         vtx.size());
-    for ( auto& tx : vtx) {
+    for (const auto& tx : vtx) {
         s << "  " << tx->ToString() << "\n";
     }
     return s.str();

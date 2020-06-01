@@ -26,7 +26,7 @@ class Reader {
 
     // Some corruption was detected.  "size" is the approximate number
     // of bytes dropped due to the corruption.
-    virtual void Corruption(size_t bytes,  Status& status) = 0;
+    virtual void Corruption(size_t bytes, const Status& status) = 0;
   };
 
   // Create a reader that will return log records from "*file".
@@ -58,10 +58,10 @@ class Reader {
   uint64_t LastRecordOffset();
 
  private:
-  SequentialFile*  file_;
-  Reporter*  reporter_;
-  bool  checksum_;
-  char*  backing_store_;
+  SequentialFile* const file_;
+  Reporter* const reporter_;
+  bool const checksum_;
+  char* const backing_store_;
   Slice buffer_;
   bool eof_;   // Last Read() indicated EOF by returning < kBlockSize
 
@@ -71,7 +71,7 @@ class Reader {
   uint64_t end_of_buffer_offset_;
 
   // Offset at which to start looking for the first record to return
-  uint64_t  initial_offset_;
+  uint64_t const initial_offset_;
 
   // True if we are resynchronizing after a seek (initial_offset_ > 0). In
   // particular, a run of kMiddleType and kLastType records can be silently
@@ -99,12 +99,12 @@ class Reader {
 
   // Reports dropped bytes to the reporter.
   // buffer_ must be updated to remove the dropped bytes prior to invocation.
-  void ReportCorruption(uint64_t bytes,  char* reason);
-  void ReportDrop(uint64_t bytes,  Status& reason);
+  void ReportCorruption(uint64_t bytes, const char* reason);
+  void ReportDrop(uint64_t bytes, const Status& reason);
 
   // No copying allowed
-  Reader( Reader&);
-  void operator=( Reader&);
+  Reader(const Reader&);
+  void operator=(const Reader&);
 };
 
 }  // namespace log

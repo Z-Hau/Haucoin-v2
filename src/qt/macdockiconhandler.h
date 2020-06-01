@@ -24,7 +24,7 @@ public:
     ~MacDockIconHandler();
 
     QMenu *dockMenu();
-    void setIcon( QIcon &icon);
+    void setIcon(const QIcon &icon);
     void setMainWindow(QMainWindow *window);
     static MacDockIconHandler *instance();
     static void cleanup();

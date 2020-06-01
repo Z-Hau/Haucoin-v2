@@ -50,8 +50,8 @@ public:
     Arena(void *base, size_t size, size_t alignment);
     virtual ~Arena();
 
-    Arena( Arena& other) = delete; // non construction-copyable
-    Arena& operator=( Arena&) = delete; // non copyable
+    Arena(const Arena& other) = delete; // non construction-copyable
+    Arena& operator=(const Arena&) = delete; // non copyable
 
     /** Memory statistics. */
     struct Stats
@@ -76,17 +76,17 @@ public:
     void free(void *ptr);
 
     /** Get arena usage statistics */
-    Stats stats() ;
+    Stats stats() const;
 
 #ifdef ARENA_DEBUG
-    void walk() ;
+    void walk() const;
 #endif
 
     /** Return whether a pointer points inside this arena.
      * This returns base <= ptr < (base+size) so only use it for (inclusive)
      * chunk starting addresses.
      */
-    bool addressInArena(void *ptr)  { return ptr >= base && ptr < end; }
+    bool addressInArena(void *ptr) const { return ptr >= base && ptr < end; }
 private:
     /** Map of chunk address to chunk information. This class makes use of the
      * sorted order to merge previous and next chunks during deallocation.
@@ -122,11 +122,11 @@ public:
      * allocation and deallocation overhead. Setting it too high allocates
      * more locked memory from the OS than strictly necessary.
      */
-    static  size_t ARENA_SIZE = 256*1024;
+    static const size_t ARENA_SIZE = 256*1024;
     /** Chunk alignment. Another compromise. Setting this too high will waste
      * memory, setting it too low will facilitate fragmentation.
      */
-    static  size_t ARENA_ALIGN = 16;
+    static const size_t ARENA_ALIGN = 16;
 
     /** Callback when allocation succeeds but locking fails.
      */
@@ -153,8 +153,8 @@ public:
     explicit LockedPool(std::unique_ptr<LockedPageAllocator> allocator, LockingFailed_Callback lf_cb_in = nullptr);
     ~LockedPool();
 
-    LockedPool( LockedPool& other) = delete; // non construction-copyable
-    LockedPool& operator=( LockedPool&) = delete; // non copyable
+    LockedPool(const LockedPool& other) = delete; // non construction-copyable
+    LockedPool& operator=(const LockedPool&) = delete; // non copyable
 
     /** Allocate size bytes from this arena.
      * Returns pointer on success, or 0 if memory is full or
@@ -169,7 +169,7 @@ public:
     void free(void *ptr);
 
     /** Get pool usage statistics */
-    Stats stats() ;
+    Stats stats() const;
 private:
     std::unique_ptr<LockedPageAllocator> allocator;
 

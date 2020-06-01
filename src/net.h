@@ -42,50 +42,50 @@ namespace boost {
 } // namespace boost
 
 /** Time between pings automatically sent out for latency probing and keepalive (in seconds). */
-static  int PING_INTERVAL = 2 * 60;
+static const int PING_INTERVAL = 2 * 60;
 /** Time after which to disconnect, after waiting for a ping response (or inactivity). */
-static  int TIMEOUT_INTERVAL = 20 * 60;
+static const int TIMEOUT_INTERVAL = 20 * 60;
 /** Run the feeler connection loop once every 2 minutes or 120 seconds. **/
-static  int FEELER_INTERVAL = 120;
+static const int FEELER_INTERVAL = 120;
 /** The maximum number of entries in an 'inv' protocol message */
-static  unsigned int MAX_INV_SZ = 50000;
+static const unsigned int MAX_INV_SZ = 50000;
 /** The maximum number of new addresses to accumulate before announcing. */
-static  unsigned int MAX_ADDR_TO_SEND = 1000;
+static const unsigned int MAX_ADDR_TO_SEND = 1000;
 /** Maximum length of incoming protocol messages (no message over 4 MB is currently acceptable). */
-static  unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 4 * 1000 * 1000;
+static const unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 4 * 1000 * 1000;
 /** Maximum length of strSubVer in `version` message */
-static  unsigned int MAX_SUBVERSION_LENGTH = 256;
+static const unsigned int MAX_SUBVERSION_LENGTH = 256;
 /** Maximum number of automatic outgoing nodes */
-static  int MAX_OUTBOUND_CONNECTIONS = 8;
+static const int MAX_OUTBOUND_CONNECTIONS = 8;
 /** Maximum number of addnode outgoing nodes */
-static  int MAX_ADDNODE_CONNECTIONS = 8;
+static const int MAX_ADDNODE_CONNECTIONS = 8;
 /** -listen default */
-static  bool DEFAULT_LISTEN = true;
+static const bool DEFAULT_LISTEN = true;
 /** -upnp default */
 #ifdef USE_UPNP
-static  bool DEFAULT_UPNP = USE_UPNP;
+static const bool DEFAULT_UPNP = USE_UPNP;
 #else
-static  bool DEFAULT_UPNP = false;
+static const bool DEFAULT_UPNP = false;
 #endif
 /** The maximum number of entries in mapAskFor */
-static  size_t MAPASKFOR_MAX_SZ = MAX_INV_SZ;
+static const size_t MAPASKFOR_MAX_SZ = MAX_INV_SZ;
 /** The maximum number of entries in setAskFor (larger due to getdata latency)*/
-static  size_t SETASKFOR_MAX_SZ = 2 * MAX_INV_SZ;
+static const size_t SETASKFOR_MAX_SZ = 2 * MAX_INV_SZ;
 /** The maximum number of peer connections to maintain. */
-static  unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 125;
+static const unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 125;
 /** The default for -maxuploadtarget. 0 = Unlimited */
-static  uint64_t DEFAULT_MAX_UPLOAD_TARGET = 0;
+static const uint64_t DEFAULT_MAX_UPLOAD_TARGET = 0;
 /** The default timeframe for -maxuploadtarget. 1 day. */
-static  uint64_t MAX_UPLOAD_TIMEFRAME = 60 * 60 * 24;
+static const uint64_t MAX_UPLOAD_TIMEFRAME = 60 * 60 * 24;
 /** Default for blocks only*/
-static  bool DEFAULT_BLOCKSONLY = false;
+static const bool DEFAULT_BLOCKSONLY = false;
 
-static  bool DEFAULT_FORCEDNSSEED = false;
-static  size_t DEFAULT_MAXRECEIVEBUFFER = 5 * 1000;
-static  size_t DEFAULT_MAXSENDBUFFER    = 1 * 1000;
+static const bool DEFAULT_FORCEDNSSEED = false;
+static const size_t DEFAULT_MAXRECEIVEBUFFER = 5 * 1000;
+static const size_t DEFAULT_MAXSENDBUFFER    = 1 * 1000;
 
 // NOTE: When adjusting this, update rpcnet:setban's help ("24h")
-static  unsigned int DEFAULT_MISBEHAVING_BANTIME = 60 * 60 * 24;  // Default 24-hour ban
+static const unsigned int DEFAULT_MISBEHAVING_BANTIME = 60 * 60 * 24;  // Default 24-hour ban
 
 typedef int64_t NodeId;
 
@@ -106,8 +106,8 @@ struct CSerializedNetMsg
     CSerializedNetMsg(CSerializedNetMsg&&) = default;
     CSerializedNetMsg& operator=(CSerializedNetMsg&&) = default;
     // No copying, only moves.
-    CSerializedNetMsg( CSerializedNetMsg& msg) = delete;
-    CSerializedNetMsg& operator=( CSerializedNetMsg&) = delete;
+    CSerializedNetMsg(const CSerializedNetMsg& msg) = delete;
+    CSerializedNetMsg& operator=(const CSerializedNetMsg&) = delete;
 
     std::vector<unsigned char> data;
     std::string command;
@@ -147,7 +147,7 @@ public:
         std::vector<std::string> m_added_nodes;
     };
 
-    void Init( Options& connOptions) {
+    void Init(const Options& connOptions) {
         nLocalServices = connOptions.nLocalServices;
         nMaxConnections = connOptions.nMaxConnections;
         nMaxOutbound = std::min(connOptions.nMaxOutbound, connOptions.nMaxConnections);
@@ -172,12 +172,12 @@ public:
 
     CConnman(uint64_t seed0, uint64_t seed1);
     ~CConnman();
-    bool Start(CScheduler& scheduler,  Options& options);
+    bool Start(CScheduler& scheduler, const Options& options);
     void Stop();
     void Interrupt();
-    bool GetNetworkActive()  { return fNetworkActive; };
+    bool GetNetworkActive() const { return fNetworkActive; };
     void SetNetworkActive(bool active);
-    void OpenNetworkConnection( CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr,  char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false);
+    void OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr, const char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false);
     bool CheckIncomingNonce(uint64_t nonce);
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
@@ -195,7 +195,7 @@ public:
     };
 
     template<typename Callable>
-    void ForEachNode(Callable&& func) 
+    void ForEachNode(Callable&& func) const
     {
         LOCK(cs_vNodes);
         for (auto&& node : vNodes) {
@@ -216,7 +216,7 @@ public:
     };
 
     template<typename Callable, typename CallableAfter>
-    void ForEachNodeThen(Callable&& pre, CallableAfter&& post) 
+    void ForEachNodeThen(Callable&& pre, CallableAfter&& post) const
     {
         LOCK(cs_vNodes);
         for (auto&& node : vNodes) {
@@ -227,10 +227,10 @@ public:
     };
 
     // Addrman functions
-    size_t GetAddressCount() ;
-    void SetServices( CService &addr, ServiceFlags nServices);
-    void MarkAddressGood( CAddress& addr);
-    void AddNewAddresses( std::vector<CAddress>& vAddr,  CAddress& addrFrom, int64_t nTimePenalty = 0);
+    size_t GetAddressCount() const;
+    void SetServices(const CService &addr, ServiceFlags nServices);
+    void MarkAddressGood(const CAddress& addr);
+    void AddNewAddresses(const std::vector<CAddress>& vAddr, const CAddress& addrFrom, int64_t nTimePenalty = 0);
     std::vector<CAddress> GetAddresses();
 
     // Denial-of-service detection/prevention
@@ -247,15 +247,15 @@ public:
     // dangerous, because it can cause a network split
     // between nodes running old code and nodes running
     // new code.
-    void Ban( CNetAddr& netAddr,  BanReason& reason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
-    void Ban( CSubNet& subNet,  BanReason& reason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
+    void Ban(const CNetAddr& netAddr, const BanReason& reason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
+    void Ban(const CSubNet& subNet, const BanReason& reason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
     void ClearBanned(); // needed for unit testing
     bool IsBanned(CNetAddr ip);
     bool IsBanned(CSubNet subnet);
-    bool Unban( CNetAddr &ip);
-    bool Unban( CSubNet &ip);
+    bool Unban(const CNetAddr &ip);
+    bool Unban(const CSubNet &ip);
     void GetBanned(banmap_t &banmap);
-    void SetBanned( banmap_t &banmap);
+    void SetBanned(const banmap_t &banmap);
 
     // This allows temporarily exceeding nMaxOutbound, with the goal of finding
     // a peer that is better than all our current peers.
@@ -270,16 +270,16 @@ public:
     // not yet fully disconnected.
     int GetExtraOutboundCount();
 
-    bool AddNode( std::string& node);
-    bool RemoveAddedNode( std::string& node);
+    bool AddNode(const std::string& node);
+    bool RemoveAddedNode(const std::string& node);
     std::vector<AddedNodeInfo> GetAddedNodeInfo();
 
     size_t GetNodeCount(NumConnections num);
     void GetNodeStats(std::vector<CNodeStats>& vstats);
-    bool DisconnectNode( std::string& node);
+    bool DisconnectNode(const std::string& node);
     bool DisconnectNode(NodeId id);
 
-    ServiceFlags GetLocalServices() ;
+    ServiceFlags GetLocalServices() const;
 
     //!set the max outbound target in bytes
     void SetMaxOutboundTarget(uint64_t limit);
@@ -306,12 +306,12 @@ public:
     uint64_t GetTotalBytesSent();
 
     void SetBestHeight(int height);
-    int GetBestHeight() ;
+    int GetBestHeight() const;
 
     /** Get a unique deterministic randomizer. */
-    CSipHasher GetDeterministicRandomizer(uint64_t id) ;
+    CSipHasher GetDeterministicRandomizer(uint64_t id) const;
 
-    unsigned int GetReceiveFloodSize() ;
+    unsigned int GetReceiveFloodSize() const;
 
     void WakeMessageHandler();
 private:
@@ -322,34 +322,34 @@ private:
         ListenSocket(SOCKET socket_, bool whitelisted_) : socket(socket_), whitelisted(whitelisted_) {}
     };
 
-    bool BindListenPort( CService &bindAddr, std::string& strError, bool fWhitelisted = false);
-    bool Bind( CService &addr, unsigned int flags);
-    bool InitBinds( std::vector<CService>& binds,  std::vector<CService>& whiteBinds);
+    bool BindListenPort(const CService &bindAddr, std::string& strError, bool fWhitelisted = false);
+    bool Bind(const CService &addr, unsigned int flags);
+    bool InitBinds(const std::vector<CService>& binds, const std::vector<CService>& whiteBinds);
     void ThreadOpenAddedConnections();
-    void AddOneShot( std::string& strDest);
+    void AddOneShot(const std::string& strDest);
     void ProcessOneShot();
     void ThreadOpenConnections(std::vector<std::string> connect);
     void ThreadMessageHandler();
-    void AcceptConnection( ListenSocket& hListenSocket);
+    void AcceptConnection(const ListenSocket& hListenSocket);
     void ThreadSocketHandler();
     void ThreadDNSAddressSeed();
 
-    uint64_t CalculateKeyedNetGroup( CAddress& ad) ;
+    uint64_t CalculateKeyedNetGroup(const CAddress& ad) const;
 
-    CNode* FindNode( CNetAddr& ip);
-    CNode* FindNode( CSubNet& subNet);
-    CNode* FindNode( std::string& addrName);
-    CNode* FindNode( CService& addr);
+    CNode* FindNode(const CNetAddr& ip);
+    CNode* FindNode(const CSubNet& subNet);
+    CNode* FindNode(const std::string& addrName);
+    CNode* FindNode(const CService& addr);
 
     bool AttemptToEvictConnection();
-    CNode* ConnectNode(CAddress addrConnect,  char *pszDest, bool fCountFailure);
-    bool IsWhitelistedRange( CNetAddr &addr);
+    CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure);
+    bool IsWhitelistedRange(const CNetAddr &addr);
 
     void DeleteNode(CNode* pnode);
 
     NodeId GetNewNodeId();
 
-    size_t SocketSendData(CNode *pnode) ;
+    size_t SocketSendData(CNode *pnode) const;
     //!check is the banlist has unwritten changes
     bool BannedSetIsDirty();
     //!set the "dirty" flag for the banlist
@@ -365,7 +365,7 @@ private:
     void RecordBytesSent(uint64_t bytes);
 
     // Whether the node should be passed out in ForEach* callbacks
-    static bool NodeFullyConnected( CNode* pnode);
+    static bool NodeFullyConnected(const CNode* pnode);
 
     // Network usage totals
     CCriticalSection cs_totalBytesRecv;
@@ -416,7 +416,7 @@ private:
     NetEventsInterface* m_msgproc;
 
     /** SipHasher seeds for deterministic randomness */
-     uint64_t nSeed0, nSeed1;
+    const uint64_t nSeed0, nSeed1;
 
     /** flag for waking the message processor. */
     bool fMsgProcWake;
@@ -444,14 +444,14 @@ extern std::unique_ptr<CConnman> g_connman;
 void Discover(boost::thread_group& threadGroup);
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
-bool BindListenPort( CService &bindAddr, std::string& strError, bool fWhitelisted = false);
+bool BindListenPort(const CService &bindAddr, std::string& strError, bool fWhitelisted = false);
 
 struct CombinerAll
 {
     typedef bool result_type;
 
     template<typename I>
-    bool operator()(I first, I last) 
+    bool operator()(I first, I last) const
     {
         while (first != last) {
             if (!(*first)) return false;
@@ -488,16 +488,16 @@ bool IsPeerAddrLocalGood(CNode *pnode);
 void AdvertiseLocal(CNode *pnode);
 void SetLimited(enum Network net, bool fLimited = true);
 bool IsLimited(enum Network net);
-bool IsLimited( CNetAddr& addr);
-bool AddLocal( CService& addr, int nScore = LOCAL_NONE);
-bool AddLocal( CNetAddr& addr, int nScore = LOCAL_NONE);
-bool RemoveLocal( CService& addr);
-bool SeenLocal( CService& addr);
-bool IsLocal( CService& addr);
-bool GetLocal(CService &addr,  CNetAddr *paddrPeer = nullptr);
+bool IsLimited(const CNetAddr& addr);
+bool AddLocal(const CService& addr, int nScore = LOCAL_NONE);
+bool AddLocal(const CNetAddr& addr, int nScore = LOCAL_NONE);
+bool RemoveLocal(const CService& addr);
+bool SeenLocal(const CService& addr);
+bool IsLocal(const CService& addr);
+bool GetLocal(CService &addr, const CNetAddr *paddrPeer = nullptr);
 bool IsReachable(enum Network net);
-bool IsReachable( CNetAddr &addr);
-CAddress GetLocalAddress( CNetAddr *paddrPeer, ServiceFlags nLocalServices);
+bool IsReachable(const CNetAddr &addr);
+CAddress GetLocalAddress(const CNetAddr *paddrPeer, ServiceFlags nLocalServices);
 
 
 extern bool fDiscover;
@@ -569,7 +569,7 @@ public:
 
     int64_t nTime;                  // time (in microseconds) of message receipt.
 
-    CNetMessage( CMessageHeader::MessageStartChars& pchMessageStartIn, int nTypeIn, int nVersionIn) : hdrbuf(nTypeIn, nVersionIn), hdr(pchMessageStartIn), vRecv(nTypeIn, nVersionIn) {
+    CNetMessage(const CMessageHeader::MessageStartChars& pchMessageStartIn, int nTypeIn, int nVersionIn) : hdrbuf(nTypeIn, nVersionIn), hdr(pchMessageStartIn), vRecv(nTypeIn, nVersionIn) {
         hdrbuf.resize(24);
         in_data = false;
         nHdrPos = 0;
@@ -577,14 +577,14 @@ public:
         nTime = 0;
     }
 
-    bool complete() 
+    bool complete() const
     {
         if (!in_data)
             return false;
         return (hdr.nMessageSize == nDataPos);
     }
 
-     uint256& GetMessageHash() ;
+    const uint256& GetMessageHash() const;
 
     void SetVersion(int nVersionIn)
     {
@@ -592,8 +592,8 @@ public:
         vRecv.SetVersion(nVersionIn);
     }
 
-    int readHeader( char *pch, unsigned int nBytes);
-    int readData( char *pch, unsigned int nBytes);
+    int readHeader(const char *pch, unsigned int nBytes);
+    int readData(const char *pch, unsigned int nBytes);
 };
 
 
@@ -625,12 +625,12 @@ public:
 
     std::atomic<int64_t> nLastSend;
     std::atomic<int64_t> nLastRecv;
-     int64_t nTimeConnected;
+    const int64_t nTimeConnected;
     std::atomic<int64_t> nTimeOffset;
     // Address of this peer
-     CAddress addr;
+    const CAddress addr;
     // Bind address of our side of the connection
-     CAddress addrBind;
+    const CAddress addrBind;
     std::atomic<int> nVersion;
     // strSubVer is whatever byte array we read from the wire. However, this field is intended
     // to be printed out, displayed to humans in various forms and so on. So we sanitize it and
@@ -643,7 +643,7 @@ public:
     bool fOneShot;
     bool m_manual_connection;
     bool fClient;
-     bool fInbound;
+    const bool fInbound;
     std::atomic_bool fSuccessfullyConnected;
     std::atomic_bool fDisconnect;
     // We use fRelayTxes for two purposes -
@@ -657,7 +657,7 @@ public:
     std::unique_ptr<CBloomFilter> pfilter;
     std::atomic<int> nRefCount;
 
-     uint64_t nKeyedNetGroup;
+    const uint64_t nKeyedNetGroup;
     std::atomic_bool fPauseRecv;
     std::atomic_bool fPauseSend;
 protected:
@@ -720,17 +720,17 @@ public:
     CAmount lastSentFeeFilter;
     int64_t nextSendTimeFeeFilter;
 
-    CNode(NodeId id, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn, SOCKET hSocketIn,  CAddress &addrIn, uint64_t nKeyedNetGroupIn, uint64_t nLocalHostNonceIn,  CAddress &addrBindIn,  std::string &addrNameIn = "", bool fInboundIn = false);
+    CNode(NodeId id, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn, SOCKET hSocketIn, const CAddress &addrIn, uint64_t nKeyedNetGroupIn, uint64_t nLocalHostNonceIn, const CAddress &addrBindIn, const std::string &addrNameIn = "", bool fInboundIn = false);
     ~CNode();
-    CNode( CNode&) = delete;
-    CNode& operator=( CNode&) = delete;
+    CNode(const CNode&) = delete;
+    CNode& operator=(const CNode&) = delete;
 
 private:
-     NodeId id;
-     uint64_t nLocalHostNonce;
+    const NodeId id;
+    const uint64_t nLocalHostNonce;
     // Services offered to this peer
-     ServiceFlags nLocalServices;
-     int nMyStartingHeight;
+    const ServiceFlags nLocalServices;
+    const int nMyStartingHeight;
     int nSendVersion;
     std::list<CNetMessage> vRecvMsg;  // Used only by SocketHandler thread
 
@@ -742,40 +742,40 @@ private:
     mutable CCriticalSection cs_addrLocal;
 public:
 
-    NodeId GetId()  {
+    NodeId GetId() const {
         return id;
     }
 
-    uint64_t GetLocalNonce()  {
+    uint64_t GetLocalNonce() const {
         return nLocalHostNonce;
     }
 
-    int GetMyStartingHeight()  {
+    int GetMyStartingHeight() const {
         return nMyStartingHeight;
     }
 
-    int GetRefCount() 
+    int GetRefCount() const
     {
         assert(nRefCount >= 0);
         return nRefCount;
     }
 
-    bool ReceiveMsgBytes( char *pch, unsigned int nBytes, bool& complete);
+    bool ReceiveMsgBytes(const char *pch, unsigned int nBytes, bool& complete);
 
     void SetRecvVersion(int nVersionIn)
     {
         nRecvVersion = nVersionIn;
     }
-    int GetRecvVersion() 
+    int GetRecvVersion() const
     {
         return nRecvVersion;
     }
     void SetSendVersion(int nVersionIn);
-    int GetSendVersion() ;
+    int GetSendVersion() const;
 
-    CService GetAddrLocal() ;
+    CService GetAddrLocal() const;
     //! May not be called more than once
-    void SetAddrLocal( CService& addrLocalIn);
+    void SetAddrLocal(const CService& addrLocalIn);
 
     CNode* AddRef()
     {
@@ -790,12 +790,12 @@ public:
 
 
 
-    void AddAddressKnown( CAddress& _addr)
+    void AddAddressKnown(const CAddress& _addr)
     {
         addrKnown.insert(_addr.GetKey());
     }
 
-    void PushAddress( CAddress& _addr, FastRandomContext &insecure_rand)
+    void PushAddress(const CAddress& _addr, FastRandomContext &insecure_rand)
     {
         // Known checking here is only to save space from duplicates.
         // SendMessages will filter it again for knowns that were added
@@ -810,7 +810,7 @@ public:
     }
 
 
-    void AddInventoryKnown( CInv& inv)
+    void AddInventoryKnown(const CInv& inv)
     {
         {
             LOCK(cs_inventory);
@@ -818,7 +818,7 @@ public:
         }
     }
 
-    void PushInventory( CInv& inv)
+    void PushInventory(const CInv& inv)
     {
         LOCK(cs_inventory);
         if (inv.type == MSG_TX) {
@@ -830,26 +830,26 @@ public:
         }
     }
 
-    void PushBlockHash( uint256 &hash)
+    void PushBlockHash(const uint256 &hash)
     {
         LOCK(cs_inventory);
         vBlockHashesToAnnounce.push_back(hash);
     }
 
-    void AskFor( CInv& inv);
+    void AskFor(const CInv& inv);
 
     void CloseSocketDisconnect();
 
     void copyStats(CNodeStats &stats);
 
-    ServiceFlags GetLocalServices() 
+    ServiceFlags GetLocalServices() const
     {
         return nLocalServices;
     }
 
-    std::string GetAddrName() ;
+    std::string GetAddrName() const;
     //! Sets the addrName only if it was not previously set
-    void MaybeSetAddrName( std::string& addrNameIn);
+    void MaybeSetAddrName(const std::string& addrNameIn);
 };
 
 

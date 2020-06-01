@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-CHMAC_SHA256::CHMAC_SHA256( unsigned char* key, size_t keylen)
+CHMAC_SHA256::CHMAC_SHA256(const unsigned char* key, size_t keylen)
 {
     unsigned char rkey[64];
     if (keylen <= 64) {

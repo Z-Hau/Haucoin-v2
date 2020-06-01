@@ -50,24 +50,24 @@ class SkipList {
 
   // Insert key into the list.
   // REQUIRES: nothing that compares equal to key is currently in the list.
-  void Insert( Key& key);
+  void Insert(const Key& key);
 
   // Returns true iff an entry that compares equal to key is in the list.
-  bool Contains( Key& key) ;
+  bool Contains(const Key& key) const;
 
   // Iteration over the contents of a skip list
   class Iterator {
    public:
     // Initialize an iterator over the specified list.
     // The returned iterator is not valid.
-    explicit Iterator( SkipList* list);
+    explicit Iterator(const SkipList* list);
 
     // Returns true iff the iterator is positioned at a valid node.
-    bool Valid() ;
+    bool Valid() const;
 
     // Returns the key at the current position.
     // REQUIRES: Valid()
-     Key& key() ;
+    const Key& key() const;
 
     // Advances to the next position.
     // REQUIRES: Valid()
@@ -78,7 +78,7 @@ class SkipList {
     void Prev();
 
     // Advance to the first entry with a key >= target
-    void Seek( Key& target);
+    void Seek(const Key& target);
 
     // Position at the first entry in list.
     // Final state of iterator is Valid() iff list is not empty.
@@ -89,7 +89,7 @@ class SkipList {
     void SeekToLast();
 
    private:
-     SkipList* list_;
+    const SkipList* list_;
     Node* node_;
     // Intentionally copyable
   };
@@ -98,16 +98,16 @@ class SkipList {
   enum { kMaxHeight = 12 };
 
   // Immutable after construction
-  Comparator  compare_;
-  Arena*  arena_;    // Arena used for allocations of nodes
+  Comparator const compare_;
+  Arena* const arena_;    // Arena used for allocations of nodes
 
-  Node*  head_;
+  Node* const head_;
 
   // Modified only by Insert().  Read racily by readers, but stale
   // values are ok.
   port::AtomicPointer max_height_;   // Height of the entire list
 
-  inline int GetMaxHeight()  {
+  inline int GetMaxHeight() const {
     return static_cast<int>(
         reinterpret_cast<intptr_t>(max_height_.NoBarrier_Load()));
   }
@@ -115,39 +115,39 @@ class SkipList {
   // Read/written only by Insert().
   Random rnd_;
 
-  Node* NewNode( Key& key, int height);
+  Node* NewNode(const Key& key, int height);
   int RandomHeight();
-  bool Equal( Key& a,  Key& b)  { return (compare_(a, b) == 0); }
+  bool Equal(const Key& a, const Key& b) const { return (compare_(a, b) == 0); }
 
   // Return true if key is greater than the data stored in "n"
-  bool KeyIsAfterNode( Key& key, Node* n) ;
+  bool KeyIsAfterNode(const Key& key, Node* n) const;
 
   // Return the earliest node that comes at or after key.
   // Return NULL if there is no such node.
   //
   // If prev is non-NULL, fills prev[level] with pointer to previous
   // node at "level" for every level in [0..max_height_-1].
-  Node* FindGreaterOrEqual( Key& key, Node** prev) ;
+  Node* FindGreaterOrEqual(const Key& key, Node** prev) const;
 
   // Return the latest node with a key < key.
   // Return head_ if there is no such node.
-  Node* FindLessThan( Key& key) ;
+  Node* FindLessThan(const Key& key) const;
 
   // Return the last node in the list.
   // Return head_ if list is empty.
-  Node* FindLast() ;
+  Node* FindLast() const;
 
   // No copying allowed
-  SkipList( SkipList&);
-  void operator=( SkipList&);
+  SkipList(const SkipList&);
+  void operator=(const SkipList&);
 };
 
 // Implementation details follow
 template<typename Key, class Comparator>
 struct SkipList<Key,Comparator>::Node {
-  explicit Node( Key& k) : key(k) { }
+  explicit Node(const Key& k) : key(k) { }
 
-  Key  key;
+  Key const key;
 
   // Accessors/mutators for links.  Wrapped in methods so we can
   // add the appropriate barriers as necessary.
@@ -181,25 +181,25 @@ struct SkipList<Key,Comparator>::Node {
 
 template<typename Key, class Comparator>
 typename SkipList<Key,Comparator>::Node*
-SkipList<Key,Comparator>::NewNode( Key& key, int height) {
+SkipList<Key,Comparator>::NewNode(const Key& key, int height) {
   char* mem = arena_->AllocateAligned(
       sizeof(Node) + sizeof(port::AtomicPointer) * (height - 1));
   return new (mem) Node(key);
 }
 
 template<typename Key, class Comparator>
-inline SkipList<Key,Comparator>::Iterator::Iterator( SkipList* list) {
+inline SkipList<Key,Comparator>::Iterator::Iterator(const SkipList* list) {
   list_ = list;
   node_ = NULL;
 }
 
 template<typename Key, class Comparator>
-inline bool SkipList<Key,Comparator>::Iterator::Valid()  {
+inline bool SkipList<Key,Comparator>::Iterator::Valid() const {
   return node_ != NULL;
 }
 
 template<typename Key, class Comparator>
-inline  Key& SkipList<Key,Comparator>::Iterator::key()  {
+inline const Key& SkipList<Key,Comparator>::Iterator::key() const {
   assert(Valid());
   return node_->key;
 }
@@ -222,7 +222,7 @@ inline void SkipList<Key,Comparator>::Iterator::Prev() {
 }
 
 template<typename Key, class Comparator>
-inline void SkipList<Key,Comparator>::Iterator::Seek( Key& target) {
+inline void SkipList<Key,Comparator>::Iterator::Seek(const Key& target) {
   node_ = list_->FindGreaterOrEqual(target, NULL);
 }
 
@@ -242,7 +242,7 @@ inline void SkipList<Key,Comparator>::Iterator::SeekToLast() {
 template<typename Key, class Comparator>
 int SkipList<Key,Comparator>::RandomHeight() {
   // Increase height with probability 1 in kBranching
-  static  unsigned int kBranching = 4;
+  static const unsigned int kBranching = 4;
   int height = 1;
   while (height < kMaxHeight && ((rnd_.Next() % kBranching) == 0)) {
     height++;
@@ -253,14 +253,14 @@ int SkipList<Key,Comparator>::RandomHeight() {
 }
 
 template<typename Key, class Comparator>
-bool SkipList<Key,Comparator>::KeyIsAfterNode( Key& key, Node* n)  {
+bool SkipList<Key,Comparator>::KeyIsAfterNode(const Key& key, Node* n) const {
   // NULL n is considered infinite
   return (n != NULL) && (compare_(n->key, key) < 0);
 }
 
 template<typename Key, class Comparator>
-typename SkipList<Key,Comparator>::Node* SkipList<Key,Comparator>::FindGreaterOrEqual( Key& key, Node** prev)
-     {
+typename SkipList<Key,Comparator>::Node* SkipList<Key,Comparator>::FindGreaterOrEqual(const Key& key, Node** prev)
+    const {
   Node* x = head_;
   int level = GetMaxHeight() - 1;
   while (true) {
@@ -282,7 +282,7 @@ typename SkipList<Key,Comparator>::Node* SkipList<Key,Comparator>::FindGreaterOr
 
 template<typename Key, class Comparator>
 typename SkipList<Key,Comparator>::Node*
-SkipList<Key,Comparator>::FindLessThan( Key& key)  {
+SkipList<Key,Comparator>::FindLessThan(const Key& key) const {
   Node* x = head_;
   int level = GetMaxHeight() - 1;
   while (true) {
@@ -303,7 +303,7 @@ SkipList<Key,Comparator>::FindLessThan( Key& key)  {
 
 template<typename Key, class Comparator>
 typename SkipList<Key,Comparator>::Node* SkipList<Key,Comparator>::FindLast()
-     {
+    const {
   Node* x = head_;
   int level = GetMaxHeight() - 1;
   while (true) {
@@ -334,7 +334,7 @@ SkipList<Key,Comparator>::SkipList(Comparator cmp, Arena* arena)
 }
 
 template<typename Key, class Comparator>
-void SkipList<Key,Comparator>::Insert( Key& key) {
+void SkipList<Key,Comparator>::Insert(const Key& key) {
   // TODO(opt): We can use a barrier-free variant of FindGreaterOrEqual()
   // here since Insert() is externally synchronized.
   Node* prev[kMaxHeight];
@@ -370,7 +370,7 @@ void SkipList<Key,Comparator>::Insert( Key& key) {
 }
 
 template<typename Key, class Comparator>
-bool SkipList<Key,Comparator>::Contains( Key& key)  {
+bool SkipList<Key,Comparator>::Contains(const Key& key) const {
   Node* x = FindGreaterOrEqual(key, NULL);
   if (x != NULL && Equal(key, x->key)) {
     return true;

@@ -14,7 +14,7 @@
 /* A non-cryptographic RNG used only for test infrastructure. */
 
 /** Seed the pseudorandom number generator for testing. */
-SECP256K1_INLINE static void secp256k1_rand_seed( unsigned char *seed16);
+SECP256K1_INLINE static void secp256k1_rand_seed(const unsigned char *seed16);
 
 /** Generate a pseudorandom number in the range [0..2**32-1]. */
 static uint32_t secp256k1_rand32(void);

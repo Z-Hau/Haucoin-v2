@@ -20,11 +20,11 @@
 #include <QFileOpenEvent>
 #include <QTemporaryFile>
 
-X509 *parse_b64der_cert( char* cert_data)
+X509 *parse_b64der_cert(const char* cert_data)
 {
     std::vector<unsigned char> data = DecodeBase64(cert_data);
     assert(data.size() > 0);
-     unsigned char* dptr = data.data();
+    const unsigned char* dptr = data.data();
     X509 *cert = d2i_X509(nullptr, &dptr, data.size());
     assert(cert);
     return cert;
@@ -43,7 +43,7 @@ static SendCoinsRecipient handleRequest(PaymentServer* server, std::vector<unsig
     // Write data to a temp file:
     QTemporaryFile f;
     f.open();
-    f.write(( char*)data.data(), data.size());
+    f.write((const char*)data.data(), data.size());
     f.close();
 
     // Create a QObject, install event filter from PaymentServer
@@ -139,7 +139,7 @@ void PaymentServerTests::paymentServerTests()
 
     // Contains a testnet paytoaddress, so payment request network doesn't match client network:
     data = DecodeBase64(paymentrequest1_cert2_BASE64);
-    byteArray = QByteArray(( char*)data.data(), data.size());
+    byteArray = QByteArray((const char*)data.data(), data.size());
     r.paymentRequest.parse(byteArray);
     // Ensure the request is initialized, because network "main" is default, even for
     // uninitialized payment requests and that will fail our test here.
@@ -148,7 +148,7 @@ void PaymentServerTests::paymentServerTests()
 
     // Expired payment request (expires is set to 1 = 1970-01-01 00:00:01):
     data = DecodeBase64(paymentrequest2_cert2_BASE64);
-    byteArray = QByteArray(( char*)data.data(), data.size());
+    byteArray = QByteArray((const char*)data.data(), data.size());
     r.paymentRequest.parse(byteArray);
     // Ensure the request is initialized
     QVERIFY(r.paymentRequest.IsInitialized());
@@ -159,7 +159,7 @@ void PaymentServerTests::paymentServerTests()
     // 9223372036854775807 (uint64), 9223372036854775807 (int64_t) and -1 (int32_t)
     // -1 is 1969-12-31 23:59:59 (for a 32 bit time values)
     data = DecodeBase64(paymentrequest3_cert2_BASE64);
-    byteArray = QByteArray(( char*)data.data(), data.size());
+    byteArray = QByteArray((const char*)data.data(), data.size());
     r.paymentRequest.parse(byteArray);
     // Ensure the request is initialized
     QVERIFY(r.paymentRequest.IsInitialized());
@@ -170,7 +170,7 @@ void PaymentServerTests::paymentServerTests()
     // 9223372036854775808 (uint64), -9223372036854775808 (int64_t) and 0 (int32_t)
     // 0 is 1970-01-01 00:00:00 (for a 32 bit time values)
     data = DecodeBase64(paymentrequest4_cert2_BASE64);
-    byteArray = QByteArray(( char*)data.data(), data.size());
+    byteArray = QByteArray((const char*)data.data(), data.size());
     r.paymentRequest.parse(byteArray);
     // Ensure the request is initialized
     QVERIFY(r.paymentRequest.IsInitialized());
@@ -183,20 +183,20 @@ void PaymentServerTests::paymentServerTests()
     // Write data to a temp file:
     QTemporaryFile tempFile;
     tempFile.open();
-    tempFile.write(( char*)randData, sizeof(randData));
+    tempFile.write((const char*)randData, sizeof(randData));
     tempFile.close();
     // compares 50001 <= BIP70_MAX_PAYMENTREQUEST_SIZE == false
     QCOMPARE(PaymentServer::verifySize(tempFile.size()), false);
 
     // Payment request with amount overflow (amount is set to 21000001 BTC):
     data = DecodeBase64(paymentrequest5_cert2_BASE64);
-    byteArray = QByteArray(( char*)data.data(), data.size());
+    byteArray = QByteArray((const char*)data.data(), data.size());
     r.paymentRequest.parse(byteArray);
     // Ensure the request is initialized
     QVERIFY(r.paymentRequest.IsInitialized());
     // Extract address and amount from the request
     QList<std::pair<CScript, CAmount> > sendingTos = r.paymentRequest.getPayTo();
-    for ( std::pair<CScript, CAmount>& sendingTo : sendingTos) {
+    for (const std::pair<CScript, CAmount>& sendingTo : sendingTos) {
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest))
             QCOMPARE(PaymentServer::verifyAmount(sendingTo.second), false);
@@ -205,7 +205,7 @@ void PaymentServerTests::paymentServerTests()
     delete server;
 }
 
-void RecipientCatcher::getRecipient( SendCoinsRecipient& r)
+void RecipientCatcher::getRecipient(const SendCoinsRecipient& r)
 {
     recipient = r;
 }

@@ -13,7 +13,7 @@
 
 namespace {
 
- int kNumKeys = 1100000;
+const int kNumKeys = 1100000;
 
 std::string Key1(int i) {
   char buf[100];

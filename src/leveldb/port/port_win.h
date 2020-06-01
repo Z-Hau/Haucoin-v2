@@ -47,7 +47,7 @@ namespace leveldb {
 namespace port {
 
 // Windows is little endian (for now :p)
-static  bool kLittleEndian = true;
+static const bool kLittleEndian = true;
 
 class CondVar;
 
@@ -68,8 +68,8 @@ class Mutex {
   void * cs_;
 
   // No copying
-  Mutex( Mutex&);
-  void operator=( Mutex&);
+  Mutex(const Mutex&);
+  void operator=(const Mutex&);
 };
 
 // the Win32 API offers a dependable condition variable mechanism, but only starting with
@@ -98,7 +98,7 @@ class CondVar {
 class OnceType {
 public:
 //    OnceType() : init_(false) {}
-    OnceType( OnceType &once) : init_(once.init_) {}
+    OnceType(const OnceType &once) : init_(once.init_) {}
     OnceType(bool f) : init_(f) {}
     void InitOnce(void (*initializer)()) {
         mutex_.Lock();
@@ -124,16 +124,16 @@ class AtomicPointer {
  public:
   AtomicPointer() : rep_(NULL) { }
   explicit AtomicPointer(void* v); 
-  void* Acquire_Load() ;
+  void* Acquire_Load() const;
 
   void Release_Store(void* v);
 
-  void* NoBarrier_Load() ;
+  void* NoBarrier_Load() const;
 
   void NoBarrier_Store(void* v);
 };
 
-inline bool Snappy_Compress( char* input, size_t length,
+inline bool Snappy_Compress(const char* input, size_t length,
                             ::std::string* output) {
 #ifdef SNAPPY
   output->resize(snappy::MaxCompressedLength(length));
@@ -146,7 +146,7 @@ inline bool Snappy_Compress( char* input, size_t length,
   return false;
 }
 
-inline bool Snappy_GetUncompressedLength( char* input, size_t length,
+inline bool Snappy_GetUncompressedLength(const char* input, size_t length,
                                          size_t* result) {
 #ifdef SNAPPY
   return snappy::GetUncompressedLength(input, length, result);
@@ -155,7 +155,7 @@ inline bool Snappy_GetUncompressedLength( char* input, size_t length,
 #endif
 }
 
-inline bool Snappy_Uncompress( char* input, size_t length,
+inline bool Snappy_Uncompress(const char* input, size_t length,
                               char* output) {
 #ifdef SNAPPY
   return snappy::RawUncompress(input, length, output);
@@ -164,12 +164,12 @@ inline bool Snappy_Uncompress( char* input, size_t length,
 #endif
 }
 
-inline bool GetHeapProfile(void (*func)(void*,  char*, int), void* arg) {
+inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
   return false;
 }
 
 bool HasAcceleratedCRC32C();
-uint32_t AcceleratedCRC32C(uint32_t crc,  char* buf, size_t size);
+uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size);
 
 }
 }

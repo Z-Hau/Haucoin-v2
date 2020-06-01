@@ -18,17 +18,17 @@ class BytewiseComparatorImpl : public Comparator {
  public:
   BytewiseComparatorImpl() { }
 
-  virtual  char* Name()  {
+  virtual const char* Name() const {
     return "leveldb.BytewiseComparator";
   }
 
-  virtual int Compare( Slice& a,  Slice& b)  {
+  virtual int Compare(const Slice& a, const Slice& b) const {
     return a.compare(b);
   }
 
   virtual void FindShortestSeparator(
       std::string* start,
-       Slice& limit)  {
+      const Slice& limit) const {
     // Find length of common prefix
     size_t min_length = std::min(start->size(), limit.size());
     size_t diff_index = 0;
@@ -50,11 +50,11 @@ class BytewiseComparatorImpl : public Comparator {
     }
   }
 
-  virtual void FindShortSuccessor(std::string* key)  {
+  virtual void FindShortSuccessor(std::string* key) const {
     // Find first character that can be incremented
     size_t n = key->size();
     for (size_t i = 0; i < n; i++) {
-       uint8_t byte = (*key)[i];
+      const uint8_t byte = (*key)[i];
       if (byte != static_cast<uint8_t>(0xff)) {
         (*key)[i] = byte + 1;
         key->resize(i+1);
@@ -67,13 +67,13 @@ class BytewiseComparatorImpl : public Comparator {
 }  // namespace
 
 static port::OnceType once = LEVELDB_ONCE_INIT;
-static  Comparator* bytewise;
+static const Comparator* bytewise;
 
 static void InitModule() {
   bytewise = new BytewiseComparatorImpl;
 }
 
- Comparator* BytewiseComparator() {
+const Comparator* BytewiseComparator() {
   port::InitOnce(&once, InitModule);
   return bytewise;
 }

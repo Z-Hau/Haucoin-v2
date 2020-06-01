@@ -11,7 +11,7 @@
 
 namespace leveldb {
 
-static  int kVerbose = 1;
+static const int kVerbose = 1;
 
 static Slice Key(int i, char* buffer) {
   EncodeFixed32(buffer, i);
@@ -20,7 +20,7 @@ static Slice Key(int i, char* buffer) {
 
 class BloomTest {
  private:
-   FilterPolicy* policy_;
+  const FilterPolicy* policy_;
   std::string filter_;
   std::vector<std::string> keys_;
 
@@ -36,7 +36,7 @@ class BloomTest {
     filter_.clear();
   }
 
-  void Add( Slice& s) {
+  void Add(const Slice& s) {
     keys_.push_back(s.ToString());
   }
 
@@ -52,14 +52,14 @@ class BloomTest {
     if (kVerbose >= 2) DumpFilter();
   }
 
-  size_t FilterSize()  {
+  size_t FilterSize() const {
     return filter_.size();
   }
 
   void DumpFilter() {
     fprintf(stderr, "F(");
     for (size_t i = 0; i+1 < filter_.size(); i++) {
-       unsigned int c = static_cast<unsigned int>(filter_[i]);
+      const unsigned int c = static_cast<unsigned int>(filter_[i]);
       for (int j = 0; j < 8; j++) {
         fprintf(stderr, "%c", (c & (1 <<j)) ? '1' : '.');
       }
@@ -67,7 +67,7 @@ class BloomTest {
     fprintf(stderr, ")\n");
   }
 
-  bool Matches( Slice& s) {
+  bool Matches(const Slice& s) {
     if (!keys_.empty()) {
       Build();
     }

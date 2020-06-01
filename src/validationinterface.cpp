@@ -20,15 +20,15 @@
 #include <boost/signals2/signal.hpp>
 
 struct MainSignalsInstance {
-    boost::signals2::signal<void ( CBlockIndex *,  CBlockIndex *, bool fInitialDownload)> UpdatedBlockTip;
-    boost::signals2::signal<void ( CTransactionRef &)> TransactionAddedToMempool;
-    boost::signals2::signal<void ( std::shared_ptr< CBlock> &,  CBlockIndex *pindex,  std::vector<CTransactionRef>&)> BlockConnected;
-    boost::signals2::signal<void ( std::shared_ptr< CBlock> &)> BlockDisconnected;
-    boost::signals2::signal<void ( CTransactionRef &)> TransactionRemovedFromMempool;
-    boost::signals2::signal<void ( CBlockLocator &)> SetBestChain;
+    boost::signals2::signal<void (const CBlockIndex *, const CBlockIndex *, bool fInitialDownload)> UpdatedBlockTip;
+    boost::signals2::signal<void (const CTransactionRef &)> TransactionAddedToMempool;
+    boost::signals2::signal<void (const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::vector<CTransactionRef>&)> BlockConnected;
+    boost::signals2::signal<void (const std::shared_ptr<const CBlock> &)> BlockDisconnected;
+    boost::signals2::signal<void (const CTransactionRef &)> TransactionRemovedFromMempool;
+    boost::signals2::signal<void (const CBlockLocator &)> SetBestChain;
     boost::signals2::signal<void (int64_t nBestBlockTime, CConnman* connman)> Broadcast;
-    boost::signals2::signal<void ( CBlock&,  CValidationState&)> BlockChecked;
-    boost::signals2::signal<void ( CBlockIndex *,  std::shared_ptr< CBlock>&)> NewPoWValidBlock;
+    boost::signals2::signal<void (const CBlock&, const CValidationState&)> BlockChecked;
+    boost::signals2::signal<void (const CBlockIndex *, const std::shared_ptr<const CBlock>&)> NewPoWValidBlock;
 
     // We are not allowed to assume the scheduler only runs in one thread,
     // but must ensure all callbacks happen in-order, so we end up creating
@@ -134,7 +134,7 @@ void CMainSignals::MempoolEntryRemoved(CTransactionRef ptx, MemPoolRemovalReason
     }
 }
 
-void CMainSignals::UpdatedBlockTip( CBlockIndex *pindexNew,  CBlockIndex *pindexFork, bool fInitialDownload) {
+void CMainSignals::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
     // Dependencies exist that require UpdatedBlockTip events to be delivered in the order in which
     // the chain actually updates. One way to ensure this is for the caller to invoke this signal
     // in the same critical section where the chain is updated
@@ -144,25 +144,25 @@ void CMainSignals::UpdatedBlockTip( CBlockIndex *pindexNew,  CBlockIndex *pindex
     });
 }
 
-void CMainSignals::TransactionAddedToMempool( CTransactionRef &ptx) {
+void CMainSignals::TransactionAddedToMempool(const CTransactionRef &ptx) {
     m_internals->m_schedulerClient.AddToProcessQueue([ptx, this] {
         m_internals->TransactionAddedToMempool(ptx);
     });
 }
 
-void CMainSignals::BlockConnected( std::shared_ptr< CBlock> &pblock,  CBlockIndex *pindex,  std::shared_ptr< std::vector<CTransactionRef>>& pvtxConflicted) {
+void CMainSignals::BlockConnected(const std::shared_ptr<const CBlock> &pblock, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>>& pvtxConflicted) {
     m_internals->m_schedulerClient.AddToProcessQueue([pblock, pindex, pvtxConflicted, this] {
         m_internals->BlockConnected(pblock, pindex, *pvtxConflicted);
     });
 }
 
-void CMainSignals::BlockDisconnected( std::shared_ptr< CBlock> &pblock) {
+void CMainSignals::BlockDisconnected(const std::shared_ptr<const CBlock> &pblock) {
     m_internals->m_schedulerClient.AddToProcessQueue([pblock, this] {
         m_internals->BlockDisconnected(pblock);
     });
 }
 
-void CMainSignals::SetBestChain( CBlockLocator &locator) {
+void CMainSignals::SetBestChain(const CBlockLocator &locator) {
     m_internals->m_schedulerClient.AddToProcessQueue([locator, this] {
         m_internals->SetBestChain(locator);
     });
@@ -172,10 +172,10 @@ void CMainSignals::Broadcast(int64_t nBestBlockTime, CConnman* connman) {
     m_internals->Broadcast(nBestBlockTime, connman);
 }
 
-void CMainSignals::BlockChecked( CBlock& block,  CValidationState& state) {
+void CMainSignals::BlockChecked(const CBlock& block, const CValidationState& state) {
     m_internals->BlockChecked(block, state);
 }
 
-void CMainSignals::NewPoWValidBlock( CBlockIndex *pindex,  std::shared_ptr< CBlock> &block) {
+void CMainSignals::NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock> &block) {
     m_internals->NewPoWValidBlock(pindex, block);
 }

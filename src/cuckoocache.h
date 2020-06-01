@@ -110,7 +110,7 @@ public:
      * @param s the index of the entry to read.
      * @returns if the bit at index s was set.
      * */
-    inline bool bit_is_set(uint32_t s) 
+    inline bool bit_is_set(uint32_t s) const
     {
         return (1 << (s & 7)) & mem[s >> 3].load(std::memory_order_relaxed);
     }
@@ -167,7 +167,7 @@ private:
     uint32_t size;
 
     /** The bit_packed_atomic_flags array is marked mutable because we want
-     * garbage collection to be allowed to occur from  methods */
+     * garbage collection to be allowed to occur from const methods */
     mutable bit_packed_atomic_flags collection_flags;
 
     /** epoch_flags tracks how recently an element was inserted into
@@ -197,11 +197,11 @@ private:
      * Should be set to log2(n)*/
     uint8_t depth_limit;
 
-    /** hash_function is a  instance of the hash function. It cannot be
+    /** hash_function is a const instance of the hash function. It cannot be
      * static or initialized at call time as it may have internal state (such as
      * a nonce).
      * */
-     Hash hash_function;
+    const Hash hash_function;
 
     /** compute_hashes is convenience for not having to write out this
      * expression everywhere we use the hash values of an Element.
@@ -240,7 +240,7 @@ private:
      * @param e the element whose hashes will be returned
      * @returns std::array<uint32_t, 8> of deterministic hashes derived from e
      */
-    inline std::array<uint32_t, 8> compute_hashes( Element& e) 
+    inline std::array<uint32_t, 8> compute_hashes(const Element& e) const
     {
         return {{(uint32_t)((hash_function.template operator()<0>(e) * (uint64_t)size) >> 32),
                  (uint32_t)((hash_function.template operator()<1>(e) * (uint64_t)size) >> 32),
@@ -254,7 +254,7 @@ private:
 
     /* end
      * @returns a constexpr index that can never be inserted to */
-    constexpr uint32_t invalid() 
+    constexpr uint32_t invalid() const
     {
         return ~(uint32_t)0;
     }
@@ -263,7 +263,7 @@ private:
      * without any concurrent insert.
      * @param n the index to allow erasure of
      */
-    inline void allow_erase(uint32_t n) 
+    inline void allow_erase(uint32_t n) const
     {
         collection_flags.bit_set(n);
     }
@@ -272,7 +272,7 @@ private:
      * Threadsafe without any concurrent insert.
      * @param n the index to prioritize keeping
      */
-    inline void please_keep(uint32_t n) 
+    inline void please_keep(uint32_t n) const
     {
         collection_flags.bit_unset(n);
     }
@@ -464,7 +464,7 @@ public:
      * flag is set
      * @returns true if the element is found, false otherwise
      */
-    inline bool contains( Element& e,  bool erase) 
+    inline bool contains(const Element& e, const bool erase) const
     {
         std::array<uint32_t, 8> locs = compute_hashes(e);
         for (uint32_t loc : locs)

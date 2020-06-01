@@ -10,7 +10,7 @@
 SECP256K1_API jlong JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1ctx_1clone
   (JNIEnv* env, jclass classObject, jlong ctx_l)
 {
-   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
+  const secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
 
   jlong ctx_clone_l = (uintptr_t) secp256k1_context_clone(ctx);
 
@@ -25,7 +25,7 @@ SECP256K1_API jint JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1context_1
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
 
-   unsigned char* seed = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
+  const unsigned char* seed = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
 
   (void)classObject;
 
@@ -49,8 +49,8 @@ SECP256K1_API jint JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1ecdsa_1ve
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
 
   unsigned char* data = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* sigdata = {  (unsigned char*) (data + 32) };
-   unsigned char* pubdata = { (unsigned char*) (data + siglen + 32) };
+  const unsigned char* sigdata = {  (unsigned char*) (data + 32) };
+  const unsigned char* pubdata = { (unsigned char*) (data + siglen + 32) };
 
   secp256k1_ecdsa_signature sig;
   secp256k1_pubkey pubkey;
@@ -127,7 +127,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1e
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
-   unsigned char* secKey = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
+  const unsigned char* secKey = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
 
   secp256k1_pubkey pubkey;
 
@@ -170,7 +170,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1p
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
   unsigned char* privkey = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* tweak = (unsigned char*) (privkey + 32);
+  const unsigned char* tweak = (unsigned char*) (privkey + 32);
 
   jobjectArray retArray;
   jbyteArray privArray, intsByteArray;
@@ -205,7 +205,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1p
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
   unsigned char* privkey = (unsigned char*) (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* tweak = (unsigned char*) (privkey + 32);
+  const unsigned char* tweak = (unsigned char*) (privkey + 32);
 
   jobjectArray retArray;
   jbyteArray privArray, intsByteArray;
@@ -241,7 +241,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1p
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
 /*  secp256k1_pubkey* pubkey = (secp256k1_pubkey*) (*env)->GetDirectBufferAddress(env, byteBufferObject);*/
   unsigned char* pkey = (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* tweak = (unsigned char*) (pkey + publen);
+  const unsigned char* tweak = (unsigned char*) (pkey + publen);
 
   jobjectArray retArray;
   jbyteArray pubArray, intsByteArray;
@@ -285,7 +285,7 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1p
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
   unsigned char* pkey = (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* tweak = (unsigned char*) (pkey + publen);
+  const unsigned char* tweak = (unsigned char*) (pkey + publen);
 
   jobjectArray retArray;
   jbyteArray pubArray, intsByteArray;
@@ -336,8 +336,8 @@ SECP256K1_API jobjectArray JNICALL Java_org_bitcoin_NativeSecp256k1_secp256k1_1e
   (JNIEnv* env, jclass classObject, jobject byteBufferObject, jlong ctx_l, jint publen)
 {
   secp256k1_context *ctx = (secp256k1_context*)(uintptr_t)ctx_l;
-   unsigned char* secdata = (*env)->GetDirectBufferAddress(env, byteBufferObject);
-   unsigned char* pubdata = ( unsigned char*) (secdata + 32);
+  const unsigned char* secdata = (*env)->GetDirectBufferAddress(env, byteBufferObject);
+  const unsigned char* pubdata = (const unsigned char*) (secdata + 32);
 
   jobjectArray retArray;
   jbyteArray outArray, intsByteArray;

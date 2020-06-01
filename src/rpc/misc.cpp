@@ -37,11 +37,11 @@
 class DescribeAddressVisitor : public boost::static_visitor<UniValue>
 {
 public:
-    CWallet *  pwallet;
+    CWallet * const pwallet;
 
     explicit DescribeAddressVisitor(CWallet *_pwallet) : pwallet(_pwallet) {}
 
-    void ProcessSubScript( CScript& subscript, UniValue& obj, bool include_addresses = false) 
+    void ProcessSubScript(const CScript& subscript, UniValue& obj, bool include_addresses = false) const
     {
         // Always present: script type and redeemscript
         txnouttype which_type;
@@ -81,9 +81,9 @@ public:
         if (include_addresses) obj.pushKV("addresses", std::move(a));
     }
 
-    UniValue operator()( CNoDestination &dest)  { return UniValue(UniValue::VOBJ); }
+    UniValue operator()(const CNoDestination &dest) const { return UniValue(UniValue::VOBJ); }
 
-    UniValue operator()( CKeyID &keyID)  {
+    UniValue operator()(const CKeyID &keyID) const {
         UniValue obj(UniValue::VOBJ);
         CPubKey vchPubKey;
         obj.push_back(Pair("isscript", false));
@@ -95,7 +95,7 @@ public:
         return obj;
     }
 
-    UniValue operator()( CScriptID &scriptID)  {
+    UniValue operator()(const CScriptID &scriptID) const {
         UniValue obj(UniValue::VOBJ);
         CScript subscript;
         obj.push_back(Pair("isscript", true));
@@ -106,7 +106,7 @@ public:
         return obj;
     }
 
-    UniValue operator()( WitnessV0KeyHash& id) 
+    UniValue operator()(const WitnessV0KeyHash& id) const
     {
         UniValue obj(UniValue::VOBJ);
         CPubKey pubkey;
@@ -120,7 +120,7 @@ public:
         return obj;
     }
 
-    UniValue operator()( WitnessV0ScriptHash& id) 
+    UniValue operator()(const WitnessV0ScriptHash& id) const
     {
         UniValue obj(UniValue::VOBJ);
         CScript subscript;
@@ -137,7 +137,7 @@ public:
         return obj;
     }
 
-    UniValue operator()( WitnessUnknown& id) 
+    UniValue operator()(const WitnessUnknown& id) const
     {
         UniValue obj(UniValue::VOBJ);
         CScript subscript;
@@ -149,7 +149,7 @@ public:
 };
 #endif
 
-UniValue validateaddress( JSONRPCRequest& request)
+UniValue validateaddress(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
@@ -195,7 +195,7 @@ UniValue validateaddress( JSONRPCRequest& request)
         );
 
 #ifdef ENABLE_WALLET
-    CWallet *  pwallet = GetWalletForJSONRPCRequest(request);
+    CWallet * const pwallet = GetWalletForJSONRPCRequest(request);
 
     LOCK2(cs_main, pwallet ? &pwallet->cs_wallet : nullptr);
 #else
@@ -225,7 +225,7 @@ UniValue validateaddress( JSONRPCRequest& request)
             ret.push_back(Pair("account", pwallet->mapAddressBook[dest].name));
         }
         if (pwallet) {
-             CKeyMetadata* meta = nullptr;
+            const CKeyMetadata* meta = nullptr;
             CKeyID key_id = GetKeyForDestination(*pwallet, dest);
             if (!key_id.IsNull()) {
                 auto it = pwallet->mapKeyMetadata.find(key_id);
@@ -255,7 +255,7 @@ UniValue validateaddress( JSONRPCRequest& request)
 // Needed even with !ENABLE_WALLET, to pass (ignored) pointers around
 class CWallet;
 
-UniValue createmultisig( JSONRPCRequest& request)
+UniValue createmultisig(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 2)
     {
@@ -291,14 +291,14 @@ UniValue createmultisig( JSONRPCRequest& request)
     int required = request.params[0].get_int();
 
     // Get the public keys
-     UniValue& keys = request.params[1].get_array();
+    const UniValue& keys = request.params[1].get_array();
     std::vector<CPubKey> pubkeys;
     for (unsigned int i = 0; i < keys.size(); ++i) {
         if (IsHex(keys[i].get_str()) && (keys[i].get_str().length() == 66 || keys[i].get_str().length() == 130)) {
             pubkeys.push_back(HexToPubKey(keys[i].get_str()));
         } else {
 #ifdef ENABLE_WALLET
-            CWallet*  pwallet = GetWalletForJSONRPCRequest(request);
+            CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
             if (IsDeprecatedRPCEnabled("createmultisig") && EnsureWalletIsAvailable(pwallet, false)) {
                 pubkeys.push_back(AddrToPubKey(pwallet, keys[i].get_str()));
             } else
@@ -320,7 +320,7 @@ UniValue createmultisig( JSONRPCRequest& request)
     return result;
 }
 
-UniValue verifymessage( JSONRPCRequest& request)
+UniValue verifymessage(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 3)
         throw std::runtime_error(
@@ -354,7 +354,7 @@ UniValue verifymessage( JSONRPCRequest& request)
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid address");
     }
 
-     CKeyID *keyID = boost::get<CKeyID>(&destination);
+    const CKeyID *keyID = boost::get<CKeyID>(&destination);
     if (!keyID) {
         throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to key");
     }
@@ -376,7 +376,7 @@ UniValue verifymessage( JSONRPCRequest& request)
     return (pubkey.GetID() == *keyID);
 }
 
-UniValue signmessagewithprivkey( JSONRPCRequest& request)
+UniValue signmessagewithprivkey(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 2)
         throw std::runtime_error(
@@ -418,7 +418,7 @@ UniValue signmessagewithprivkey( JSONRPCRequest& request)
     return EncodeBase64(vchSig.data(), vchSig.size());
 }
 
-UniValue setmocktime( JSONRPCRequest& request)
+UniValue setmocktime(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
@@ -477,7 +477,7 @@ static std::string RPCMallocInfo()
 }
 #endif
 
-UniValue getmemoryinfo( JSONRPCRequest& request)
+UniValue getmemoryinfo(const JSONRPCRequest& request)
 {
     /* Please, avoid using the word "pool" here in the RPC interface or help,
      * as users will undoubtedly confuse it with the other "memory pool"
@@ -541,7 +541,7 @@ uint32_t getCategoryMask(UniValue cats) {
     return mask;
 }
 
-UniValue logging( JSONRPCRequest& request)
+UniValue logging(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 2) {
         throw std::runtime_error(
@@ -603,14 +603,14 @@ UniValue logging( JSONRPCRequest& request)
 
     UniValue result(UniValue::VOBJ);
     std::vector<CLogCategoryActive> vLogCatActive = ListActiveLogCategories();
-    for ( auto& logCatActive : vLogCatActive) {
+    for (const auto& logCatActive : vLogCatActive) {
         result.pushKV(logCatActive.category, logCatActive.active);
     }
 
     return result;
 }
 
-UniValue echo( JSONRPCRequest& request)
+UniValue echo(const JSONRPCRequest& request)
 {
     if (request.fHelp)
         throw std::runtime_error(
@@ -623,7 +623,7 @@ UniValue echo( JSONRPCRequest& request)
     return request.params;
 }
 
-static UniValue getinfo_deprecated( JSONRPCRequest& request)
+static UniValue getinfo_deprecated(const JSONRPCRequest& request)
 {
     throw JSONRPCError(RPC_METHOD_NOT_FOUND,
         "getinfo\n"
@@ -635,7 +635,7 @@ static UniValue getinfo_deprecated( JSONRPCRequest& request)
     );
 }
 
-static  CRPCCommand commands[] =
+static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
     { "control",            "getmemoryinfo",          &getmemoryinfo,          {"mode"} },

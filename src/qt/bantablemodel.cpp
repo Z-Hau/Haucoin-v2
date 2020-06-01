@@ -14,10 +14,10 @@
 #include <QDebug>
 #include <QList>
 
-bool BannedNodeLessThan::operator()( CCombinedBan& left,  CCombinedBan& right) 
+bool BannedNodeLessThan::operator()(const CCombinedBan& left, const CCombinedBan& right) const
 {
-     CCombinedBan* pLeft = &left;
-     CCombinedBan* pRight = &right;
+    const CCombinedBan* pLeft = &left;
+    const CCombinedBan* pRight = &right;
 
     if (order == Qt::DescendingOrder)
         std::swap(pLeft, pRight);
@@ -55,7 +55,7 @@ public:
 #if QT_VERSION >= 0x040700
         cachedBanlist.reserve(banMap.size());
 #endif
-        for ( auto& entry : banMap)
+        for (const auto& entry : banMap)
         {
             CCombinedBan banEntry;
             banEntry.subnet = entry.first;
@@ -68,7 +68,7 @@ public:
             qStableSort(cachedBanlist.begin(), cachedBanlist.end(), BannedNodeLessThan(sortColumn, sortOrder));
     }
 
-    int size() 
+    int size() const
     {
         return cachedBanlist.size();
     }
@@ -100,19 +100,19 @@ BanTableModel::~BanTableModel()
     // Intentionally left empty
 }
 
-int BanTableModel::rowCount( QModelIndex &parent) 
+int BanTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return priv->size();
 }
 
-int BanTableModel::columnCount( QModelIndex &parent) 
+int BanTableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return columns.length();
 }
 
-QVariant BanTableModel::data( QModelIndex &index, int role) 
+QVariant BanTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
         return QVariant();
@@ -134,7 +134,7 @@ QVariant BanTableModel::data( QModelIndex &index, int role)
     return QVariant();
 }
 
-QVariant BanTableModel::headerData(int section, Qt::Orientation orientation, int role) 
+QVariant BanTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(orientation == Qt::Horizontal)
     {
@@ -146,7 +146,7 @@ QVariant BanTableModel::headerData(int section, Qt::Orientation orientation, int
     return QVariant();
 }
 
-Qt::ItemFlags BanTableModel::flags( QModelIndex &index) 
+Qt::ItemFlags BanTableModel::flags(const QModelIndex &index) const
 {
     if(!index.isValid())
         return 0;
@@ -155,7 +155,7 @@ Qt::ItemFlags BanTableModel::flags( QModelIndex &index)
     return retval;
 }
 
-QModelIndex BanTableModel::index(int row, int column,  QModelIndex &parent) 
+QModelIndex BanTableModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     CCombinedBan *data = priv->index(row);

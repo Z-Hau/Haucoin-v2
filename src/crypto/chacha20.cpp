@@ -18,12 +18,12 @@ constexpr static inline uint32_t rotl32(uint32_t v, int c) { return (v << c) | (
   a += b; d = rotl32(d ^ a, 8); \
   c += d; b = rotl32(b ^ c, 7);
 
-static  unsigned char sigma[] = "expand 32-byte k";
-static  unsigned char tau[] = "expand 16-byte k";
+static const unsigned char sigma[] = "expand 32-byte k";
+static const unsigned char tau[] = "expand 16-byte k";
 
-void ChaCha20::SetKey( unsigned char* k, size_t keylen)
+void ChaCha20::SetKey(const unsigned char* k, size_t keylen)
 {
-     unsigned char *constants;
+    const unsigned char *constants;
 
     input[4] = ReadLE32(k + 0);
     input[5] = ReadLE32(k + 4);
@@ -54,7 +54,7 @@ ChaCha20::ChaCha20()
     memset(input, 0, sizeof(input));
 }
 
-ChaCha20::ChaCha20( unsigned char* k, size_t keylen)
+ChaCha20::ChaCha20(const unsigned char* k, size_t keylen)
 {
     SetKey(k, keylen);
 }

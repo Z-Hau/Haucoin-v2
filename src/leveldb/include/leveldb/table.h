@@ -35,7 +35,7 @@ class Table {
   // for the duration of the returned table's lifetime.
   //
   // *file must remain live while this Table is in use.
-  static Status Open( Options& options,
+  static Status Open(const Options& options,
                      RandomAccessFile* file,
                      uint64_t file_size,
                      Table** table);
@@ -45,7 +45,7 @@ class Table {
   // Returns a new iterator over the table contents.
   // The result of NewIterator() is initially invalid (caller must
   // call one of the Seek methods on the iterator before using it).
-  Iterator* NewIterator( ReadOptions&) ;
+  Iterator* NewIterator(const ReadOptions&) const;
 
   // Given a key, return an approximate byte offset in the file where
   // the data for that key begins (or would begin if the key were
@@ -53,31 +53,31 @@ class Table {
   // bytes, and so includes effects like compression of the underlying data.
   // E.g., the approximate offset of the last key in the table will
   // be close to the file length.
-  uint64_t ApproximateOffsetOf( Slice& key) ;
+  uint64_t ApproximateOffsetOf(const Slice& key) const;
 
  private:
   struct Rep;
   Rep* rep_;
 
   explicit Table(Rep* rep) { rep_ = rep; }
-  static Iterator* BlockReader(void*,  ReadOptions&,  Slice&);
+  static Iterator* BlockReader(void*, const ReadOptions&, const Slice&);
 
   // Calls (*handle_result)(arg, ...) with the entry found after a call
   // to Seek(key).  May not make such a call if filter policy says
   // that key is not present.
   friend class TableCache;
   Status InternalGet(
-       ReadOptions&,  Slice& key,
+      const ReadOptions&, const Slice& key,
       void* arg,
-      void (*handle_result)(void* arg,  Slice& k,  Slice& v));
+      void (*handle_result)(void* arg, const Slice& k, const Slice& v));
 
 
-  void ReadMeta( Footer& footer);
-  void ReadFilter( Slice& filter_handle_value);
+  void ReadMeta(const Footer& footer);
+  void ReadFilter(const Slice& filter_handle_value);
 
   // No copying allowed
-  Table( Table&);
-  void operator=( Table&);
+  Table(const Table&);
+  void operator=(const Table&);
 };
 
 }  // namespace leveldb

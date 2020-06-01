@@ -33,7 +33,7 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView( PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit TransactionView(const PlatformStyle *platformStyle, QWidget *parent = 0);
 
     void setModel(WalletModel *model);
 
@@ -87,7 +87,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private Q_SLOTS:
-    void contextualMenu( QPoint &);
+    void contextualMenu(const QPoint &);
     void dateRangeChanged();
     void showDetails();
     void copyAddress();
@@ -103,10 +103,10 @@ private Q_SLOTS:
     void bumpFee();
 
 Q_SIGNALS:
-    void doubleClicked( QModelIndex&);
+    void doubleClicked(const QModelIndex&);
 
     /**  Fired when a message should be reported to the user */
-    void message( QString &title,  QString &message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
 
 public Q_SLOTS:
     void chooseDate(int idx);
@@ -115,7 +115,7 @@ public Q_SLOTS:
     void changedAmount();
     void changedSearch();
     void exportClicked();
-    void focusTransaction( QModelIndex&);
+    void focusTransaction(const QModelIndex&);
 
 };
 

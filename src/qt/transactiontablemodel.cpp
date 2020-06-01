@@ -39,15 +39,15 @@ static int column_alignments[] = {
 // Comparison operator for sort/binary search of model tx list
 struct TxLessThan
 {
-    bool operator()( TransactionRecord &a,  TransactionRecord &b) 
+    bool operator()(const TransactionRecord &a, const TransactionRecord &b) const
     {
         return a.hash < b.hash;
     }
-    bool operator()( TransactionRecord &a,  uint256 &b) 
+    bool operator()(const TransactionRecord &a, const uint256 &b) const
     {
         return a.hash < b;
     }
-    bool operator()( uint256 &a,  TransactionRecord &b) 
+    bool operator()(const uint256 &a, const TransactionRecord &b) const
     {
         return a < b.hash;
     }
@@ -80,7 +80,7 @@ public:
         cachedWallet.clear();
         {
             LOCK2(cs_main, wallet->cs_wallet);
-            for ( auto& entry : wallet->mapWallet)
+            for (const auto& entry : wallet->mapWallet)
             {
                 if (TransactionRecord::showTransaction(entry.second))
                     cachedWallet.append(TransactionRecord::decomposeTransaction(wallet, entry.second));
@@ -93,7 +93,7 @@ public:
 
        Call with transaction that was added, removed or changed.
      */
-    void updateWallet( uint256 &hash, int status, bool showTransaction)
+    void updateWallet(const uint256 &hash, int status, bool showTransaction)
     {
         qDebug() << "TransactionTablePriv::updateWallet: " + QString::fromStdString(hash.ToString()) + " " + QString::number(status);
 
@@ -143,7 +143,7 @@ public:
                 {
                     parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex+toInsert.size()-1);
                     int insert_idx = lowerIndex;
-                    for ( TransactionRecord &rec : toInsert)
+                    for (const TransactionRecord &rec : toInsert)
                     {
                         cachedWallet.insert(insert_idx, rec);
                         insert_idx += 1;
@@ -237,7 +237,7 @@ public:
     }
 };
 
-TransactionTableModel::TransactionTableModel( PlatformStyle *_platformStyle, CWallet* _wallet, WalletModel *parent):
+TransactionTableModel::TransactionTableModel(const PlatformStyle *_platformStyle, CWallet* _wallet, WalletModel *parent):
         QAbstractTableModel(parent),
         wallet(_wallet),
         walletModel(parent),
@@ -266,7 +266,7 @@ void TransactionTableModel::updateAmountColumnTitle()
     Q_EMIT headerDataChanged(Qt::Horizontal,Amount,Amount);
 }
 
-void TransactionTableModel::updateTransaction( QString &hash, int status, bool showTransaction)
+void TransactionTableModel::updateTransaction(const QString &hash, int status, bool showTransaction)
 {
     uint256 updated;
     updated.SetHex(hash.toStdString());
@@ -284,19 +284,19 @@ void TransactionTableModel::updateConfirmations()
     Q_EMIT dataChanged(index(0, ToAddress), index(priv->size()-1, ToAddress));
 }
 
-int TransactionTableModel::rowCount( QModelIndex &parent) 
+int TransactionTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return priv->size();
 }
 
-int TransactionTableModel::columnCount( QModelIndex &parent) 
+int TransactionTableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return columns.length();
 }
 
-QString TransactionTableModel::formatTxStatus( TransactionRecord *wtx) 
+QString TransactionTableModel::formatTxStatus(const TransactionRecord *wtx) const
 {
     QString status;
 
@@ -334,7 +334,7 @@ QString TransactionTableModel::formatTxStatus( TransactionRecord *wtx)
     return status;
 }
 
-QString TransactionTableModel::formatTxDate( TransactionRecord *wtx) 
+QString TransactionTableModel::formatTxDate(const TransactionRecord *wtx) const
 {
     if(wtx->time)
     {
@@ -346,7 +346,7 @@ QString TransactionTableModel::formatTxDate( TransactionRecord *wtx)
 /* Look up address in address book, if found return label (address)
    otherwise just return (address)
  */
-QString TransactionTableModel::lookupAddress( std::string &address, bool tooltip) 
+QString TransactionTableModel::lookupAddress(const std::string &address, bool tooltip) const
 {
     QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(address));
     QString description;
@@ -361,7 +361,7 @@ QString TransactionTableModel::lookupAddress( std::string &address, bool tooltip
     return description;
 }
 
-QString TransactionTableModel::formatTxType( TransactionRecord *wtx) 
+QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
 {
     switch(wtx->type)
     {
@@ -381,7 +381,7 @@ QString TransactionTableModel::formatTxType( TransactionRecord *wtx)
     }
 }
 
-QVariant TransactionTableModel::txAddressDecoration( TransactionRecord *wtx) 
+QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord *wtx) const
 {
     switch(wtx->type)
     {
@@ -398,7 +398,7 @@ QVariant TransactionTableModel::txAddressDecoration( TransactionRecord *wtx)
     }
 }
 
-QString TransactionTableModel::formatTxToAddress( TransactionRecord *wtx, bool tooltip) 
+QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, bool tooltip) const
 {
     QString watchAddress;
     if (tooltip) {
@@ -422,7 +422,7 @@ QString TransactionTableModel::formatTxToAddress( TransactionRecord *wtx, bool t
     }
 }
 
-QVariant TransactionTableModel::addressColor( TransactionRecord *wtx) 
+QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
 {
     // Show addresses without label in a less visible color
     switch(wtx->type)
@@ -443,7 +443,7 @@ QVariant TransactionTableModel::addressColor( TransactionRecord *wtx)
     return QVariant();
 }
 
-QString TransactionTableModel::formatTxAmount( TransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) 
+QString TransactionTableModel::formatTxAmount(const TransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
 {
     QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit, false, separators);
     if(showUnconfirmed)
@@ -456,7 +456,7 @@ QString TransactionTableModel::formatTxAmount( TransactionRecord *wtx, bool show
     return QString(str);
 }
 
-QVariant TransactionTableModel::txStatusDecoration( TransactionRecord *wtx) 
+QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx) const
 {
     switch(wtx->status.status)
     {
@@ -492,7 +492,7 @@ QVariant TransactionTableModel::txStatusDecoration( TransactionRecord *wtx)
     }
 }
 
-QVariant TransactionTableModel::txWatchonlyDecoration( TransactionRecord *wtx) 
+QVariant TransactionTableModel::txWatchonlyDecoration(const TransactionRecord *wtx) const
 {
     if (wtx->involvesWatchAddress)
         return QIcon(":/icons/eye");
@@ -500,7 +500,7 @@ QVariant TransactionTableModel::txWatchonlyDecoration( TransactionRecord *wtx)
         return QVariant();
 }
 
-QString TransactionTableModel::formatTooltip( TransactionRecord *rec) 
+QString TransactionTableModel::formatTooltip(const TransactionRecord *rec) const
 {
     QString tooltip = formatTxStatus(rec) + QString("\n") + formatTxType(rec);
     if(rec->type==TransactionRecord::RecvFromOther || rec->type==TransactionRecord::SendToOther ||
@@ -511,7 +511,7 @@ QString TransactionTableModel::formatTooltip( TransactionRecord *rec)
     return tooltip;
 }
 
-QVariant TransactionTableModel::data( QModelIndex &index, int role) 
+QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
         return QVariant();
@@ -651,7 +651,7 @@ QVariant TransactionTableModel::data( QModelIndex &index, int role)
     return QVariant();
 }
 
-QVariant TransactionTableModel::headerData(int section, Qt::Orientation orientation, int role) 
+QVariant TransactionTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(orientation == Qt::Horizontal)
     {
@@ -684,7 +684,7 @@ QVariant TransactionTableModel::headerData(int section, Qt::Orientation orientat
     return QVariant();
 }
 
-QModelIndex TransactionTableModel::index(int row, int column,  QModelIndex &parent) 
+QModelIndex TransactionTableModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     TransactionRecord *data = priv->index(row);
@@ -728,7 +728,7 @@ private:
 static bool fQueueNotifications = false;
 static std::vector< TransactionNotification > vQueueNotifications;
 
-static void NotifyTransactionChanged(TransactionTableModel *ttm, CWallet *wallet,  uint256 &hash, ChangeType status)
+static void NotifyTransactionChanged(TransactionTableModel *ttm, CWallet *wallet, const uint256 &hash, ChangeType status)
 {
     // Find transaction in wallet
     std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
@@ -746,7 +746,7 @@ static void NotifyTransactionChanged(TransactionTableModel *ttm, CWallet *wallet
     notification.invoke(ttm);
 }
 
-static void ShowProgress(TransactionTableModel *ttm,  std::string &title, int nProgress)
+static void ShowProgress(TransactionTableModel *ttm, const std::string &title, int nProgress)
 {
     if (nProgress == 0)
         fQueueNotifications = true;

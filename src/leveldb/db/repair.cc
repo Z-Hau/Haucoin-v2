@@ -44,7 +44,7 @@ namespace {
 
 class Repairer {
  public:
-  Repairer( std::string& dbname,  Options& options)
+  Repairer(const std::string& dbname, const Options& options)
       : dbname_(dbname),
         env_(options.env),
         icmp_(options.comparator),
@@ -97,11 +97,11 @@ class Repairer {
     SequenceNumber max_sequence;
   };
 
-  std::string  dbname_;
-  Env*  env_;
-  InternalKeyComparator  icmp_;
-  InternalFilterPolicy  ipolicy_;
-  Options  options_;
+  std::string const dbname_;
+  Env* const env_;
+  InternalKeyComparator const icmp_;
+  InternalFilterPolicy const ipolicy_;
+  Options const options_;
   bool owns_info_log_;
   bool owns_cache_;
   TableCache* table_cache_;
@@ -164,7 +164,7 @@ class Repairer {
       Env* env;
       Logger* info_log;
       uint64_t lognum;
-      virtual void Corruption(size_t bytes,  Status& s) {
+      virtual void Corruption(size_t bytes, const Status& s) {
         // We print error messages for corruption, but continue repairing.
         Log(info_log, "Log #%llu: dropping %d bytes; %s",
             (unsigned long long) lognum,
@@ -247,7 +247,7 @@ class Repairer {
     }
   }
 
-  Iterator* NewTableIterator( FileMetaData& meta) {
+  Iterator* NewTableIterator(const FileMetaData& meta) {
     // Same as compaction iterators: if paranoid_checks are on, turn
     // on checksum verification.
     ReadOptions r;
@@ -318,7 +318,7 @@ class Repairer {
     }
   }
 
-  void RepairTable( std::string& src, TableInfo t) {
+  void RepairTable(const std::string& src, TableInfo t) {
     // We will copy src contents to a new table and then rename the
     // new table over the source.
 
@@ -394,7 +394,7 @@ class Repairer {
 
     for (size_t i = 0; i < tables_.size(); i++) {
       // TODO(opt): separate out into multiple levels
-       TableInfo& t = tables_[i];
+      const TableInfo& t = tables_[i];
       edit_.AddFile(0, t.meta.number, t.meta.file_size,
                     t.meta.smallest, t.meta.largest);
     }
@@ -431,12 +431,12 @@ class Repairer {
     return status;
   }
 
-  void ArchiveFile( std::string& fname) {
+  void ArchiveFile(const std::string& fname) {
     // Move into another directory.  E.g., for
     //    dir/foo
     // rename to
     //    dir/lost/foo
-     char* slash = strrchr(fname.c_str(), '/');
+    const char* slash = strrchr(fname.c_str(), '/');
     std::string new_dir;
     if (slash != NULL) {
       new_dir.assign(fname.data(), slash - fname.data());
@@ -453,7 +453,7 @@ class Repairer {
 };
 }  // namespace
 
-Status RepairDB( std::string& dbname,  Options& options) {
+Status RepairDB(const std::string& dbname, const Options& options) {
   Repairer repairer(dbname, options);
   return repairer.Run();
 }

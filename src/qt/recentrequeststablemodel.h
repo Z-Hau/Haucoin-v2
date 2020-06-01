@@ -18,7 +18,7 @@ class RecentRequestEntry
 public:
     RecentRequestEntry() : nVersion(RecentRequestEntry::CURRENT_VERSION), id(0) { }
 
-    static  int CURRENT_VERSION = 1;
+    static const int CURRENT_VERSION = 1;
     int nVersion;
     int64_t id;
     QDateTime date;
@@ -45,7 +45,7 @@ class RecentRequestEntryLessThan
 public:
     RecentRequestEntryLessThan(int nColumn, Qt::SortOrder fOrder):
         column(nColumn), order(fOrder) {}
-    bool operator()(RecentRequestEntry &left, RecentRequestEntry &right) ;
+    bool operator()(RecentRequestEntry &left, RecentRequestEntry &right) const;
 
 private:
     int column;
@@ -73,19 +73,19 @@ public:
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount( QModelIndex &parent) ;
-    int columnCount( QModelIndex &parent) ;
-    QVariant data( QModelIndex &index, int role) ;
-    bool setData( QModelIndex &index,  QVariant &value, int role);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) ;
-    QModelIndex index(int row, int column,  QModelIndex &parent) ;
-    bool removeRows(int row, int count,  QModelIndex &parent = QModelIndex());
-    Qt::ItemFlags flags( QModelIndex &index) ;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    Qt::ItemFlags flags(const QModelIndex &index) const;
     /*@}*/
 
-     RecentRequestEntry &entry(int row)  { return list[row]; }
-    void addNewRequest( SendCoinsRecipient &recipient);
-    void addNewRequest( std::string &recipient);
+    const RecentRequestEntry &entry(int row) const { return list[row]; }
+    void addNewRequest(const SendCoinsRecipient &recipient);
+    void addNewRequest(const std::string &recipient);
     void addNewRequest(RecentRequestEntry &recipient);
 
 public Q_SLOTS:

@@ -16,7 +16,7 @@ struct TableAndFile {
   Table* table;
 };
 
-static void DeleteEntry( Slice& key, void* value) {
+static void DeleteEntry(const Slice& key, void* value) {
   TableAndFile* tf = reinterpret_cast<TableAndFile*>(value);
   delete tf->table;
   delete tf->file;
@@ -29,8 +29,8 @@ static void UnrefEntry(void* arg1, void* arg2) {
   cache->Release(h);
 }
 
-TableCache::TableCache( std::string& dbname,
-                        Options* options,
+TableCache::TableCache(const std::string& dbname,
+                       const Options* options,
                        int entries)
     : env_(options->env),
       dbname_(dbname),
@@ -79,7 +79,7 @@ Status TableCache::FindTable(uint64_t file_number, uint64_t file_size,
   return s;
 }
 
-Iterator* TableCache::NewIterator( ReadOptions& options,
+Iterator* TableCache::NewIterator(const ReadOptions& options,
                                   uint64_t file_number,
                                   uint64_t file_size,
                                   Table** tableptr) {
@@ -102,12 +102,12 @@ Iterator* TableCache::NewIterator( ReadOptions& options,
   return result;
 }
 
-Status TableCache::Get( ReadOptions& options,
+Status TableCache::Get(const ReadOptions& options,
                        uint64_t file_number,
                        uint64_t file_size,
-                        Slice& k,
+                       const Slice& k,
                        void* arg,
-                       void (*saver)(void*,  Slice&,  Slice&)) {
+                       void (*saver)(void*, const Slice&, const Slice&)) {
   Cache::Handle* handle = NULL;
   Status s = FindTable(file_number, file_size, &handle);
   if (s.ok()) {

@@ -73,7 +73,7 @@ public:
     explicit FastRandomContext(bool fDeterministic = false);
 
     /** Initialize with explicit seed (only for testing) */
-    explicit FastRandomContext( uint256& seed);
+    explicit FastRandomContext(const uint256& seed);
 
     /** Generate a random 64-bit integer. */
     uint64_t rand64()
@@ -128,7 +128,7 @@ public:
  * sure that the underlying OS APIs for all platforms support the number.
  * (many cap out at 256 bytes).
  */
-static  int NUM_OS_RANDOM_BYTES = 32;
+static const int NUM_OS_RANDOM_BYTES = 32;
 
 /** Get 32 bytes of system entropy. Do not use this in application code: use
  * GetStrongRandBytes instead.

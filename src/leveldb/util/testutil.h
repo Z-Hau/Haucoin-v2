@@ -36,7 +36,7 @@ class ErrorEnv : public EnvWrapper {
                writable_file_error_(false),
                num_writable_file_errors_(0) { }
 
-  virtual Status NewWritableFile( std::string& fname,
+  virtual Status NewWritableFile(const std::string& fname,
                                  WritableFile** result) {
     if (writable_file_error_) {
       ++num_writable_file_errors_;
@@ -46,7 +46,7 @@ class ErrorEnv : public EnvWrapper {
     return target()->NewWritableFile(fname, result);
   }
 
-  virtual Status NewAppendableFile( std::string& fname,
+  virtual Status NewAppendableFile(const std::string& fname,
                                    WritableFile** result) {
     if (writable_file_error_) {
       ++num_writable_file_errors_;

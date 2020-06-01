@@ -12,8 +12,8 @@
 #include <sys/select.h>
 #endif
 
-extern "C" void* memcpy(void* a,  void* b, size_t c);
-void* memcpy_int(void* a,  void* b, size_t c)
+extern "C" void* memcpy(void* a, const void* b, size_t c);
+void* memcpy_int(void* a, const void* b, size_t c)
 {
     return memcpy(a, b, c);
 }

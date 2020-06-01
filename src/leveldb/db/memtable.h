@@ -21,7 +21,7 @@ class MemTable {
  public:
   // MemTables are reference counted.  The initial reference count
   // is zero and the caller must call Ref() at least once.
-  explicit MemTable( InternalKeyComparator& comparator);
+  explicit MemTable(const InternalKeyComparator& comparator);
 
   // Increase reference count.
   void Ref() { ++refs_; }
@@ -51,27 +51,27 @@ class MemTable {
   // specified sequence number and with the specified type.
   // Typically value will be empty if type==kTypeDeletion.
   void Add(SequenceNumber seq, ValueType type,
-            Slice& key,
-            Slice& value);
+           const Slice& key,
+           const Slice& value);
 
   // If memtable contains a value for key, store it in *value and return true.
   // If memtable contains a deletion for key, store a NotFound() error
   // in *status and return true.
   // Else, return false.
-  bool Get( LookupKey& key, std::string* value, Status* s);
+  bool Get(const LookupKey& key, std::string* value, Status* s);
 
  private:
   ~MemTable();  // Private since only Unref() should be used to delete it
 
   struct KeyComparator {
-     InternalKeyComparator comparator;
-    explicit KeyComparator( InternalKeyComparator& c) : comparator(c) { }
-    int operator()( char* a,  char* b) ;
+    const InternalKeyComparator comparator;
+    explicit KeyComparator(const InternalKeyComparator& c) : comparator(c) { }
+    int operator()(const char* a, const char* b) const;
   };
   friend class MemTableIterator;
   friend class MemTableBackwardIterator;
 
-  typedef SkipList< char*, KeyComparator> Table;
+  typedef SkipList<const char*, KeyComparator> Table;
 
   KeyComparator comparator_;
   int refs_;
@@ -79,8 +79,8 @@ class MemTable {
   Table table_;
 
   // No copying allowed
-  MemTable( MemTable&);
-  void operator=( MemTable&);
+  MemTable(const MemTable&);
+  void operator=(const MemTable&);
 };
 
 }  // namespace leveldb

@@ -21,7 +21,7 @@ class IteratorWrapper {
     Set(iter);
   }
   ~IteratorWrapper() { delete iter_; }
-  Iterator* iter()  { return iter_; }
+  Iterator* iter() const { return iter_; }
 
   // Takes ownership of "iter" and will delete it when destroyed, or
   // when Set() is invoked again.
@@ -37,14 +37,14 @@ class IteratorWrapper {
 
 
   // Iterator interface methods
-  bool Valid()         { return valid_; }
-  Slice key()          { assert(Valid()); return key_; }
-  Slice value()        { assert(Valid()); return iter_->value(); }
+  bool Valid() const        { return valid_; }
+  Slice key() const         { assert(Valid()); return key_; }
+  Slice value() const       { assert(Valid()); return iter_->value(); }
   // Methods below require iter() != NULL
-  Status status()      { assert(iter_); return iter_->status(); }
+  Status status() const     { assert(iter_); return iter_->status(); }
   void Next()               { assert(iter_); iter_->Next();        Update(); }
   void Prev()               { assert(iter_); iter_->Prev();        Update(); }
-  void Seek( Slice& k) { assert(iter_); iter_->Seek(k);       Update(); }
+  void Seek(const Slice& k) { assert(iter_); iter_->Seek(k);       Update(); }
   void SeekToFirst()        { assert(iter_); iter_->SeekToFirst(); Update(); }
   void SeekToLast()         { assert(iter_); iter_->SeekToLast();  Update(); }
 

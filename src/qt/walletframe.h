@@ -31,17 +31,17 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame( PlatformStyle *platformStyle, BitcoinGUI *_gui = 0);
+    explicit WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui = 0);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
 
-    bool addWallet( QString& name, WalletModel *walletModel);
-    bool setCurrentWallet( QString& name);
-    bool removeWallet( QString &name);
+    bool addWallet(const QString& name, WalletModel *walletModel);
+    bool setCurrentWallet(const QString& name);
+    bool removeWallet(const QString &name);
     void removeAllWallets();
 
-    bool handlePaymentRequest( SendCoinsRecipient& recipient);
+    bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
 
@@ -57,7 +57,7 @@ private:
 
     bool bOutOfSync;
 
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
     WalletView *currentWalletView();
 

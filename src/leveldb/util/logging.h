@@ -23,14 +23,14 @@ extern void AppendNumberTo(std::string* str, uint64_t num);
 
 // Append a human-readable printout of "value" to *str.
 // Escapes any non-printable characters found in "value".
-extern void AppendEscapedStringTo(std::string* str,  Slice& value);
+extern void AppendEscapedStringTo(std::string* str, const Slice& value);
 
 // Return a human-readable printout of "num"
 extern std::string NumberToString(uint64_t num);
 
 // Return a human-readable version of "value".
 // Escapes any non-printable characters found in "value".
-extern std::string EscapeString( Slice& value);
+extern std::string EscapeString(const Slice& value);
 
 // Parse a human-readable number from "*in" into *value.  On success,
 // advances "*in" past the consumed number and sets "*val" to the

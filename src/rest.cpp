@@ -22,7 +22,7 @@
 
 #include <univalue.h>
 
-static  size_t MAX_GETUTXOS_OUTPOINTS = 15; //allow a max of 15 outpoints to be queried at once
+static const size_t MAX_GETUTXOS_OUTPOINTS = 15; //allow a max of 15 outpoints to be queried at once
 
 enum RetFormat {
     RF_UNDEF,
@@ -31,9 +31,9 @@ enum RetFormat {
     RF_JSON,
 };
 
-static  struct {
+static const struct {
     enum RetFormat rf;
-     char* name;
+    const char* name;
 } rf_names[] = {
       {RF_UNDEF, ""},
       {RF_BINARY, "bin"},
@@ -67,9 +67,9 @@ static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, std::string me
     return false;
 }
 
-static enum RetFormat ParseDataFormat(std::string& param,  std::string& strReq)
+static enum RetFormat ParseDataFormat(std::string& param, const std::string& strReq)
 {
-     std::string::size_type pos = strReq.rfind('.');
+    const std::string::size_type pos = strReq.rfind('.');
     if (pos == std::string::npos)
     {
         param = strReq;
@@ -77,7 +77,7 @@ static enum RetFormat ParseDataFormat(std::string& param,  std::string& strReq)
     }
 
     param = strReq.substr(0, pos);
-     std::string suff(strReq, pos + 1);
+    const std::string suff(strReq, pos + 1);
 
     for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
         if (suff == rf_names[i].name)
@@ -104,7 +104,7 @@ static std::string AvailableDataFormatsString()
     return formats;
 }
 
-static bool ParseHashStr( std::string& strReq, uint256& v)
+static bool ParseHashStr(const std::string& strReq, uint256& v)
 {
     if (!IsHex(strReq) || (strReq.size() != 64))
         return false;
@@ -122,12 +122,12 @@ static bool CheckWarmup(HTTPRequest* req)
 }
 
 static bool rest_headers(HTTPRequest* req,
-                          std::string& strURIPart)
+                         const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string param;
-     RetFormat rf = ParseDataFormat(param, strURIPart);
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
     std::vector<std::string> path;
     boost::split(path, param, boost::is_any_of("/"));
 
@@ -143,12 +143,12 @@ static bool rest_headers(HTTPRequest* req,
     if (!ParseHashStr(hashStr, hash))
         return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
-    std::vector< CBlockIndex *> headers;
+    std::vector<const CBlockIndex *> headers;
     headers.reserve(count);
     {
         LOCK(cs_main);
         BlockMap::const_iterator it = mapBlockIndex.find(hash);
-         CBlockIndex *pindex = (it != mapBlockIndex.end()) ? it->second : nullptr;
+        const CBlockIndex *pindex = (it != mapBlockIndex.end()) ? it->second : nullptr;
         while (pindex != nullptr && chainActive.Contains(pindex)) {
             headers.push_back(pindex);
             if (headers.size() == (unsigned long)count)
@@ -158,7 +158,7 @@ static bool rest_headers(HTTPRequest* req,
     }
 
     CDataStream ssHeader(SER_NETWORK, PROTOCOL_VERSION);
-    for ( CBlockIndex *pindex : headers) {
+    for (const CBlockIndex *pindex : headers) {
         ssHeader << pindex->GetBlockHeader();
     }
 
@@ -180,7 +180,7 @@ static bool rest_headers(HTTPRequest* req,
         UniValue jsonHeaders(UniValue::VARR);
         {
             LOCK(cs_main);
-            for ( CBlockIndex *pindex : headers) {
+            for (const CBlockIndex *pindex : headers) {
                 jsonHeaders.push_back(blockheaderToJSON(pindex));
             }
         }
@@ -196,13 +196,13 @@ static bool rest_headers(HTTPRequest* req,
 }
 
 static bool rest_block(HTTPRequest* req,
-                        std::string& strURIPart,
+                       const std::string& strURIPart,
                        bool showTxDetails)
 {
     if (!CheckWarmup(req))
         return false;
     std::string hashStr;
-     RetFormat rf = ParseDataFormat(hashStr, strURIPart);
+    const RetFormat rf = ParseDataFormat(hashStr, strURIPart);
 
     uint256 hash;
     if (!ParseHashStr(hashStr, hash))
@@ -259,25 +259,25 @@ static bool rest_block(HTTPRequest* req,
     }
 }
 
-static bool rest_block_extended(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_block_extended(HTTPRequest* req, const std::string& strURIPart)
 {
     return rest_block(req, strURIPart, true);
 }
 
-static bool rest_block_notxdetails(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_block_notxdetails(HTTPRequest* req, const std::string& strURIPart)
 {
     return rest_block(req, strURIPart, false);
 }
 
 // A bit of a hack - dependency on a function defined in rpc/blockchain.cpp
-UniValue getblockchaininfo( JSONRPCRequest& request);
+UniValue getblockchaininfo(const JSONRPCRequest& request);
 
-static bool rest_chaininfo(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_chaininfo(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string param;
-     RetFormat rf = ParseDataFormat(param, strURIPart);
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -295,12 +295,12 @@ static bool rest_chaininfo(HTTPRequest* req,  std::string& strURIPart)
     }
 }
 
-static bool rest_mempool_info(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_mempool_info(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string param;
-     RetFormat rf = ParseDataFormat(param, strURIPart);
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -317,12 +317,12 @@ static bool rest_mempool_info(HTTPRequest* req,  std::string& strURIPart)
     }
 }
 
-static bool rest_mempool_contents(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_mempool_contents(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string param;
-     RetFormat rf = ParseDataFormat(param, strURIPart);
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -339,12 +339,12 @@ static bool rest_mempool_contents(HTTPRequest* req,  std::string& strURIPart)
     }
 }
 
-static bool rest_tx(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string hashStr;
-     RetFormat rf = ParseDataFormat(hashStr, strURIPart);
+    const RetFormat rf = ParseDataFormat(hashStr, strURIPart);
 
     uint256 hash;
     if (!ParseHashStr(hashStr, hash))
@@ -388,12 +388,12 @@ static bool rest_tx(HTTPRequest* req,  std::string& strURIPart)
     }
 }
 
-static bool rest_getutxos(HTTPRequest* req,  std::string& strURIPart)
+static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
     std::string param;
-     RetFormat rf = ParseDataFormat(param, strURIPart);
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     std::vector<std::string> uriParts;
     if (param.length() > 1)
@@ -459,7 +459,7 @@ static bool rest_getutxos(HTTPRequest* req,  std::string& strURIPart)
                 oss >> fCheckMemPool;
                 oss >> vOutPoints;
             }
-        } catch ( std::ios_base::failure& e) {
+        } catch (const std::ios_base::failure& e) {
             // abort in case of unreadable binary data
             return RESTERR(req, HTTP_BAD_REQUEST, "Parse error");
         }
@@ -545,7 +545,7 @@ static bool rest_getutxos(HTTPRequest* req,  std::string& strURIPart)
         objGetUTXOResponse.push_back(Pair("bitmap", bitmapStringRepresentation));
 
         UniValue utxos(UniValue::VARR);
-        for ( CCoin& coin : outs) {
+        for (const CCoin& coin : outs) {
             UniValue utxo(UniValue::VOBJ);
             utxo.push_back(Pair("height", (int32_t)coin.nHeight));
             utxo.push_back(Pair("value", ValueFromAmount(coin.out.nValue)));
@@ -570,9 +570,9 @@ static bool rest_getutxos(HTTPRequest* req,  std::string& strURIPart)
     }
 }
 
-static  struct {
-     char* prefix;
-    bool (*handler)(HTTPRequest* req,  std::string& strReq);
+static const struct {
+    const char* prefix;
+    bool (*handler)(HTTPRequest* req, const std::string& strReq);
 } uri_prefixes[] = {
       {"/rest/tx/", rest_tx},
       {"/rest/block/notxdetails/", rest_block_notxdetails},

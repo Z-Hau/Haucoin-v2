@@ -23,7 +23,7 @@
 // calculation, but we should be able to refactor after priority is removed).
 // NOTE: this requires that all inputs must be in mapWallet (eg the tx should
 // be IsAllFromMe).
-static int64_t CalculateMaximumSignedTxSize( CTransaction &tx,  CWallet *wallet)
+static int64_t CalculateMaximumSignedTxSize(const CTransaction &tx, const CWallet *wallet)
 {
     CMutableTransaction txNew(tx);
     std::vector<CInputCoin> vCoins;
@@ -31,7 +31,7 @@ static int64_t CalculateMaximumSignedTxSize( CTransaction &tx,  CWallet *wallet)
     // IsAllFromMe(ISMINE_SPENDABLE), so every input should already be in our
     // wallet, with a valid index into the vout array.
     for (auto& input : tx.vin) {
-         auto mi = wallet->mapWallet.find(input.prevout.hash);
+        const auto mi = wallet->mapWallet.find(input.prevout.hash);
         assert(mi != wallet->mapWallet.end() && input.prevout.n < mi->second.tx->vout.size());
         vCoins.emplace_back(CInputCoin(&(mi->second), input.prevout.n));
     }
@@ -45,7 +45,7 @@ static int64_t CalculateMaximumSignedTxSize( CTransaction &tx,  CWallet *wallet)
 
 //! Check whether transaction has descendant in wallet or mempool, or has been
 //! mined, or conflicts with a mined transaction. Return a feebumper::Result.
-static feebumper::Result PreconditionChecks( CWallet* wallet,  CWalletTx& wtx, std::vector<std::string>& errors)
+static feebumper::Result PreconditionChecks(const CWallet* wallet, const CWalletTx& wtx, std::vector<std::string>& errors)
 {
     if (wallet->HasWalletSpend(wtx.GetHash())) {
         errors.push_back("Transaction has descendants in the wallet");
@@ -70,14 +70,14 @@ static feebumper::Result PreconditionChecks( CWallet* wallet,  CWalletTx& wtx, s
 
 namespace feebumper {
 
-bool TransactionCanBeBumped(CWallet* wallet,  uint256& txid)
+bool TransactionCanBeBumped(CWallet* wallet, const uint256& txid)
 {
     LOCK2(cs_main, wallet->cs_wallet);
-     CWalletTx* wtx = wallet->GetWalletTx(txid);
+    const CWalletTx* wtx = wallet->GetWalletTx(txid);
     return wtx && SignalsOptInRBF(*wtx->tx) && !wtx->mapValue.count("replaced_by_txid");
 }
 
-Result CreateTransaction( CWallet* wallet,  uint256& txid,  CCoinControl& coin_control, CAmount total_fee, std::vector<std::string>& errors,
+Result CreateTransaction(const CWallet* wallet, const uint256& txid, const CCoinControl& coin_control, CAmount total_fee, std::vector<std::string>& errors,
                          CAmount& old_fee, CAmount& new_fee, CMutableTransaction& mtx)
 {
     LOCK2(cs_main, wallet->cs_wallet);
@@ -87,7 +87,7 @@ Result CreateTransaction( CWallet* wallet,  uint256& txid,  CCoinControl& coin_c
         errors.push_back("Invalid or non-wallet transaction id");
         return Result::INVALID_ADDRESS_OR_KEY;
     }
-     CWalletTx& wtx = it->second;
+    const CWalletTx& wtx = it->second;
 
     Result result = PreconditionChecks(wallet, wtx, errors);
     if (result != Result::OK) {
@@ -130,7 +130,7 @@ Result CreateTransaction( CWallet* wallet,  uint256& txid,  CCoinControl& coin_c
 
     // Calculate the expected size of the new transaction.
     int64_t txSize = GetVirtualTransactionSize(*(wtx.tx));
-     int64_t maxNewTxSize = CalculateMaximumSignedTxSize(*wtx.tx, wallet);
+    const int64_t maxNewTxSize = CalculateMaximumSignedTxSize(*wtx.tx, wallet);
     if (maxNewTxSize < 0) {
         errors.push_back("Transaction contains inputs that cannot be signed");
         return Result::INVALID_ADDRESS_OR_KEY;
@@ -236,7 +236,7 @@ bool SignTransaction(CWallet* wallet, CMutableTransaction& mtx) {
     return wallet->SignTransaction(mtx);
 }
 
-Result CommitTransaction(CWallet* wallet,  uint256& txid, CMutableTransaction&& mtx, std::vector<std::string>& errors, uint256& bumped_txid)
+Result CommitTransaction(CWallet* wallet, const uint256& txid, CMutableTransaction&& mtx, std::vector<std::string>& errors, uint256& bumped_txid)
 {
     LOCK2(cs_main, wallet->cs_wallet);
     if (!errors.empty()) {

@@ -15,7 +15,7 @@
 namespace leveldb {
 namespace crc32c {
 
-static  uint32_t table0_[256] = {
+static const uint32_t table0_[256] = {
   0x00000000, 0xf26b8303, 0xe13b70f7, 0x1350f3f4,
   0xc79a971f, 0x35f1141c, 0x26a1e7e8, 0xd4ca64eb,
   0x8ad958cf, 0x78b2dbcc, 0x6be22838, 0x9989ab3b,
@@ -81,7 +81,7 @@ static  uint32_t table0_[256] = {
   0x79b737ba, 0x8bdcb4b9, 0x988c474d, 0x6ae7c44e,
   0xbe2da0a5, 0x4c4623a6, 0x5f16d052, 0xad7d5351
 };
-static  uint32_t table1_[256] = {
+static const uint32_t table1_[256] = {
   0x00000000, 0x13a29877, 0x274530ee, 0x34e7a899,
   0x4e8a61dc, 0x5d28f9ab, 0x69cf5132, 0x7a6dc945,
   0x9d14c3b8, 0x8eb65bcf, 0xba51f356, 0xa9f36b21,
@@ -147,7 +147,7 @@ static  uint32_t table1_[256] = {
   0xd98eedc6, 0xca2c75b1, 0xfecbdd28, 0xed69455f,
   0x97048c1a, 0x84a6146d, 0xb041bcf4, 0xa3e32483
 };
-static  uint32_t table2_[256] = {
+static const uint32_t table2_[256] = {
   0x00000000, 0xa541927e, 0x4f6f520d, 0xea2ec073,
   0x9edea41a, 0x3b9f3664, 0xd1b1f617, 0x74f06469,
   0x38513ec5, 0x9d10acbb, 0x773e6cc8, 0xd27ffeb6,
@@ -213,7 +213,7 @@ static  uint32_t table2_[256] = {
   0xe5f54fc1, 0x40b4ddbf, 0xaa9a1dcc, 0x0fdb8fb2,
   0x7b2bebdb, 0xde6a79a5, 0x3444b9d6, 0x91052ba8
 };
-static  uint32_t table3_[256] = {
+static const uint32_t table3_[256] = {
   0x00000000, 0xdd45aab8, 0xbf672381, 0x62228939,
   0x7b2231f3, 0xa6679b4b, 0xc4451272, 0x1900b8ca,
   0xf64463e6, 0x2b01c95e, 0x49234067, 0x9466eadf,
@@ -281,8 +281,8 @@ static  uint32_t table3_[256] = {
 };
 
 // Used to fetch a naturally-aligned 32-bit word in little endian byte-order
-static inline uint32_t LE_LOAD32( uint8_t *p) {
-  return DecodeFixed32(reinterpret_cast< char*>(p));
+static inline uint32_t LE_LOAD32(const uint8_t *p) {
+  return DecodeFixed32(reinterpret_cast<const char*>(p));
 }
 
 // Determine if the CPU running this program can accelerate the CRC32C
@@ -293,21 +293,21 @@ static bool CanAccelerateCRC32C() {
 
   // Double-check that the accelerated implementation functions correctly.
   // port::AcceleretedCRC32C returns zero when unable to accelerate.
-  static  char kTestCRCBuffer[] = "TestCRCBuffer";
-  static  char kBufSize = sizeof(kTestCRCBuffer) - 1;
-  static  uint32_t kTestCRCValue = 0xdcbc59fa;
+  static const char kTestCRCBuffer[] = "TestCRCBuffer";
+  static const char kBufSize = sizeof(kTestCRCBuffer) - 1;
+  static const uint32_t kTestCRCValue = 0xdcbc59fa;
 
   return port::AcceleratedCRC32C(0, kTestCRCBuffer, kBufSize) == kTestCRCValue;
 }
 
-uint32_t Extend(uint32_t crc,  char* buf, size_t size) {
+uint32_t Extend(uint32_t crc, const char* buf, size_t size) {
   static bool accelerate = CanAccelerateCRC32C();
   if (accelerate) {
     return port::AcceleratedCRC32C(crc, buf, size);
   }
 
-   uint8_t *p = reinterpret_cast< uint8_t *>(buf);
-   uint8_t *e = p + size;
+  const uint8_t *p = reinterpret_cast<const uint8_t *>(buf);
+  const uint8_t *e = p + size;
   uint32_t l = crc ^ 0xffffffffu;
 
 #define STEP1 do {                              \
@@ -325,8 +325,8 @@ uint32_t Extend(uint32_t crc,  char* buf, size_t size) {
 
   // Point x at first 4-byte aligned byte in string.  This might be
   // just past the end of the string.
-   uintptr_t pval = reinterpret_cast<uintptr_t>(p);
-   uint8_t* x = reinterpret_cast< uint8_t*>(((pval + 3) >> 2) << 2);
+  const uintptr_t pval = reinterpret_cast<uintptr_t>(p);
+  const uint8_t* x = reinterpret_cast<const uint8_t*>(((pval + 3) >> 2) << 2);
   if (x <= e) {
     // Process bytes until finished or p is 4-byte aligned
     while (p != x) {

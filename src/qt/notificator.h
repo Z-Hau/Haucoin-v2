@@ -29,7 +29,7 @@ public:
     /** Create a new notificator.
        @note Ownership of trayIcon is not transferred to this object.
     */
-    Notificator( QString &programName, QSystemTrayIcon *trayIcon, QWidget *parent);
+    Notificator(const QString &programName, QSystemTrayIcon *trayIcon, QWidget *parent);
     ~Notificator();
 
     // Message class
@@ -49,8 +49,8 @@ public Q_SLOTS:
        @param[in] millisTimeout notification timeout in milliseconds (defaults to 10 seconds)
        @note Platform implementations are free to ignore any of the provided fields except for \a text.
      */
-    void notify(Class cls,  QString &title,  QString &text,
-                 QIcon &icon = QIcon(), int millisTimeout = 10000);
+    void notify(Class cls, const QString &title, const QString &text,
+                const QIcon &icon = QIcon(), int millisTimeout = 10000);
 
 private:
     QWidget *parent;
@@ -66,11 +66,11 @@ private:
 #ifdef USE_DBUS
     QDBusInterface *interface;
 
-    void notifyDBus(Class cls,  QString &title,  QString &text,  QIcon &icon, int millisTimeout);
+    void notifyDBus(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout);
 #endif
-    void notifySystray(Class cls,  QString &title,  QString &text,  QIcon &icon, int millisTimeout);
+    void notifySystray(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout);
 #ifdef Q_OS_MAC
-    void notifyMacUserNotificationCenter(Class cls,  QString &title,  QString &text,  QIcon &icon);
+    void notifyMacUserNotificationCenter(Class cls, const QString &title, const QString &text, const QIcon &icon);
 #endif
 };
 

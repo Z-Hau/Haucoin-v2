@@ -19,7 +19,7 @@ CAmount GetRequiredFee(unsigned int nTxBytes)
 }
 
 
-CAmount GetMinimumFee(unsigned int nTxBytes,  CCoinControl& coin_control,  CTxMemPool& pool,  CBlockPolicyEstimator& estimator, FeeCalculation *feeCalc)
+CAmount GetMinimumFee(unsigned int nTxBytes, const CCoinControl& coin_control, const CTxMemPool& pool, const CBlockPolicyEstimator& estimator, FeeCalculation *feeCalc)
 {
     /* User control of how to calculate fee uses the following parameter precedence:
        1. coin_control.m_feerate
@@ -77,7 +77,7 @@ CAmount GetMinimumFee(unsigned int nTxBytes,  CCoinControl& coin_control,  CTxMe
 }
 
 
-CFeeRate GetDiscardRate( CBlockPolicyEstimator& estimator)
+CFeeRate GetDiscardRate(const CBlockPolicyEstimator& estimator)
 {
     unsigned int highest_target = estimator.HighestTargetTracked(FeeEstimateHorizon::LONG_HALFLIFE);
     CFeeRate discard_rate = estimator.estimateSmartFee(highest_target, nullptr /* FeeCalculation */, false /* conservative */);

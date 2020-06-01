@@ -103,7 +103,7 @@ void QValidatedLineEdit::checkValidity()
     Q_EMIT validationDidChange(this);
 }
 
-void QValidatedLineEdit::setCheckValidator( QValidator *v)
+void QValidatedLineEdit::setCheckValidator(const QValidator *v)
 {
     checkValidator = v;
 }

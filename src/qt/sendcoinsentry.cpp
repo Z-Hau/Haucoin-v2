@@ -14,7 +14,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-SendCoinsEntry::SendCoinsEntry( PlatformStyle *_platformStyle, QWidget *parent) :
+SendCoinsEntry::SendCoinsEntry(const PlatformStyle *_platformStyle, QWidget *parent) :
     QStackedWidget(parent),
     ui(new Ui::SendCoinsEntry),
     model(0),
@@ -74,7 +74,7 @@ void SendCoinsEntry::on_addressBookButton_clicked()
     }
 }
 
-void SendCoinsEntry::on_payTo_textChanged( QString &address)
+void SendCoinsEntry::on_payTo_textChanged(const QString &address)
 {
     updateLabel(address);
 }
@@ -194,7 +194,7 @@ QWidget *SendCoinsEntry::setupTabChain(QWidget *prev)
     return ui->deleteButton;
 }
 
-void SendCoinsEntry::setValue( SendCoinsRecipient &value)
+void SendCoinsEntry::setValue(const SendCoinsRecipient &value)
 {
     recipient = value;
 
@@ -232,13 +232,13 @@ void SendCoinsEntry::setValue( SendCoinsRecipient &value)
     }
 }
 
-void SendCoinsEntry::setAddress( QString &address)
+void SendCoinsEntry::setAddress(const QString &address)
 {
     ui->payTo->setText(address);
     ui->payAmount->setFocus();
 }
 
-void SendCoinsEntry::setAmount( CAmount &amount)
+void SendCoinsEntry::setAmount(const CAmount &amount)
 {
     ui->payAmount->setValue(amount);
 }
@@ -264,7 +264,7 @@ void SendCoinsEntry::updateDisplayUnit()
     }
 }
 
-bool SendCoinsEntry::updateLabel( QString &address)
+bool SendCoinsEntry::updateLabel(const QString &address)
 {
     if(!model)
         return false;

@@ -5,7 +5,7 @@
 
 #include <script/script_error.h>
 
- char* ScriptErrorString( ScriptError serror)
+const char* ScriptErrorString(const ScriptError serror)
 {
     switch (serror)
     {

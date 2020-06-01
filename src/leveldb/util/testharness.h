@@ -42,12 +42,12 @@ extern int RandomSeed();
 class Tester {
  private:
   bool ok_;
-   char* fname_;
+  const char* fname_;
   int line_;
   std::stringstream ss_;
 
  public:
-  Tester( char* f, int l)
+  Tester(const char* f, int l)
       : ok_(true), fname_(f), line_(l) {
   }
 
@@ -58,7 +58,7 @@ class Tester {
     }
   }
 
-  Tester& Is(bool b,  char* msg) {
+  Tester& Is(bool b, const char* msg) {
     if (!b) {
       ss_ << " Assertion failure " << msg;
       ok_ = false;
@@ -66,7 +66,7 @@ class Tester {
     return *this;
   }
 
-  Tester& IsOk( Status& s) {
+  Tester& IsOk(const Status& s) {
     if (!s.ok()) {
       ss_ << " " << s.ToString();
       ok_ = false;
@@ -76,7 +76,7 @@ class Tester {
 
 #define BINARY_OP(name,op)                              \
   template <class X, class Y>                           \
-  Tester& name( X& x,  Y& y) {                \
+  Tester& name(const X& x, const Y& y) {                \
     if (! (x op y)) {                                   \
       ss_ << " failed: " << x << (" " #op " ") << y;    \
       ok_ = false;                                      \
@@ -94,7 +94,7 @@ class Tester {
 
   // Attach the specified value to the error message if an error has occurred
   template <class V>
-  Tester& operator<<( V& value) {
+  Tester& operator<<(const V& value) {
     if (!ok_) {
       ss_ << " " << value;
     }
@@ -129,7 +129,7 @@ void TCONCAT(_Test_,name)::_Run()
 
 // Register the specified test.  Typically not used directly, but
 // invoked via the macro expansion of TEST.
-extern bool RegisterTest( char* base,  char* name, void (*func)());
+extern bool RegisterTest(const char* base, const char* name, void (*func)());
 
 
 }  // namespace test
