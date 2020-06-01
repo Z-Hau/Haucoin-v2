@@ -18,7 +18,7 @@ class DBImpl;
 // into appropriate user keys.
 extern Iterator* NewDBIterator(
     DBImpl* db,
-     Comparator* user_key_comparator,
+    const Comparator* user_key_comparator,
     Iterator* internal_iter,
     SequenceNumber sequence,
     uint32_t seed);

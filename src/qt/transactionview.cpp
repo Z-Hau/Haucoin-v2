@@ -36,7 +36,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-TransactionView::TransactionView( PlatformStyle *platformStyle, QWidget *parent) :
+TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *parent) :
     QWidget(parent), model(0), transactionProxyModel(0),
     transactionView(0), abandonAction(0), bumpFeeAction(0), columnResizingFixer(0)
 {
@@ -113,7 +113,7 @@ TransactionView::TransactionView( PlatformStyle *platformStyle, QWidget *parent)
     hlayout->addWidget(amountWidget);
 
     // Delay before filtering transactions in ms
-    static  int input_filter_delay = 200;
+    static const int input_filter_delay = 200;
 
     QTimer* amount_typing_delay = new QTimer(this);
     amount_typing_delay->setSingleShot(true);
@@ -384,7 +384,7 @@ void TransactionView::exportClicked()
     }
 }
 
-void TransactionView::contextualMenu( QPoint &point)
+void TransactionView::contextualMenu(const QPoint &point)
 {
     QModelIndex index = transactionView->indexAt(point);
     QModelIndexList selection = transactionView->selectionModel()->selectedRows(0);
@@ -582,7 +582,7 @@ void TransactionView::dateRangeChanged()
             QDateTime(dateTo->date()).addDays(1));
 }
 
-void TransactionView::focusTransaction( QModelIndex &idx)
+void TransactionView::focusTransaction(const QModelIndex &idx)
 {
     if(!transactionProxyModel)
         return;

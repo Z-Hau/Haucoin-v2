@@ -15,7 +15,7 @@
 namespace leveldb {
 namespace port {
 
-static void PthreadCall( char* label, int result) {
+static void PthreadCall(const char* label, int result) {
   if (result != 0) {
     fprintf(stderr, "pthread %s: %s\n", label, strerror(result));
     abort();

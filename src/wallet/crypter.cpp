@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-int CCrypter::BytesToKeySHA512AES( std::vector<unsigned char>& chSalt,  SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) 
+int CCrypter::BytesToKeySHA512AES(const std::vector<unsigned char>& chSalt, const SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) const
 {
     // This mimics the behavior of openssl's EVP_BytesToKey with an aes256cbc
     // cipher and sha512 message digest. Because sha512's output size (64b) is
@@ -26,7 +26,7 @@ int CCrypter::BytesToKeySHA512AES( std::vector<unsigned char>& chSalt,  SecureSt
     unsigned char buf[CSHA512::OUTPUT_SIZE];
     CSHA512 di;
 
-    di.Write(( unsigned char*)strKeyData.c_str(), strKeyData.size());
+    di.Write((const unsigned char*)strKeyData.c_str(), strKeyData.size());
     di.Write(chSalt.data(), chSalt.size());
     di.Finalize(buf);
 
@@ -39,7 +39,7 @@ int CCrypter::BytesToKeySHA512AES( std::vector<unsigned char>& chSalt,  SecureSt
     return WALLET_CRYPTO_KEY_SIZE;
 }
 
-bool CCrypter::SetKeyFromPassphrase( SecureString& strKeyData,  std::vector<unsigned char>& chSalt,  unsigned int nRounds,  unsigned int nDerivationMethod)
+bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod)
 {
     if (nRounds < 1 || chSalt.size() != WALLET_CRYPTO_SALT_SIZE)
         return false;
@@ -59,7 +59,7 @@ bool CCrypter::SetKeyFromPassphrase( SecureString& strKeyData,  std::vector<unsi
     return true;
 }
 
-bool CCrypter::SetKey( CKeyingMaterial& chNewKey,  std::vector<unsigned char>& chNewIV)
+bool CCrypter::SetKey(const CKeyingMaterial& chNewKey, const std::vector<unsigned char>& chNewIV)
 {
     if (chNewKey.size() != WALLET_CRYPTO_KEY_SIZE || chNewIV.size() != WALLET_CRYPTO_IV_SIZE)
         return false;
@@ -71,7 +71,7 @@ bool CCrypter::SetKey( CKeyingMaterial& chNewKey,  std::vector<unsigned char>& c
     return true;
 }
 
-bool CCrypter::Encrypt( CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) 
+bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) const
 {
     if (!fKeySet)
         return false;
@@ -89,7 +89,7 @@ bool CCrypter::Encrypt( CKeyingMaterial& vchPlaintext, std::vector<unsigned char
     return true;
 }
 
-bool CCrypter::Decrypt( std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) 
+bool CCrypter::Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) const
 {
     if (!fKeySet)
         return false;
@@ -108,17 +108,17 @@ bool CCrypter::Decrypt( std::vector<unsigned char>& vchCiphertext, CKeyingMateri
 }
 
 
-static bool EncryptSecret( CKeyingMaterial& vMasterKey,  CKeyingMaterial &vchPlaintext,  uint256& nIV, std::vector<unsigned char> &vchCiphertext)
+static bool EncryptSecret(const CKeyingMaterial& vMasterKey, const CKeyingMaterial &vchPlaintext, const uint256& nIV, std::vector<unsigned char> &vchCiphertext)
 {
     CCrypter cKeyCrypter;
     std::vector<unsigned char> chIV(WALLET_CRYPTO_IV_SIZE);
     memcpy(chIV.data(), &nIV, WALLET_CRYPTO_IV_SIZE);
     if(!cKeyCrypter.SetKey(vMasterKey, chIV))
         return false;
-    return cKeyCrypter.Encrypt(*(( CKeyingMaterial*)&vchPlaintext), vchCiphertext);
+    return cKeyCrypter.Encrypt(*((const CKeyingMaterial*)&vchPlaintext), vchCiphertext);
 }
 
-static bool DecryptSecret( CKeyingMaterial& vMasterKey,  std::vector<unsigned char>& vchCiphertext,  uint256& nIV, CKeyingMaterial& vchPlaintext)
+static bool DecryptSecret(const CKeyingMaterial& vMasterKey, const std::vector<unsigned char>& vchCiphertext, const uint256& nIV, CKeyingMaterial& vchPlaintext)
 {
     CCrypter cKeyCrypter;
     std::vector<unsigned char> chIV(WALLET_CRYPTO_IV_SIZE);
@@ -128,7 +128,7 @@ static bool DecryptSecret( CKeyingMaterial& vMasterKey,  std::vector<unsigned ch
     return cKeyCrypter.Decrypt(vchCiphertext, *((CKeyingMaterial*)&vchPlaintext));
 }
 
-static bool DecryptKey( CKeyingMaterial& vMasterKey,  std::vector<unsigned char>& vchCryptedSecret,  CPubKey& vchPubKey, CKey& key)
+static bool DecryptKey(const CKeyingMaterial& vMasterKey, const std::vector<unsigned char>& vchCryptedSecret, const CPubKey& vchPubKey, CKey& key)
 {
     CKeyingMaterial vchSecret;
     if(!DecryptSecret(vMasterKey, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
@@ -152,7 +152,7 @@ bool CCryptoKeyStore::SetCrypted()
     return true;
 }
 
-bool CCryptoKeyStore::IsLocked() 
+bool CCryptoKeyStore::IsLocked() const
 {
     if (!IsCrypted()) {
         return false;
@@ -175,7 +175,7 @@ bool CCryptoKeyStore::Lock()
     return true;
 }
 
-bool CCryptoKeyStore::Unlock( CKeyingMaterial& vMasterKeyIn)
+bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
 {
     {
         LOCK(cs_KeyStore);
@@ -187,8 +187,8 @@ bool CCryptoKeyStore::Unlock( CKeyingMaterial& vMasterKeyIn)
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
         for (; mi != mapCryptedKeys.end(); ++mi)
         {
-             CPubKey &vchPubKey = (*mi).second.first;
-             std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+            const CPubKey &vchPubKey = (*mi).second.first;
+            const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
             CKey key;
             if (!DecryptKey(vMasterKeyIn, vchCryptedSecret, vchPubKey, key))
             {
@@ -213,7 +213,7 @@ bool CCryptoKeyStore::Unlock( CKeyingMaterial& vMasterKeyIn)
     return true;
 }
 
-bool CCryptoKeyStore::AddKeyPubKey( CKey& key,  CPubKey &pubkey)
+bool CCryptoKeyStore::AddKeyPubKey(const CKey& key, const CPubKey &pubkey)
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted()) {
@@ -237,7 +237,7 @@ bool CCryptoKeyStore::AddKeyPubKey( CKey& key,  CPubKey &pubkey)
 }
 
 
-bool CCryptoKeyStore::AddCryptedKey( CPubKey &vchPubKey,  std::vector<unsigned char> &vchCryptedSecret)
+bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret)
 {
     LOCK(cs_KeyStore);
     if (!SetCrypted()) {
@@ -249,7 +249,7 @@ bool CCryptoKeyStore::AddCryptedKey( CPubKey &vchPubKey,  std::vector<unsigned c
     return true;
 }
 
-bool CCryptoKeyStore::HaveKey( CKeyID &address) 
+bool CCryptoKeyStore::HaveKey(const CKeyID &address) const
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted()) {
@@ -258,7 +258,7 @@ bool CCryptoKeyStore::HaveKey( CKeyID &address)
     return mapCryptedKeys.count(address) > 0;
 }
 
-bool CCryptoKeyStore::GetKey( CKeyID &address, CKey& keyOut) 
+bool CCryptoKeyStore::GetKey(const CKeyID &address, CKey& keyOut) const
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted()) {
@@ -268,14 +268,14 @@ bool CCryptoKeyStore::GetKey( CKeyID &address, CKey& keyOut)
     CryptedKeyMap::const_iterator mi = mapCryptedKeys.find(address);
     if (mi != mapCryptedKeys.end())
     {
-         CPubKey &vchPubKey = (*mi).second.first;
-         std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+        const CPubKey &vchPubKey = (*mi).second.first;
+        const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
         return DecryptKey(vMasterKey, vchCryptedSecret, vchPubKey, keyOut);
     }
     return false;
 }
 
-bool CCryptoKeyStore::GetPubKey( CKeyID &address, CPubKey& vchPubKeyOut) 
+bool CCryptoKeyStore::GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted())
@@ -291,14 +291,14 @@ bool CCryptoKeyStore::GetPubKey( CKeyID &address, CPubKey& vchPubKeyOut)
     return CBasicKeyStore::GetPubKey(address, vchPubKeyOut);
 }
 
-std::set<CKeyID> CCryptoKeyStore::GetKeys() 
+std::set<CKeyID> CCryptoKeyStore::GetKeys() const
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted()) {
         return CBasicKeyStore::GetKeys();
     }
     std::set<CKeyID> set_address;
-    for ( auto& mi : mapCryptedKeys) {
+    for (const auto& mi : mapCryptedKeys) {
         set_address.insert(mi.first);
     }
     return set_address;
@@ -313,7 +313,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
     fUseCrypto = true;
     for (KeyMap::value_type& mKey : mapKeys)
     {
-         CKey &key = mKey.second;
+        const CKey &key = mKey.second;
         CPubKey vchPubKey = key.GetPubKey();
         CKeyingMaterial vchSecret(key.begin(), key.end());
         std::vector<unsigned char> vchCryptedSecret;

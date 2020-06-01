@@ -27,9 +27,9 @@
 #include <QSettings>
 #include <QStringList>
 
- char *DEFAULT_GUI_PROXY_HOST = "127.0.0.1";
+const char *DEFAULT_GUI_PROXY_HOST = "127.0.0.1";
 
-static  QString GetDefaultProxyAddress();
+static const QString GetDefaultProxyAddress();
 
 OptionsModel::OptionsModel(QObject *parent, bool resetSettings) :
     QAbstractListModel(parent)
@@ -37,7 +37,7 @@ OptionsModel::OptionsModel(QObject *parent, bool resetSettings) :
     Init(resetSettings);
 }
 
-void OptionsModel::addOverriddenOption( std::string &option)
+void OptionsModel::addOverriddenOption(const std::string &option)
 {
     strOverriddenByCommandLine += QString::fromStdString(option) + "=" + QString::fromStdString(gArgs.GetArg(option, "")) + " ";
 }
@@ -157,15 +157,15 @@ void OptionsModel::Init(bool resetSettings)
 /** Helper function to copy contents from one QSettings to another.
  * By using allKeys this also covers nested settings in a hierarchy.
  */
-static void CopySettings(QSettings& dst,  QSettings& src)
+static void CopySettings(QSettings& dst, const QSettings& src)
 {
-    for ( QString& key : src.allKeys()) {
+    for (const QString& key : src.allKeys()) {
         dst.setValue(key, src.value(key));
     }
 }
 
 /** Back up a QSettings to an ini-formatted file. */
-static void BackupSettings( fs::path& filename,  QSettings& src)
+static void BackupSettings(const fs::path& filename, const QSettings& src)
 {
     qWarning() << "Backing up GUI settings to" << GUIUtil::boostPathToQString(filename);
     QSettings dst(GUIUtil::boostPathToQString(filename), QSettings::IniFormat);
@@ -198,7 +198,7 @@ void OptionsModel::Reset()
         GUIUtil::SetStartOnSystemStartup(false);
 }
 
-int OptionsModel::rowCount( QModelIndex & parent) 
+int OptionsModel::rowCount(const QModelIndex & parent) const
 {
     return OptionIDRowCount;
 }
@@ -209,9 +209,9 @@ struct ProxySetting {
     QString port;
 };
 
-static ProxySetting GetProxySetting(QSettings &settings,  QString &name)
+static ProxySetting GetProxySetting(QSettings &settings, const QString &name)
 {
-    static  ProxySetting default_val = {false, DEFAULT_GUI_PROXY_HOST, QString("%1").arg(DEFAULT_GUI_PROXY_PORT)};
+    static const ProxySetting default_val = {false, DEFAULT_GUI_PROXY_HOST, QString("%1").arg(DEFAULT_GUI_PROXY_PORT)};
     // Handle the case that the setting is not set at all
     if (!settings.contains(name)) {
         return default_val;
@@ -225,18 +225,18 @@ static ProxySetting GetProxySetting(QSettings &settings,  QString &name)
     }
 }
 
-static void SetProxySetting(QSettings &settings,  QString &name,  ProxySetting &ip_port)
+static void SetProxySetting(QSettings &settings, const QString &name, const ProxySetting &ip_port)
 {
     settings.setValue(name, ip_port.ip + ":" + ip_port.port);
 }
 
-static  QString GetDefaultProxyAddress()
+static const QString GetDefaultProxyAddress()
 {
     return QString("%1:%2").arg(DEFAULT_GUI_PROXY_HOST).arg(DEFAULT_GUI_PROXY_PORT);
 }
 
 // read QSettings values and return them
-QVariant OptionsModel::data( QModelIndex & index, int role) 
+QVariant OptionsModel::data(const QModelIndex & index, int role) const
 {
     if(role == Qt::EditRole)
     {
@@ -300,7 +300,7 @@ QVariant OptionsModel::data( QModelIndex & index, int role)
 }
 
 // write QSettings values
-bool OptionsModel::setData( QModelIndex & index,  QVariant & value, int role)
+bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     bool successful = true; /* set to false on parse error */
     if(role == Qt::EditRole)
@@ -439,7 +439,7 @@ bool OptionsModel::setData( QModelIndex & index,  QVariant & value, int role)
 }
 
 /** Updates current unit in memory, settings and emits displayUnitChanged(newUnit) signal */
-void OptionsModel::setDisplayUnit( QVariant &value)
+void OptionsModel::setDisplayUnit(const QVariant &value)
 {
     if (!value.isNull())
     {
@@ -450,7 +450,7 @@ void OptionsModel::setDisplayUnit( QVariant &value)
     }
 }
 
-bool OptionsModel::getProxySettings(QNetworkProxy& proxy) 
+bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
 {
     // Directly query current base proxy, because
     // GUI settings can be overridden with -proxy.
@@ -474,7 +474,7 @@ void OptionsModel::setRestartRequired(bool fRequired)
     return settings.setValue("fRestartRequired", fRequired);
 }
 
-bool OptionsModel::isRestartRequired() 
+bool OptionsModel::isRestartRequired() const
 {
     QSettings settings;
     return settings.value("fRestartRequired", false).toBool();
@@ -485,7 +485,7 @@ void OptionsModel::checkAndMigrate()
     // Migration of default values
     // Check if the QSettings container was already loaded with this client version
     QSettings settings;
-    static  char strSettingsVersionKey[] = "nSettingsVersion";
+    static const char strSettingsVersionKey[] = "nSettingsVersion";
     int settingsVersion = settings.contains(strSettingsVersionKey) ? settings.value(strSettingsVersionKey).toInt() : 0;
     if (settingsVersion < CLIENT_VERSION)
     {

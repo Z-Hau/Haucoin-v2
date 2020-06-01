@@ -10,7 +10,7 @@
 BOOST_FIXTURE_TEST_SUITE(merkle_tests, TestingSetup)
 
 // Older version of the merkle root computation code, for comparison.
-static uint256 BlockBuildMerkleTree( CBlock& block, bool* fMutated, std::vector<uint256>& vMerkleTree)
+static uint256 BlockBuildMerkleTree(const CBlock& block, bool* fMutated, std::vector<uint256>& vMerkleTree)
 {
     vMerkleTree.clear();
     vMerkleTree.reserve(block.vtx.size() * 2 + 16); // Safe upper bound for the number of total nodes.
@@ -39,7 +39,7 @@ static uint256 BlockBuildMerkleTree( CBlock& block, bool* fMutated, std::vector<
 }
 
 // Older version of the merkle branch computation code, for comparison.
-static std::vector<uint256> BlockGetMerkleBranch( CBlock& block,  std::vector<uint256>& vMerkleTree, int nIndex)
+static std::vector<uint256> BlockGetMerkleBranch(const CBlock& block, const std::vector<uint256>& vMerkleTree, int nIndex)
 {
     std::vector<uint256> vMerkleBranch;
     int j = 0;

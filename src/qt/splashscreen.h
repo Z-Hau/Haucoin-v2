@@ -22,7 +22,7 @@ class SplashScreen : public QWidget
     Q_OBJECT
 
 public:
-    explicit SplashScreen(Qt::WindowFlags f,  NetworkStyle *networkStyle);
+    explicit SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle);
     ~SplashScreen();
 
 protected:
@@ -34,7 +34,7 @@ public Q_SLOTS:
     void slotFinish(QWidget *mainWin);
 
     /** Show message and progress */
-    void showMessage( QString &message, int alignment,  QColor &color);
+    void showMessage(const QString &message, int alignment, const QColor &color);
 
 protected:
     bool eventFilter(QObject * obj, QEvent * ev);

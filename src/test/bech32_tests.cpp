@@ -9,7 +9,7 @@
 
 BOOST_FIXTURE_TEST_SUITE(bech32_tests, BasicTestingSetup)
 
-bool CaseInsensitiveEqual( std::string &s1,  std::string &s2)
+bool CaseInsensitiveEqual(const std::string &s1, const std::string &s2)
 {
     if (s1.size() != s2.size()) return false;
     for (size_t i = 0; i < s1.size(); ++i) {
@@ -24,7 +24,7 @@ bool CaseInsensitiveEqual( std::string &s1,  std::string &s2)
 
 BOOST_AUTO_TEST_CASE(bip173_testvectors_valid)
 {
-    static  std::string CASES[] = {
+    static const std::string CASES[] = {
         "A12UEL5L",
         "a12uel5l",
         "an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs",
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(bip173_testvectors_valid)
         "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
         "?1ezyfcl",
     };
-    for ( std::string& str : CASES) {
+    for (const std::string& str : CASES) {
         auto ret = bech32::Decode(str);
         BOOST_CHECK(!ret.first.empty());
         std::string recode = bech32::Encode(ret.first, ret.second);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(bip173_testvectors_valid)
 
 BOOST_AUTO_TEST_CASE(bip173_testvectors_invalid)
 {
-    static  std::string CASES[] = {
+    static const std::string CASES[] = {
         " 1nwldj5",
         "\x7f""1axkwrx",
         "\x80""1eym55h",
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(bip173_testvectors_invalid)
         "10a06t8",
         "1qzzfhee",
     };
-    for ( std::string& str : CASES) {
+    for (const std::string& str : CASES) {
         auto ret = bech32::Decode(str);
         BOOST_CHECK(ret.first.empty());
     }

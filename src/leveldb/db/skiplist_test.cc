@@ -15,7 +15,7 @@ namespace leveldb {
 typedef uint64_t Key;
 
 struct Comparator {
-  int operator()( Key& a,  Key& b)  {
+  int operator()(const Key& a, const Key& b) const {
     if (a < b) {
       return -1;
     } else if (a > b) {
@@ -45,8 +45,8 @@ TEST(SkipTest, Empty) {
 }
 
 TEST(SkipTest, InsertAndLookup) {
-   int N = 2000;
-   int R = 5000;
+  const int N = 2000;
+  const int R = 5000;
   Random rnd(1000);
   std::set<Key> keys;
   Arena arena;
@@ -148,7 +148,7 @@ TEST(SkipTest, InsertAndLookup) {
 // been concurrently added since the iterator started.
 class ConcurrentTest {
  private:
-  static  uint32_t K = 4;
+  static const uint32_t K = 4;
 
   static uint64_t key(Key key) { return (key >> 40); }
   static uint64_t gen(Key key) { return (key >> 8) & 0xffffffffu; }
@@ -215,9 +215,9 @@ class ConcurrentTest {
 
   // REQUIRES: External synchronization
   void WriteStep(Random* rnd) {
-     uint32_t k = rnd->Next() % K;
-     intptr_t g = current_.Get(k) + 1;
-     Key key = MakeKey(k, g);
+    const uint32_t k = rnd->Next() % K;
+    const intptr_t g = current_.Get(k) + 1;
+    const Key key = MakeKey(k, g);
     list_.Insert(key);
     current_.Set(k, g);
   }
@@ -281,7 +281,7 @@ class ConcurrentTest {
     }
   }
 };
- uint32_t ConcurrentTest::K;
+const uint32_t ConcurrentTest::K;
 
 // Simple test that does single-threaded testing of the ConcurrentTest
 // scaffolding.
@@ -346,10 +346,10 @@ static void ConcurrentReader(void* arg) {
 }
 
 static void RunConcurrent(int run) {
-   int seed = test::RandomSeed() + (run * 100);
+  const int seed = test::RandomSeed() + (run * 100);
   Random rnd(seed);
-   int N = 1000;
-   int kSize = 1000;
+  const int N = 1000;
+  const int kSize = 1000;
   for (int i = 0; i < N; i++) {
     if ((i % 100) == 0) {
       fprintf(stderr, "Run %d of %d\n", i, N);

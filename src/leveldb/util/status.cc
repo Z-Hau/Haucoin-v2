@@ -8,7 +8,7 @@
 
 namespace leveldb {
 
- char* Status::CopyState( char* state) {
+const char* Status::CopyState(const char* state) {
   uint32_t size;
   memcpy(&size, state, sizeof(size));
   char* result = new char[size + 5];
@@ -16,11 +16,11 @@ namespace leveldb {
   return result;
 }
 
-Status::Status(Code code,  Slice& msg,  Slice& msg2) {
+Status::Status(Code code, const Slice& msg, const Slice& msg2) {
   assert(code != kOk);
-   uint32_t len1 = msg.size();
-   uint32_t len2 = msg2.size();
-   uint32_t size = len1 + (len2 ? (2 + len2) : 0);
+  const uint32_t len1 = msg.size();
+  const uint32_t len2 = msg2.size();
+  const uint32_t size = len1 + (len2 ? (2 + len2) : 0);
   char* result = new char[size + 5];
   memcpy(result, &size, sizeof(size));
   result[4] = static_cast<char>(code);
@@ -33,12 +33,12 @@ Status::Status(Code code,  Slice& msg,  Slice& msg2) {
   state_ = result;
 }
 
-std::string Status::ToString()  {
+std::string Status::ToString() const {
   if (state_ == NULL) {
     return "OK";
   } else {
     char tmp[30];
-     char* type;
+    const char* type;
     switch (code()) {
       case kOk:
         type = "OK";

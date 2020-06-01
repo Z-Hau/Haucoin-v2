@@ -87,13 +87,13 @@ public:
     //! Number of decimals left
     static int decimals(int unit);
     //! Format as string
-    static QString format(int unit,  CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
+    static QString format(int unit, const CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
     //! Format as string (with unit)
-    static QString formatWithUnit(int unit,  CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
+    static QString formatWithUnit(int unit, const CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
     //! Format as HTML string (with unit)
-    static QString formatHtmlWithUnit(int unit,  CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
+    static QString formatHtmlWithUnit(int unit, const CAmount& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
     //! Parse string to coin amount
-    static bool parse(int unit,  QString &value, CAmount *val_out);
+    static bool parse(int unit, const QString &value, CAmount *val_out);
     //! Gets title for amount column including current display unit if optionsModel reference available */
     static QString getAmountColumnTitle(int unit);
     ///@}
@@ -105,8 +105,8 @@ public:
         /** Unit identifier */
         UnitRole = Qt::UserRole
     };
-    int rowCount( QModelIndex &parent) ;
-    QVariant data( QModelIndex &index, int role) ;
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
     ///@}
 
     static QString removeSpaces(QString text)

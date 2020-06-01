@@ -18,45 +18,45 @@ struct CMutableTransaction;
 /** Virtual base class for signature creators. */
 class BaseSignatureCreator {
 protected:
-     CKeyStore* keystore;
+    const CKeyStore* keystore;
 
 public:
-    explicit BaseSignatureCreator( CKeyStore* keystoreIn) : keystore(keystoreIn) {}
-     CKeyStore& KeyStore()  { return *keystore; };
+    explicit BaseSignatureCreator(const CKeyStore* keystoreIn) : keystore(keystoreIn) {}
+    const CKeyStore& KeyStore() const { return *keystore; };
     virtual ~BaseSignatureCreator() {}
-    virtual  BaseSignatureChecker& Checker()  =0;
+    virtual const BaseSignatureChecker& Checker() const =0;
 
     /** Create a singular (non-script) signature. */
-    virtual bool CreateSig(std::vector<unsigned char>& vchSig,  CKeyID& keyid,  CScript& scriptCode, SigVersion sigversion)  =0;
+    virtual bool CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const =0;
 };
 
 /** A signature creator for transactions. */
 class TransactionSignatureCreator : public BaseSignatureCreator {
-     CTransaction* txTo;
+    const CTransaction* txTo;
     unsigned int nIn;
     int nHashType;
     CAmount amount;
-     TransactionSignatureChecker checker;
+    const TransactionSignatureChecker checker;
 
 public:
-    TransactionSignatureCreator( CKeyStore* keystoreIn,  CTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn, int nHashTypeIn=SIGHASH_ALL);
-     BaseSignatureChecker& Checker()  override { return checker; }
-    bool CreateSig(std::vector<unsigned char>& vchSig,  CKeyID& keyid,  CScript& scriptCode, SigVersion sigversion)  override;
+    TransactionSignatureCreator(const CKeyStore* keystoreIn, const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, int nHashTypeIn=SIGHASH_ALL);
+    const BaseSignatureChecker& Checker() const override { return checker; }
+    bool CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override;
 };
 
 class MutableTransactionSignatureCreator : public TransactionSignatureCreator {
     CTransaction tx;
 
 public:
-    MutableTransactionSignatureCreator( CKeyStore* keystoreIn,  CMutableTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn, int nHashTypeIn) : TransactionSignatureCreator(keystoreIn, &tx, nInIn, amountIn, nHashTypeIn), tx(*txToIn) {}
+    MutableTransactionSignatureCreator(const CKeyStore* keystoreIn, const CMutableTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, int nHashTypeIn) : TransactionSignatureCreator(keystoreIn, &tx, nInIn, amountIn, nHashTypeIn), tx(*txToIn) {}
 };
 
 /** A signature creator that just produces 72-byte empty signatures. */
 class DummySignatureCreator : public BaseSignatureCreator {
 public:
-    explicit DummySignatureCreator( CKeyStore* keystoreIn) : BaseSignatureCreator(keystoreIn) {}
-     BaseSignatureChecker& Checker()  override;
-    bool CreateSig(std::vector<unsigned char>& vchSig,  CKeyID& keyid,  CScript& scriptCode, SigVersion sigversion)  override;
+    explicit DummySignatureCreator(const CKeyStore* keystoreIn) : BaseSignatureCreator(keystoreIn) {}
+    const BaseSignatureChecker& Checker() const override;
+    bool CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override;
 };
 
 struct SignatureData {
@@ -64,27 +64,27 @@ struct SignatureData {
     CScriptWitness scriptWitness;
 
     SignatureData() {}
-    explicit SignatureData( CScript& script) : scriptSig(script) {}
+    explicit SignatureData(const CScript& script) : scriptSig(script) {}
 };
 
 /** Produce a script signature using a generic signature creator. */
-bool ProduceSignature( BaseSignatureCreator& creator,  CScript& scriptPubKey, SignatureData& sigdata);
+bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& scriptPubKey, SignatureData& sigdata);
 
 /** Produce a script signature for a transaction. */
-bool SignSignature( CKeyStore &keystore,  CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn,  CAmount& amount, int nHashType);
-bool SignSignature( CKeyStore& keystore,  CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType);
+bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, const CAmount& amount, int nHashType);
+bool SignSignature(const CKeyStore& keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType);
 
 /** Combine two script signatures using a generic signature checker, intelligently, possibly with OP_0 placeholders. */
-SignatureData CombineSignatures( CScript& scriptPubKey,  BaseSignatureChecker& checker,  SignatureData& scriptSig1,  SignatureData& scriptSig2);
+SignatureData CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker, const SignatureData& scriptSig1, const SignatureData& scriptSig2);
 
 /** Extract signature data from a transaction, and insert it. */
-SignatureData DataFromTransaction( CMutableTransaction& tx, unsigned int nIn);
-void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn,  SignatureData& data);
+SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn);
+void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data);
 
 /* Check whether we know how to sign for an output like this, assuming we
  * have all private keys. While this function does not need private keys, the passed
  * keystore is used to look up public keys and redeemscripts by hash.
  * Solvability is unrelated to whether we consider this output to be ours. */
-bool IsSolvable( CKeyStore& store,  CScript& script);
+bool IsSolvable(const CKeyStore& store, const CScript& script);
 
 #endif // BITCOIN_SCRIPT_SIGN_H

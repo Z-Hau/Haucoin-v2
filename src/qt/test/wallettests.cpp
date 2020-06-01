@@ -66,7 +66,7 @@ void ConfirmSend(QString* text = nullptr, bool cancel = false)
 }
 
 //! Send coins to address and return txid.
-uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog,  CTxDestination& address, CAmount amount, bool rbf)
+uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog, const CTxDestination& address, CAmount amount, bool rbf)
 {
     QVBoxLayout* entries = sendCoinsDialog.findChild<QVBoxLayout*>("entries");
     SendCoinsEntry* entry = qobject_cast<SendCoinsEntry*>(entries->itemAt(0)->widget());
@@ -77,7 +77,7 @@ uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog,  CTxDestina
         ->findChild<QCheckBox*>("optInRBF")
         ->setCheckState(rbf ? Qt::Checked : Qt::Unchecked);
     uint256 txid;
-    boost::signals2::scoped_connection c(wallet.NotifyTransactionChanged.connect([&txid](CWallet*,  uint256& hash, ChangeType status) {
+    boost::signals2::scoped_connection c(wallet.NotifyTransactionChanged.connect([&txid](CWallet*, const uint256& hash, ChangeType status) {
         if (status == CT_NEW) txid = hash;
     }));
     ConfirmSend();
@@ -86,7 +86,7 @@ uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog,  CTxDestina
 }
 
 //! Find index of txid in transaction list.
-QModelIndex FindTx( QAbstractItemModel& model,  uint256& txid)
+QModelIndex FindTx(const QAbstractItemModel& model, const uint256& txid)
 {
     QString hash = QString::fromStdString(txid.ToString());
     int rows = model.rowCount({});
@@ -111,7 +111,7 @@ void RequestContextMenu(QWidget* widget)
 }
 
 //! Invoke bumpfee on txid and check results.
-void BumpFee(TransactionView& view,  uint256& txid, bool expectDisabled, std::string expectError, bool cancel)
+void BumpFee(TransactionView& view, const uint256& txid, bool expectDisabled, std::string expectError, bool cancel)
 {
     QTableView* table = view.findChild<QTableView*>("transactionView");
     QModelIndex index = FindTx(*table->selectionModel()->model(), txid);
@@ -178,7 +178,7 @@ void TestGUI()
     wallet.SetBroadcastTransactions(true);
 
     // Create widgets for sending coins and listing transactions.
-    std::unique_ptr< PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
+    std::unique_ptr<const PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
     SendCoinsDialog sendCoinsDialog(platformStyle.get());
     TransactionView transactionView(platformStyle.get());
     OptionsModel optionsModel;

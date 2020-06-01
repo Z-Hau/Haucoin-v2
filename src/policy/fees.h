@@ -100,7 +100,7 @@ enum class FeeEstimateMode {
     CONSERVATIVE, //! Force estimateSmartFee to use conservative estimates
 };
 
-bool FeeModeFromString( std::string& mode_string, FeeEstimateMode& fee_estimate_mode);
+bool FeeModeFromString(const std::string& mode_string, FeeEstimateMode& fee_estimate_mode);
 
 /* Used to return detailed information about a feerate bucket */
 struct EstimatorBucket
@@ -148,7 +148,7 @@ private:
     static constexpr unsigned int LONG_BLOCK_PERIODS = 42;
     static constexpr unsigned int LONG_SCALE = 24;
     /** Historical estimates that are older than this aren't valid */
-    static  unsigned int OLDEST_ESTIMATE_HISTORY = 6 * 1008;
+    static const unsigned int OLDEST_ESTIMATE_HISTORY = 6 * 1008;
 
     /** Decay of .962 is a half-life of 18 blocks or about 3 hours */
     static constexpr double SHORT_DECAY = .962;
@@ -193,32 +193,32 @@ public:
 
     /** Process all the transactions that have been included in a block */
     void processBlock(unsigned int nBlockHeight,
-                      std::vector< CTxMemPoolEntry*>& entries);
+                      std::vector<const CTxMemPoolEntry*>& entries);
 
     /** Process a transaction accepted to the mempool*/
-    void processTransaction( CTxMemPoolEntry& entry, bool validFeeEstimate);
+    void processTransaction(const CTxMemPoolEntry& entry, bool validFeeEstimate);
 
     /** Remove a transaction from the mempool tracking stats*/
     bool removeTx(uint256 hash, bool inBlock);
 
     /** DEPRECATED. Return a feerate estimate */
-    CFeeRate estimateFee(int confTarget) ;
+    CFeeRate estimateFee(int confTarget) const;
 
     /** Estimate feerate needed to get be included in a block within confTarget
      *  blocks. If no answer can be given at confTarget, return an estimate at
      *  the closest target where one can be given.  'conservative' estimates are
      *  valid over longer time horizons also.
      */
-    CFeeRate estimateSmartFee(int confTarget, FeeCalculation *feeCalc, bool conservative) ;
+    CFeeRate estimateSmartFee(int confTarget, FeeCalculation *feeCalc, bool conservative) const;
 
     /** Return a specific fee estimate calculation with a given success
      * threshold and time horizon, and optionally return detailed data about
      * calculation
      */
-    CFeeRate estimateRawFee(int confTarget, double successThreshold, FeeEstimateHorizon horizon, EstimationResult *result = nullptr) ;
+    CFeeRate estimateRawFee(int confTarget, double successThreshold, FeeEstimateHorizon horizon, EstimationResult *result = nullptr) const;
 
     /** Write estimation data to a file */
-    bool Write(CAutoFile& fileout) ;
+    bool Write(CAutoFile& fileout) const;
 
     /** Read estimation data from a file */
     bool Read(CAutoFile& filein);
@@ -227,7 +227,7 @@ public:
     void FlushUnconfirmed(CTxMemPool& pool);
 
     /** Calculation of highest target that estimates are tracked for */
-    unsigned int HighestTargetTracked(FeeEstimateHorizon horizon) ;
+    unsigned int HighestTargetTracked(FeeEstimateHorizon horizon) const;
 
 private:
     unsigned int nBestSeenHeight;
@@ -259,18 +259,18 @@ private:
     mutable CCriticalSection cs_feeEstimator;
 
     /** Process a transaction confirmed in a block*/
-    bool processBlockTx(unsigned int nBlockHeight,  CTxMemPoolEntry* entry);
+    bool processBlockTx(unsigned int nBlockHeight, const CTxMemPoolEntry* entry);
 
     /** Helper for estimateSmartFee */
-    double estimateCombinedFee(unsigned int confTarget, double successThreshold, bool checkShorterHorizon, EstimationResult *result) ;
+    double estimateCombinedFee(unsigned int confTarget, double successThreshold, bool checkShorterHorizon, EstimationResult *result) const;
     /** Helper for estimateSmartFee */
-    double estimateConservativeFee(unsigned int doubleTarget, EstimationResult *result) ;
+    double estimateConservativeFee(unsigned int doubleTarget, EstimationResult *result) const;
     /** Number of blocks of data recorded while fee estimates have been running */
-    unsigned int BlockSpan() ;
+    unsigned int BlockSpan() const;
     /** Number of blocks of recorded fee estimate data represented in saved data file */
-    unsigned int HistoricalBlockSpan() ;
+    unsigned int HistoricalBlockSpan() const;
     /** Calculation of highest target that reasonable estimate can be provided for */
-    unsigned int MaxUsableEstimate() ;
+    unsigned int MaxUsableEstimate() const;
 };
 
 class FeeFilterRounder
@@ -285,7 +285,7 @@ private:
 
 public:
     /** Create new FeeFilterRounder */
-    explicit FeeFilterRounder( CFeeRate& minIncrementalFee);
+    explicit FeeFilterRounder(const CFeeRate& minIncrementalFee);
 
     /** Quantize a minimum fee for privacy purpose before broadcast **/
     CAmount round(CAmount currentMinFee);

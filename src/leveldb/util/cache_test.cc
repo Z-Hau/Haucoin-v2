@@ -16,7 +16,7 @@ static std::string EncodeKey(int k) {
   PutFixed32(&result, k);
   return result;
 }
-static int DecodeKey( Slice& k) {
+static int DecodeKey(const Slice& k) {
   assert(k.size() == 4);
   return DecodeFixed32(k.data());
 }
@@ -27,12 +27,12 @@ class CacheTest {
  public:
   static CacheTest* current_;
 
-  static void Deleter( Slice& key, void* v) {
+  static void Deleter(const Slice& key, void* v) {
     current_->deleted_keys_.push_back(DecodeKey(key));
     current_->deleted_values_.push_back(DecodeValue(v));
   }
 
-  static  int kCacheSize = 1000;
+  static const int kCacheSize = 1000;
   std::vector<int> deleted_keys_;
   std::vector<int> deleted_values_;
   Cache* cache_;
@@ -47,7 +47,7 @@ class CacheTest {
 
   int Lookup(int key) {
     Cache::Handle* handle = cache_->Lookup(EncodeKey(key));
-     int r = (handle == NULL) ? -1 : DecodeValue(cache_->Value(handle));
+    const int r = (handle == NULL) ? -1 : DecodeValue(cache_->Value(handle));
     if (handle != NULL) {
       cache_->Release(handle);
     }
@@ -177,12 +177,12 @@ TEST(CacheTest, HeavyEntries) {
   // Add a bunch of light and heavy entries and then count the combined
   // size of items still in the cache, which must be approximately the
   // same as the total capacity.
-   int kLight = 1;
-   int kHeavy = 10;
+  const int kLight = 1;
+  const int kHeavy = 10;
   int added = 0;
   int index = 0;
   while (added < 2*kCacheSize) {
-     int weight = (index & 1) ? kLight : kHeavy;
+    const int weight = (index & 1) ? kLight : kHeavy;
     Insert(index, 1000+index, weight);
     added += weight;
     index++;
@@ -190,7 +190,7 @@ TEST(CacheTest, HeavyEntries) {
 
   int cached_weight = 0;
   for (int i = 0; i < index; i++) {
-     int weight = (i & 1 ? kLight : kHeavy);
+    const int weight = (i & 1 ? kLight : kHeavy);
     int r = Lookup(i);
     if (r >= 0) {
       cached_weight += weight;

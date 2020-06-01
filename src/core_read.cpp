@@ -19,7 +19,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-CScript ParseScript( std::string& s)
+CScript ParseScript(const std::string& s)
 {
     CScript result;
 
@@ -33,7 +33,7 @@ CScript ParseScript( std::string& s)
             if (op < OP_NOP && op != OP_RESERVED)
                 continue;
 
-             char* name = GetOpName((opcodetype)op);
+            const char* name = GetOpName((opcodetype)op);
             if (strcmp(name, "OP_UNKNOWN") == 0)
                 continue;
             std::string strName(name);
@@ -88,7 +88,7 @@ CScript ParseScript( std::string& s)
 }
 
 // Check that all of the input and output scripts of a transaction contains valid opcodes
-bool CheckTxScriptsSanity( CMutableTransaction& tx)
+bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 {
     // Check input scripts for non-coinbase txs
     if (!CTransaction(tx).IsCoinBase()) {
@@ -108,7 +108,7 @@ bool CheckTxScriptsSanity( CMutableTransaction& tx)
     return true;
 }
 
-bool DecodeHexTx(CMutableTransaction& tx,  std::string& hex_tx, bool try_no_witness, bool try_witness)
+bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness, bool try_witness)
 {
     if (!IsHex(hex_tx)) {
         return false;
@@ -123,7 +123,7 @@ bool DecodeHexTx(CMutableTransaction& tx,  std::string& hex_tx, bool try_no_witn
             if (ssData.eof() && (!try_witness || CheckTxScriptsSanity(tx))) {
                 return true;
             }
-        } catch ( std::exception&) {
+        } catch (const std::exception&) {
             // Fall through.
         }
     }
@@ -135,7 +135,7 @@ bool DecodeHexTx(CMutableTransaction& tx,  std::string& hex_tx, bool try_no_witn
             if (ssData.empty()) {
                 return true;
             }
-        } catch ( std::exception&) {
+        } catch (const std::exception&) {
             // Fall through.
         }
     }
@@ -143,7 +143,7 @@ bool DecodeHexTx(CMutableTransaction& tx,  std::string& hex_tx, bool try_no_witn
     return false;
 }
 
-bool DecodeHexBlk(CBlock& block,  std::string& strHexBlk)
+bool DecodeHexBlk(CBlock& block, const std::string& strHexBlk)
 {
     if (!IsHex(strHexBlk))
         return false;
@@ -153,14 +153,14 @@ bool DecodeHexBlk(CBlock& block,  std::string& strHexBlk)
     try {
         ssBlock >> block;
     }
-    catch ( std::exception&) {
+    catch (const std::exception&) {
         return false;
     }
 
     return true;
 }
 
-uint256 ParseHashUV( UniValue& v,  std::string& strName)
+uint256 ParseHashUV(const UniValue& v, const std::string& strName)
 {
     std::string strHex;
     if (v.isStr())
@@ -168,7 +168,7 @@ uint256 ParseHashUV( UniValue& v,  std::string& strName)
     return ParseHashStr(strHex, strName);  // Note: ParseHashStr("") throws a runtime_error
 }
 
-uint256 ParseHashStr( std::string& strHex,  std::string& strName)
+uint256 ParseHashStr(const std::string& strHex, const std::string& strName)
 {
     if (!IsHex(strHex)) // Note: IsHex("") is false
         throw std::runtime_error(strName + " must be hexadecimal string (not '" + strHex + "')");
@@ -178,7 +178,7 @@ uint256 ParseHashStr( std::string& strHex,  std::string& strName)
     return result;
 }
 
-std::vector<unsigned char> ParseHexUV( UniValue& v,  std::string& strName)
+std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName)
 {
     std::string strHex;
     if (v.isStr())

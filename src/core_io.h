@@ -18,19 +18,19 @@ class uint256;
 class UniValue;
 
 // core_read.cpp
-CScript ParseScript( std::string& s);
-std::string ScriptToAsmStr( CScript& script,  bool fAttemptSighashDecode = false);
-bool DecodeHexTx(CMutableTransaction& tx,  std::string& hex_tx, bool try_no_witness = false, bool try_witness = true);
-bool DecodeHexBlk(CBlock&,  std::string& strHexBlk);
-uint256 ParseHashUV( UniValue& v,  std::string& strName);
-uint256 ParseHashStr( std::string&,  std::string& strName);
-std::vector<unsigned char> ParseHexUV( UniValue& v,  std::string& strName);
+CScript ParseScript(const std::string& s);
+std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDecode = false);
+bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness = false, bool try_witness = true);
+bool DecodeHexBlk(CBlock&, const std::string& strHexBlk);
+uint256 ParseHashUV(const UniValue& v, const std::string& strName);
+uint256 ParseHashStr(const std::string&, const std::string& strName);
+std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
 
 // core_write.cpp
-UniValue ValueFromAmount( CAmount& amount);
-std::string FormatScript( CScript& script);
-std::string EncodeHexTx( CTransaction& tx,  int serializeFlags = 0);
-void ScriptPubKeyToUniv( CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
-void TxToUniv( CTransaction& tx,  uint256& hashBlock, UniValue& entry, bool include_hex = true, int serialize_flags = 0);
+UniValue ValueFromAmount(const CAmount& amount);
+std::string FormatScript(const CScript& script);
+std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags = 0);
+void ScriptPubKeyToUniv(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
+void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex = true, int serialize_flags = 0);
 
 #endif // BITCOIN_CORE_IO_H

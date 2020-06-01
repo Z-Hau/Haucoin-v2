@@ -11,7 +11,7 @@
 #include <utilstrencodings.h>
 
 // Converts a hex string to a public key if possible
-CPubKey HexToPubKey( std::string& hex_in)
+CPubKey HexToPubKey(const std::string& hex_in)
 {
     if (!IsHex(hex_in)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid public key: " + hex_in);
@@ -24,7 +24,7 @@ CPubKey HexToPubKey( std::string& hex_in)
 }
 
 // Retrieves a public key for an address from the given CKeyStore
-CPubKey AddrToPubKey(CKeyStore*  keystore,  std::string& addr_in)
+CPubKey AddrToPubKey(CKeyStore* const keystore, const std::string& addr_in)
 {
     CTxDestination dest = DecodeDestination(addr_in);
     if (!IsValidDestination(dest)) {
@@ -45,7 +45,7 @@ CPubKey AddrToPubKey(CKeyStore*  keystore,  std::string& addr_in)
 }
 
 // Creates a multisig redeemscript from a given list of public keys and number required.
-CScript CreateMultisigRedeemscript( int required,  std::vector<CPubKey>& pubkeys)
+CScript CreateMultisigRedeemscript(const int required, const std::vector<CPubKey>& pubkeys)
 {
     // Gather public keys
     if (required < 1) {

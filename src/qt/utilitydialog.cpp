@@ -78,7 +78,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
         cursor.insertBlock();
 
         std::string strUsage = HelpMessage(HMM_BITCOIN_QT);
-         bool showDebug = gArgs.GetBoolArg("-help-debug", false);
+        const bool showDebug = gArgs.GetBoolArg("-help-debug", false);
         strUsage += HelpMessageGroup(tr("UI Options:").toStdString());
         if (showDebug) {
             strUsage += HelpMessageOpt("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS));
@@ -106,7 +106,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, bool about) :
         QTextCharFormat bold;
         bold.setFontWeight(QFont::Bold);
 
-        for ( QString &line : coreOptions.split("\n")) {
+        for (const QString &line : coreOptions.split("\n")) {
             if (line.startsWith("  -"))
             {
                 cursor.currentTable()->appendRows(1);
@@ -181,7 +181,7 @@ QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI *window)
     shutdownWindow->setWindowTitle(window->windowTitle());
 
     // Center shutdown window at where main window was
-     QPoint global = window->mapToGlobal(window->rect().center());
+    const QPoint global = window->mapToGlobal(window->rect().center());
     shutdownWindow->move(global.x() - shutdownWindow->width() / 2, global.y() - shutdownWindow->height() / 2);
     shutdownWindow->show();
     return shutdownWindow;

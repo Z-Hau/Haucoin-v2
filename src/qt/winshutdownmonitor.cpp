@@ -16,7 +16,7 @@
 
 // If we don't want a message to be processed by Qt, return true and set result to
 // the value that the window procedure should return. Otherwise return false.
-bool WinShutdownMonitor::nativeEventFilter( QByteArray &eventType, void *pMessage, long *pnResult)
+bool WinShutdownMonitor::nativeEventFilter(const QByteArray &eventType, void *pMessage, long *pnResult)
 {
        Q_UNUSED(eventType);
 
@@ -53,7 +53,7 @@ bool WinShutdownMonitor::nativeEventFilter( QByteArray &eventType, void *pMessag
        return false;
 }
 
-void WinShutdownMonitor::registerShutdownBlockReason( QString& strReason,  HWND& mainWinId)
+void WinShutdownMonitor::registerShutdownBlockReason(const QString& strReason, const HWND& mainWinId)
 {
     typedef BOOL (WINAPI *PSHUTDOWNBRCREATE)(HWND, LPCWSTR);
     PSHUTDOWNBRCREATE shutdownBRCreate = (PSHUTDOWNBRCREATE)GetProcAddress(GetModuleHandleA("User32.dll"), "ShutdownBlockReasonCreate");

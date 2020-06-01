@@ -12,8 +12,8 @@ class CKeyStore;
 class CPubKey;
 class CScript;
 
-CPubKey HexToPubKey( std::string& hex_in);
-CPubKey AddrToPubKey(CKeyStore*  keystore,  std::string& addr_in);
-CScript CreateMultisigRedeemscript( int required,  std::vector<CPubKey>& pubkeys);
+CPubKey HexToPubKey(const std::string& hex_in);
+CPubKey AddrToPubKey(CKeyStore* const keystore, const std::string& addr_in);
+CScript CreateMultisigRedeemscript(const int required, const std::vector<CPubKey>& pubkeys);
 
 #endif // BITCOIN_RPC_UTIL_H

@@ -27,6 +27,6 @@ void SetMockTime(int64_t nMockTimeIn);
 int64_t GetMockTime();
 void MilliSleep(int64_t n);
 
-std::string DateTimeStrFormat( char* pszFormat, int64_t nTime);
+std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime);
 
 #endif // BITCOIN_UTILTIME_H

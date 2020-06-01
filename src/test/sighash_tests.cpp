@@ -21,12 +21,12 @@
 
 #include <univalue.h>
 
-extern UniValue read_json( std::string& jsondata);
+extern UniValue read_json(const std::string& jsondata);
 
 // Old script.cpp SignatureHash function
-uint256 static SignatureHashOld(CScript scriptCode,  CTransaction& txTo, unsigned int nIn, int nHashType)
+uint256 static SignatureHashOld(CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType)
 {
-    static  uint256 one(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
+    static const uint256 one(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
     if (nIn >= txTo.vin.size())
     {
         return one;
@@ -85,7 +85,7 @@ uint256 static SignatureHashOld(CScript scriptCode,  CTransaction& txTo, unsigne
 }
 
 void static RandomScript(CScript &script) {
-    static  opcodetype oplist[] = {OP_FALSE, OP_1, OP_2, OP_3, OP_CHECKSIG, OP_IF, OP_VERIF, OP_RETURN, OP_CODESEPARATOR};
+    static const opcodetype oplist[] = {OP_FALSE, OP_1, OP_2, OP_3, OP_CHECKSIG, OP_IF, OP_VERIF, OP_RETURN, OP_CODESEPARATOR};
     script = CScript();
     int ops = (InsecureRandRange(10));
     for (int i=0; i<ops; i++)

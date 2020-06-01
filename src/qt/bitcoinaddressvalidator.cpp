@@ -20,7 +20,7 @@ BitcoinAddressEntryValidator::BitcoinAddressEntryValidator(QObject *parent) :
 {
 }
 
-QValidator::State BitcoinAddressEntryValidator::validate(QString &input, int &pos) 
+QValidator::State BitcoinAddressEntryValidator::validate(QString &input, int &pos) const
 {
     Q_UNUSED(pos);
 
@@ -85,7 +85,7 @@ BitcoinAddressCheckValidator::BitcoinAddressCheckValidator(QObject *parent) :
 {
 }
 
-QValidator::State BitcoinAddressCheckValidator::validate(QString &input, int &pos) 
+QValidator::State BitcoinAddressCheckValidator::validate(QString &input, int &pos) const
 {
     Q_UNUSED(pos);
     // Validate the passed Bitcoin address

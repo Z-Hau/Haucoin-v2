@@ -30,7 +30,7 @@ class Writer {
 
   ~Writer();
 
-  Status AddRecord( Slice& slice);
+  Status AddRecord(const Slice& slice);
 
  private:
   WritableFile* dest_;
@@ -41,11 +41,11 @@ class Writer {
   // record type stored in the header.
   uint32_t type_crc_[kMaxRecordType + 1];
 
-  Status EmitPhysicalRecord(RecordType type,  char* ptr, size_t length);
+  Status EmitPhysicalRecord(RecordType type, const char* ptr, size_t length);
 
   // No copying allowed
-  Writer( Writer&);
-  void operator=( Writer&);
+  Writer(const Writer&);
+  void operator=(const Writer&);
 };
 
 }  // namespace log

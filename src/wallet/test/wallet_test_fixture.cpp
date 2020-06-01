@@ -7,7 +7,7 @@
 #include <rpc/server.h>
 #include <wallet/db.h>
 
-WalletTestingSetup::WalletTestingSetup( std::string& chainName):
+WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     TestingSetup(chainName)
 {
     bitdb.MakeMock();

@@ -32,7 +32,7 @@
  * represent the database itself.
  */
 
-static  bool DEFAULT_FLUSHWALLET = true;
+static const bool DEFAULT_FLUSHWALLET = true;
 
 class CAccount;
 class CAccountingEntry;
@@ -64,9 +64,9 @@ public:
     uint32_t nInternalChainCounter;
     CKeyID masterKeyID; //!< master key hash160
 
-    static  int VERSION_HD_BASE        = 1;
-    static  int VERSION_HD_CHAIN_SPLIT = 2;
-    static  int CURRENT_VERSION        = VERSION_HD_CHAIN_SPLIT;
+    static const int VERSION_HD_BASE        = 1;
+    static const int VERSION_HD_CHAIN_SPLIT = 2;
+    static const int CURRENT_VERSION        = VERSION_HD_CHAIN_SPLIT;
     int nVersion;
 
     CHDChain() { SetNull(); }
@@ -93,9 +93,9 @@ public:
 class CKeyMetadata
 {
 public:
-    static  int VERSION_BASIC=1;
-    static  int VERSION_WITH_HDDATA=10;
-    static  int CURRENT_VERSION=VERSION_WITH_HDDATA;
+    static const int VERSION_BASIC=1;
+    static const int VERSION_WITH_HDDATA=10;
+    static const int CURRENT_VERSION=VERSION_WITH_HDDATA;
     int nVersion;
     int64_t nCreateTime; // 0 means unknown
     std::string hdKeypath; //optional HD/bip32 keypath
@@ -142,7 +142,7 @@ class CWalletDB
 {
 private:
     template <typename K, typename T>
-    bool WriteIC( K& key,  T& value, bool fOverwrite = true)
+    bool WriteIC(const K& key, const T& value, bool fOverwrite = true)
     {
         if (!batch.Write(key, value, fOverwrite)) {
             return false;
@@ -152,7 +152,7 @@ private:
     }
 
     template <typename K>
-    bool EraseIC( K& key)
+    bool EraseIC(const K& key)
     {
         if (!batch.Erase(key)) {
             return false;
@@ -162,76 +162,76 @@ private:
     }
 
 public:
-    explicit CWalletDB(CWalletDBWrapper& dbw,  char* pszMode = "r+", bool _fFlushOnClose = true) :
+    explicit CWalletDB(CWalletDBWrapper& dbw, const char* pszMode = "r+", bool _fFlushOnClose = true) :
         batch(dbw, pszMode, _fFlushOnClose),
         m_dbw(dbw)
     {
     }
-    CWalletDB( CWalletDB&) = delete;
-    CWalletDB& operator=( CWalletDB&) = delete;
+    CWalletDB(const CWalletDB&) = delete;
+    CWalletDB& operator=(const CWalletDB&) = delete;
 
-    bool WriteName( std::string& strAddress,  std::string& strName);
-    bool EraseName( std::string& strAddress);
+    bool WriteName(const std::string& strAddress, const std::string& strName);
+    bool EraseName(const std::string& strAddress);
 
-    bool WritePurpose( std::string& strAddress,  std::string& purpose);
-    bool ErasePurpose( std::string& strAddress);
+    bool WritePurpose(const std::string& strAddress, const std::string& purpose);
+    bool ErasePurpose(const std::string& strAddress);
 
-    bool WriteTx( CWalletTx& wtx);
+    bool WriteTx(const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
 
-    bool WriteKey( CPubKey& vchPubKey,  CPrivKey& vchPrivKey,  CKeyMetadata &keyMeta);
-    bool WriteCryptedKey( CPubKey& vchPubKey,  std::vector<unsigned char>& vchCryptedSecret,  CKeyMetadata &keyMeta);
-    bool WriteMasterKey(unsigned int nID,  CMasterKey& kMasterKey);
+    bool WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta);
+    bool WriteCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta);
+    bool WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey);
 
-    bool WriteCScript( uint160& hash,  CScript& redeemScript);
+    bool WriteCScript(const uint160& hash, const CScript& redeemScript);
 
-    bool WriteWatchOnly( CScript &script,  CKeyMetadata &keymeta);
-    bool EraseWatchOnly( CScript &script);
+    bool WriteWatchOnly(const CScript &script, const CKeyMetadata &keymeta);
+    bool EraseWatchOnly(const CScript &script);
 
-    bool WriteBestBlock( CBlockLocator& locator);
+    bool WriteBestBlock(const CBlockLocator& locator);
     bool ReadBestBlock(CBlockLocator& locator);
 
     bool WriteOrderPosNext(int64_t nOrderPosNext);
 
     bool ReadPool(int64_t nPool, CKeyPool& keypool);
-    bool WritePool(int64_t nPool,  CKeyPool& keypool);
+    bool WritePool(int64_t nPool, const CKeyPool& keypool);
     bool ErasePool(int64_t nPool);
 
     bool WriteMinVersion(int nVersion);
 
     /// This writes directly to the database, and will not update the CWallet's cached accounting entries!
     /// Use wallet.AddAccountingEntry instead, to write *and* update its caches.
-    bool WriteAccountingEntry( uint64_t nAccEntryNum,  CAccountingEntry& acentry);
-    bool ReadAccount( std::string& strAccount, CAccount& account);
-    bool WriteAccount( std::string& strAccount,  CAccount& account);
+    bool WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry);
+    bool ReadAccount(const std::string& strAccount, CAccount& account);
+    bool WriteAccount(const std::string& strAccount, const CAccount& account);
 
     /// Write destination data key,value tuple to database
-    bool WriteDestData( std::string &address,  std::string &key,  std::string &value);
+    bool WriteDestData(const std::string &address, const std::string &key, const std::string &value);
     /// Erase destination data tuple from wallet database
-    bool EraseDestData( std::string &address,  std::string &key);
+    bool EraseDestData(const std::string &address, const std::string &key);
 
-    CAmount GetAccountCreditDebit( std::string& strAccount);
-    void ListAccountCreditDebit( std::string& strAccount, std::list<CAccountingEntry>& acentries);
+    CAmount GetAccountCreditDebit(const std::string& strAccount);
+    void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
     DBErrors LoadWallet(CWallet* pwallet);
     DBErrors FindWalletTx(std::vector<uint256>& vTxHash, std::vector<CWalletTx>& vWtx);
     DBErrors ZapWalletTx(std::vector<CWalletTx>& vWtx);
     DBErrors ZapSelectTx(std::vector<uint256>& vHashIn, std::vector<uint256>& vHashOut);
     /* Try to (very carefully!) recover wallet database (with a possible key type filter) */
-    static bool Recover( std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& out_backup_filename);
+    static bool Recover(const std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& out_backup_filename);
     /* Recover convenience-function to bypass the key filter callback, called when verify fails, recovers everything */
-    static bool Recover( std::string& filename, std::string& out_backup_filename);
+    static bool Recover(const std::string& filename, std::string& out_backup_filename);
     /* Recover filter (used as callback), will only let keys (cryptographical keys) as KV/key-type pass through */
     static bool RecoverKeysOnlyFilter(void *callbackData, CDataStream ssKey, CDataStream ssValue);
     /* Function to determine if a certain KV/key-type is a key (cryptographical key) type */
-    static bool IsKeyType( std::string& strType);
+    static bool IsKeyType(const std::string& strType);
     /* verifies the database environment */
-    static bool VerifyEnvironment( std::string& walletFile,  fs::path& walletDir, std::string& errorStr);
+    static bool VerifyEnvironment(const std::string& walletFile, const fs::path& walletDir, std::string& errorStr);
     /* verifies the database file */
-    static bool VerifyDatabaseFile( std::string& walletFile,  fs::path& walletDir, std::string& warningStr, std::string& errorStr);
+    static bool VerifyDatabaseFile(const std::string& walletFile, const fs::path& walletDir, std::string& warningStr, std::string& errorStr);
 
     //! write the hdchain model (external chain child index counter)
-    bool WriteHDChain( CHDChain& chain);
+    bool WriteHDChain(const CHDChain& chain);
 
     //! Begin a new transaction
     bool TxnBegin();

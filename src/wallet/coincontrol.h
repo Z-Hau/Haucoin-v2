@@ -54,22 +54,22 @@ public:
         m_fee_mode = FeeEstimateMode::UNSET;
     }
 
-    bool HasSelected() 
+    bool HasSelected() const
     {
         return (setSelected.size() > 0);
     }
 
-    bool IsSelected( COutPoint& output) 
+    bool IsSelected(const COutPoint& output) const
     {
         return (setSelected.count(output) > 0);
     }
 
-    void Select( COutPoint& output)
+    void Select(const COutPoint& output)
     {
         setSelected.insert(output);
     }
 
-    void UnSelect( COutPoint& output)
+    void UnSelect(const COutPoint& output)
     {
         setSelected.erase(output);
     }
@@ -79,7 +79,7 @@ public:
         setSelected.clear();
     }
 
-    void ListSelected(std::vector<COutPoint>& vOutpoints) 
+    void ListSelected(std::vector<COutPoint>& vOutpoints) const
     {
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }

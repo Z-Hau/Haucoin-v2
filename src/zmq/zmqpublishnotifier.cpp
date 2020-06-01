@@ -12,13 +12,13 @@
 
 static std::multimap<std::string, CZMQAbstractPublishNotifier*> mapPublishNotifiers;
 
-static  char *MSG_HASHBLOCK = "hashblock";
-static  char *MSG_HASHTX    = "hashtx";
-static  char *MSG_RAWBLOCK  = "rawblock";
-static  char *MSG_RAWTX     = "rawtx";
+static const char *MSG_HASHBLOCK = "hashblock";
+static const char *MSG_HASHTX    = "hashtx";
+static const char *MSG_RAWBLOCK  = "rawblock";
+static const char *MSG_RAWTX     = "rawtx";
 
 // Internal function to send multipart message
-static int zmq_send_multipart(void *sock,  void* data, size_t size, ...)
+static int zmq_send_multipart(void *sock, const void* data, size_t size, ...)
 {
     va_list args;
     va_start(args, size);
@@ -38,7 +38,7 @@ static int zmq_send_multipart(void *sock,  void* data, size_t size, ...)
         void *buf = zmq_msg_data(&msg);
         memcpy(buf, data, size);
 
-        data = va_arg(args,  void*);
+        data = va_arg(args, const void*);
 
         rc = zmq_msg_send(&msg, sock, data ? ZMQ_SNDMORE : 0);
         if (rc == -1)
@@ -129,7 +129,7 @@ void CZMQAbstractPublishNotifier::Shutdown()
     psocket = nullptr;
 }
 
-bool CZMQAbstractPublishNotifier::SendMessage( char *command,  void* data, size_t size)
+bool CZMQAbstractPublishNotifier::SendMessage(const char *command, const void* data, size_t size)
 {
     assert(psocket);
 
@@ -146,7 +146,7 @@ bool CZMQAbstractPublishNotifier::SendMessage( char *command,  void* data, size_
     return true;
 }
 
-bool CZMQPublishHashBlockNotifier::NotifyBlock( CBlockIndex *pindex)
+bool CZMQPublishHashBlockNotifier::NotifyBlock(const CBlockIndex *pindex)
 {
     uint256 hash = pindex->GetBlockHash();
     LogPrint(BCLog::ZMQ, "zmq: Publish hashblock %s\n", hash.GetHex());
@@ -156,7 +156,7 @@ bool CZMQPublishHashBlockNotifier::NotifyBlock( CBlockIndex *pindex)
     return SendMessage(MSG_HASHBLOCK, data, 32);
 }
 
-bool CZMQPublishHashTransactionNotifier::NotifyTransaction( CTransaction &transaction)
+bool CZMQPublishHashTransactionNotifier::NotifyTransaction(const CTransaction &transaction)
 {
     uint256 hash = transaction.GetHash();
     LogPrint(BCLog::ZMQ, "zmq: Publish hashtx %s\n", hash.GetHex());
@@ -166,11 +166,11 @@ bool CZMQPublishHashTransactionNotifier::NotifyTransaction( CTransaction &transa
     return SendMessage(MSG_HASHTX, data, 32);
 }
 
-bool CZMQPublishRawBlockNotifier::NotifyBlock( CBlockIndex *pindex)
+bool CZMQPublishRawBlockNotifier::NotifyBlock(const CBlockIndex *pindex)
 {
     LogPrint(BCLog::ZMQ, "zmq: Publish rawblock %s\n", pindex->GetBlockHash().GetHex());
 
-     Consensus::Params& consensusParams = Params().GetConsensus();
+    const Consensus::Params& consensusParams = Params().GetConsensus();
     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION | RPCSerializationFlags());
     {
         LOCK(cs_main);
@@ -187,7 +187,7 @@ bool CZMQPublishRawBlockNotifier::NotifyBlock( CBlockIndex *pindex)
     return SendMessage(MSG_RAWBLOCK, &(*ss.begin()), ss.size());
 }
 
-bool CZMQPublishRawTransactionNotifier::NotifyTransaction( CTransaction &transaction)
+bool CZMQPublishRawTransactionNotifier::NotifyTransaction(const CTransaction &transaction)
 {
     uint256 hash = transaction.GetHash();
     LogPrint(BCLog::ZMQ, "zmq: Publish rawtx %s\n", hash.GetHex());

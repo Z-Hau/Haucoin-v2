@@ -42,14 +42,14 @@ namespace Win32
 {
 
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName( TypeName&);               \
-  void operator=( TypeName&)
+  TypeName(const TypeName&);               \
+  void operator=(const TypeName&)
 
 std::string GetCurrentDir();
 std::wstring GetCurrentDirW();
 
-static  std::string CurrentDir = GetCurrentDir();
-static  std::wstring CurrentDirW = GetCurrentDirW();
+static const std::string CurrentDir = GetCurrentDir();
+static const std::wstring CurrentDirW = GetCurrentDirW();
 
 std::string& ModifyPath(std::string& path);
 std::wstring& ModifyPath(std::wstring& path);
@@ -78,11 +78,11 @@ public:
     virtual Status Read(size_t n, Slice* result, char* scratch);
     virtual Status Skip(uint64_t n);
     BOOL isEnable();
-    virtual std::string GetName()  { return _filename; }
+    virtual std::string GetName() const { return _filename; }
 private:
     BOOL _Init();
     void _CleanUp();
-    Win32SequentialFile( std::string& fname);
+    Win32SequentialFile(const std::string& fname);
     std::string _filename;
     ::HANDLE _hFile;
     DISALLOW_COPY_AND_ASSIGN(Win32SequentialFile);
@@ -93,30 +93,30 @@ class Win32RandomAccessFile : public RandomAccessFile
 public:
     friend class Win32Env;
     virtual ~Win32RandomAccessFile();
-    virtual Status Read(uint64_t offset, size_t n, Slice* result,char* scratch) ;
+    virtual Status Read(uint64_t offset, size_t n, Slice* result,char* scratch) const;
     BOOL isEnable();
-    virtual std::string GetName()  { return _filename; }
+    virtual std::string GetName() const { return _filename; }
 private:
     BOOL _Init(LPCWSTR path);
     void _CleanUp();
-    Win32RandomAccessFile( std::string& fname);
+    Win32RandomAccessFile(const std::string& fname);
     HANDLE _hFile;
-     std::string _filename;
+    const std::string _filename;
     DISALLOW_COPY_AND_ASSIGN(Win32RandomAccessFile);
 };
 
 class Win32WritableFile : public WritableFile
 {
 public:
-    Win32WritableFile( std::string& fname, bool append);
+    Win32WritableFile(const std::string& fname, bool append);
     ~Win32WritableFile();
 
-    virtual Status Append( Slice& data);
+    virtual Status Append(const Slice& data);
     virtual Status Close();
     virtual Status Flush();
     virtual Status Sync();
     BOOL isEnable();
-    virtual std::string GetName()  { return filename_; }
+    virtual std::string GetName() const { return filename_; }
 private:
     std::string filename_;
     ::HANDLE _hFile;
@@ -131,7 +131,7 @@ public:
 private:
     BOOL _Init(LPCWSTR path);
     void _CleanUp();
-    Win32FileLock( std::string& fname);
+    Win32FileLock(const std::string& fname);
     HANDLE _hFile;
     std::string _filename;
     DISALLOW_COPY_AND_ASSIGN(Win32FileLock);
@@ -142,7 +142,7 @@ class Win32Logger : public Logger
 public: 
     friend class Win32Env;
     virtual ~Win32Logger();
-    virtual void Logv( char* format, va_list ap);
+    virtual void Logv(const char* format, va_list ap);
 private:
     explicit Win32Logger(WritableFile* pFile);
     WritableFile* _pFileProxy;
@@ -154,33 +154,33 @@ class Win32Env : public Env
 public:
     Win32Env();
     virtual ~Win32Env();
-    virtual Status NewSequentialFile( std::string& fname,
+    virtual Status NewSequentialFile(const std::string& fname,
         SequentialFile** result);
 
-    virtual Status NewRandomAccessFile( std::string& fname,
+    virtual Status NewRandomAccessFile(const std::string& fname,
         RandomAccessFile** result);
-    virtual Status NewWritableFile( std::string& fname,
+    virtual Status NewWritableFile(const std::string& fname,
         WritableFile** result);
-    virtual Status NewAppendableFile( std::string& fname,
+    virtual Status NewAppendableFile(const std::string& fname,
         WritableFile** result);
 
-    virtual bool FileExists( std::string& fname);
+    virtual bool FileExists(const std::string& fname);
 
-    virtual Status GetChildren( std::string& dir,
+    virtual Status GetChildren(const std::string& dir,
         std::vector<std::string>* result);
 
-    virtual Status DeleteFile( std::string& fname);
+    virtual Status DeleteFile(const std::string& fname);
 
-    virtual Status CreateDir( std::string& dirname);
+    virtual Status CreateDir(const std::string& dirname);
 
-    virtual Status DeleteDir( std::string& dirname);
+    virtual Status DeleteDir(const std::string& dirname);
 
-    virtual Status GetFileSize( std::string& fname, uint64_t* file_size);
+    virtual Status GetFileSize(const std::string& fname, uint64_t* file_size);
 
-    virtual Status RenameFile( std::string& src,
-         std::string& target);
+    virtual Status RenameFile(const std::string& src,
+        const std::string& target);
 
-    virtual Status LockFile( std::string& fname, FileLock** lock);
+    virtual Status LockFile(const std::string& fname, FileLock** lock);
 
     virtual Status UnlockFile(FileLock* lock);
 
@@ -192,22 +192,22 @@ public:
 
     virtual Status GetTestDirectory(std::string* path);
 
-    //virtual void Logv(WritableFile* log,  char* format, va_list ap);
+    //virtual void Logv(WritableFile* log, const char* format, va_list ap);
 
-    virtual Status NewLogger( std::string& fname, Logger** result);
+    virtual Status NewLogger(const std::string& fname, Logger** result);
 
     virtual uint64_t NowMicros();
 
     virtual void SleepForMicroseconds(int micros);
 };
 
-void ToWidePath( std::string& value, std::wstring& target) {
+void ToWidePath(const std::string& value, std::wstring& target) {
 	wchar_t buffer[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, value.c_str(), -1, buffer, MAX_PATH);
 	target = buffer;
 }
 
-void ToNarrowPath( std::wstring& value, std::string& target) {
+void ToNarrowPath(const std::wstring& value, std::string& target) {
 	char buffer[MAX_PATH];
 	WideCharToMultiByte(CP_ACP, 0, value.c_str(), -1, buffer, MAX_PATH, NULL, NULL);
 	target = buffer;
@@ -310,10 +310,10 @@ size_t GetPageSize()
     return std::max(si.dwPageSize,si.dwAllocationGranularity);
 }
 
- size_t g_PageSize = GetPageSize();
+const size_t g_PageSize = GetPageSize();
 
 
-Win32SequentialFile::Win32SequentialFile(  std::string& fname ) :
+Win32SequentialFile::Win32SequentialFile( const std::string& fname ) :
     _filename(fname),_hFile(NULL)
 {
     _Init();
@@ -376,7 +376,7 @@ void Win32SequentialFile::_CleanUp()
     }
 }
 
-Win32RandomAccessFile::Win32RandomAccessFile(  std::string& fname ) :
+Win32RandomAccessFile::Win32RandomAccessFile( const std::string& fname ) :
     _filename(fname),_hFile(NULL)
 {
 	std::wstring path;
@@ -389,7 +389,7 @@ Win32RandomAccessFile::~Win32RandomAccessFile()
     _CleanUp();
 }
 
-Status Win32RandomAccessFile::Read(uint64_t offset,size_t n,Slice* result,char* scratch) 
+Status Win32RandomAccessFile::Read(uint64_t offset,size_t n,Slice* result,char* scratch) const
 {
     Status sRet;
     OVERLAPPED ol = {0};
@@ -430,7 +430,7 @@ void Win32RandomAccessFile::_CleanUp()
     }
 }
 
-Win32WritableFile::Win32WritableFile( std::string& fname, bool append)
+Win32WritableFile::Win32WritableFile(const std::string& fname, bool append)
     : filename_(fname)
 {
     std::wstring path;
@@ -458,7 +458,7 @@ Win32WritableFile::~Win32WritableFile()
         Close();
 }
 
-Status Win32WritableFile::Append( Slice& data)
+Status Win32WritableFile::Append(const Slice& data)
 {
     DWORD r = 0;
     if (!WriteFile(_hFile, data.data(), data.size(), &r, NULL) || r != data.size()) {
@@ -495,7 +495,7 @@ BOOL Win32WritableFile::isEnable()
     return _hFile != INVALID_HANDLE_VALUE;
 }
 
-Win32FileLock::Win32FileLock(  std::string& fname ) :
+Win32FileLock::Win32FileLock( const std::string& fname ) :
     _hFile(NULL),_filename(fname)
 {
 	std::wstring path;
@@ -543,7 +543,7 @@ Win32Logger::~Win32Logger()
         delete _pFileProxy;
 }
 
-void Win32Logger::Logv(  char* format, va_list ap )
+void Win32Logger::Logv( const char* format, va_list ap )
 {
     uint64_t thread_id = ::GetCurrentThreadId();
 
@@ -611,7 +611,7 @@ void Win32Logger::Logv(  char* format, va_list ap )
     }
 }
 
-bool Win32Env::FileExists( std::string& fname)
+bool Win32Env::FileExists(const std::string& fname)
 {
 	std::string path = fname;
     std::wstring wpath;
@@ -619,7 +619,7 @@ bool Win32Env::FileExists( std::string& fname)
     return ::PathFileExistsW(wpath.c_str()) ? true : false;
 }
 
-Status Win32Env::GetChildren( std::string& dir, std::vector<std::string>* result)
+Status Win32Env::GetChildren(const std::string& dir, std::vector<std::string>* result)
 {
     Status sRet;
     ::WIN32_FIND_DATAW wfd;
@@ -653,7 +653,7 @@ void Win32Env::SleepForMicroseconds( int micros )
 }
 
 
-Status Win32Env::DeleteFile(  std::string& fname )
+Status Win32Env::DeleteFile( const std::string& fname )
 {
     Status sRet;
     std::string path = fname;
@@ -666,7 +666,7 @@ Status Win32Env::DeleteFile(  std::string& fname )
     return sRet;
 }
 
-Status Win32Env::GetFileSize(  std::string& fname, uint64_t* file_size )
+Status Win32Env::GetFileSize( const std::string& fname, uint64_t* file_size )
 {
     Status sRet;
     std::string path = fname;
@@ -684,7 +684,7 @@ Status Win32Env::GetFileSize(  std::string& fname, uint64_t* file_size )
     return sRet;
 }
 
-Status Win32Env::RenameFile(  std::string& src,  std::string& target )
+Status Win32Env::RenameFile( const std::string& src, const std::string& target )
 {
     Status sRet;
     std::string src_path = src;
@@ -707,7 +707,7 @@ Status Win32Env::RenameFile(  std::string& src,  std::string& target )
     return sRet;
 }
 
-Status Win32Env::LockFile(  std::string& fname, FileLock** lock )
+Status Win32Env::LockFile( const std::string& fname, FileLock** lock )
 {
     Status sRet;
     std::string path = fname;
@@ -761,7 +761,7 @@ uint64_t Win32Env::NowMicros()
     return (uint64_t)(GetTickCount64()*1000);
 }
 
-static Status CreateDirInner(  std::string& dirname )
+static Status CreateDirInner( const std::string& dirname )
 {
     Status sRet;
     DWORD attr = ::GetFileAttributes(dirname.c_str());
@@ -780,7 +780,7 @@ static Status CreateDirInner(  std::string& dirname )
     return sRet;
 }
 
-Status Win32Env::CreateDir(  std::string& dirname )
+Status Win32Env::CreateDir( const std::string& dirname )
 {
     std::string path = dirname;
     if(path[path.length() - 1] != '\\'){
@@ -791,7 +791,7 @@ Status Win32Env::CreateDir(  std::string& dirname )
     return CreateDirInner(path);
 }
 
-Status Win32Env::DeleteDir(  std::string& dirname )
+Status Win32Env::DeleteDir( const std::string& dirname )
 {
     Status sRet;
     std::wstring path;
@@ -803,7 +803,7 @@ Status Win32Env::DeleteDir(  std::string& dirname )
     return sRet;
 }
 
-Status Win32Env::NewSequentialFile(  std::string& fname, SequentialFile** result )
+Status Win32Env::NewSequentialFile( const std::string& fname, SequentialFile** result )
 {
     Status sRet;
     std::string path = fname;
@@ -818,7 +818,7 @@ Status Win32Env::NewSequentialFile(  std::string& fname, SequentialFile** result
     return sRet;
 }
 
-Status Win32Env::NewRandomAccessFile(  std::string& fname, RandomAccessFile** result )
+Status Win32Env::NewRandomAccessFile( const std::string& fname, RandomAccessFile** result )
 {
     Status sRet;
     std::string path = fname;
@@ -832,7 +832,7 @@ Status Win32Env::NewRandomAccessFile(  std::string& fname, RandomAccessFile** re
     return sRet;
 }
 
-Status Win32Env::NewLogger(  std::string& fname, Logger** result )
+Status Win32Env::NewLogger( const std::string& fname, Logger** result )
 {
     Status sRet;
     std::string path = fname;
@@ -848,7 +848,7 @@ Status Win32Env::NewLogger(  std::string& fname, Logger** result )
     return sRet;
 }
 
-Status Win32Env::NewWritableFile(  std::string& fname, WritableFile** result )
+Status Win32Env::NewWritableFile( const std::string& fname, WritableFile** result )
 {
     Status sRet;
     std::string path = fname;
@@ -861,7 +861,7 @@ Status Win32Env::NewWritableFile(  std::string& fname, WritableFile** result )
     return sRet;
 }
 
-Status Win32Env::NewAppendableFile(  std::string& fname, WritableFile** result )
+Status Win32Env::NewAppendableFile( const std::string& fname, WritableFile** result )
 {
     Status sRet;
     std::string path = fname;

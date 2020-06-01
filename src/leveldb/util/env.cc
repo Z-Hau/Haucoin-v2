@@ -9,7 +9,7 @@ namespace leveldb {
 Env::~Env() {
 }
 
-Status Env::NewAppendableFile( std::string& fname, WritableFile** result) {
+Status Env::NewAppendableFile(const std::string& fname, WritableFile** result) {
   return Status::NotSupported("NewAppendableFile", fname);
 }
 
@@ -28,7 +28,7 @@ Logger::~Logger() {
 FileLock::~FileLock() {
 }
 
-void Log(Logger* info_log,  char* format, ...) {
+void Log(Logger* info_log, const char* format, ...) {
   if (info_log != NULL) {
     va_list ap;
     va_start(ap, format);
@@ -37,8 +37,8 @@ void Log(Logger* info_log,  char* format, ...) {
   }
 }
 
-static Status DoWriteStringToFile(Env* env,  Slice& data,
-                                   std::string& fname,
+static Status DoWriteStringToFile(Env* env, const Slice& data,
+                                  const std::string& fname,
                                   bool should_sync) {
   WritableFile* file;
   Status s = env->NewWritableFile(fname, &file);
@@ -59,24 +59,24 @@ static Status DoWriteStringToFile(Env* env,  Slice& data,
   return s;
 }
 
-Status WriteStringToFile(Env* env,  Slice& data,
-                          std::string& fname) {
+Status WriteStringToFile(Env* env, const Slice& data,
+                         const std::string& fname) {
   return DoWriteStringToFile(env, data, fname, false);
 }
 
-Status WriteStringToFileSync(Env* env,  Slice& data,
-                              std::string& fname) {
+Status WriteStringToFileSync(Env* env, const Slice& data,
+                             const std::string& fname) {
   return DoWriteStringToFile(env, data, fname, true);
 }
 
-Status ReadFileToString(Env* env,  std::string& fname, std::string* data) {
+Status ReadFileToString(Env* env, const std::string& fname, std::string* data) {
   data->clear();
   SequentialFile* file;
   Status s = env->NewSequentialFile(fname, &file);
   if (!s.ok()) {
     return s;
   }
-  static  int kBufferSize = 8192;
+  static const int kBufferSize = 8192;
   char* space = new char[kBufferSize];
   while (true) {
     Slice fragment;

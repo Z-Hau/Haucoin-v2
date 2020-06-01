@@ -25,15 +25,15 @@ class TxViewDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    explicit TxViewDelegate( PlatformStyle *_platformStyle, QObject *parent=nullptr):
+    explicit TxViewDelegate(const PlatformStyle *_platformStyle, QObject *parent=nullptr):
         QAbstractItemDelegate(parent), unit(BitcoinUnits::BTC),
         platformStyle(_platformStyle)
     {
 
     }
 
-    inline void paint(QPainter *painter,  QStyleOptionViewItem &option,
-                       QModelIndex &index ) 
+    inline void paint(QPainter *painter, const QStyleOptionViewItem &option,
+                      const QModelIndex &index ) const
     {
         painter->save();
 
@@ -97,18 +97,18 @@ public:
         painter->restore();
     }
 
-    inline QSize sizeHint( QStyleOptionViewItem &option,  QModelIndex &index) 
+    inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
         return QSize(DECORATION_SIZE, DECORATION_SIZE);
     }
 
     int unit;
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
 };
 #include <qt/overviewpage.moc>
 
-OverviewPage::OverviewPage( PlatformStyle *platformStyle, QWidget *parent) :
+OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::OverviewPage),
     clientModel(0),
@@ -143,7 +143,7 @@ OverviewPage::OverviewPage( PlatformStyle *platformStyle, QWidget *parent) :
     connect(ui->labelTransactionsStatus, SIGNAL(clicked()), this, SLOT(handleOutOfSyncWarningClicks()));
 }
 
-void OverviewPage::handleTransactionClicked( QModelIndex &index)
+void OverviewPage::handleTransactionClicked(const QModelIndex &index)
 {
     if(filter)
         Q_EMIT transactionClicked(filter->mapToSource(index));
@@ -159,7 +159,7 @@ OverviewPage::~OverviewPage()
     delete ui;
 }
 
-void OverviewPage::setBalance( CAmount& balance,  CAmount& unconfirmedBalance,  CAmount& immatureBalance,  CAmount& watchOnlyBalance,  CAmount& watchUnconfBalance,  CAmount& watchImmatureBalance)
+void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
 {
     int unit = walletModel->getOptionsModel()->getDisplayUnit();
     currentBalance = balance;
@@ -260,7 +260,7 @@ void OverviewPage::updateDisplayUnit()
     }
 }
 
-void OverviewPage::updateAlerts( QString &warnings)
+void OverviewPage::updateAlerts(const QString &warnings)
 {
     this->ui->labelAlerts->setVisible(!warnings.isEmpty());
     this->ui->labelAlerts->setText(warnings);

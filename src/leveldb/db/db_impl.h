@@ -25,27 +25,27 @@ class VersionSet;
 
 class DBImpl : public DB {
  public:
-  DBImpl( Options& options,  std::string& dbname);
+  DBImpl(const Options& options, const std::string& dbname);
   virtual ~DBImpl();
 
   // Implementations of the DB interface
-  virtual Status Put( WriteOptions&,  Slice& key,  Slice& value);
-  virtual Status Delete( WriteOptions&,  Slice& key);
-  virtual Status Write( WriteOptions& options, WriteBatch* updates);
-  virtual Status Get( ReadOptions& options,
-                      Slice& key,
+  virtual Status Put(const WriteOptions&, const Slice& key, const Slice& value);
+  virtual Status Delete(const WriteOptions&, const Slice& key);
+  virtual Status Write(const WriteOptions& options, WriteBatch* updates);
+  virtual Status Get(const ReadOptions& options,
+                     const Slice& key,
                      std::string* value);
-  virtual Iterator* NewIterator( ReadOptions&);
-  virtual  Snapshot* GetSnapshot();
-  virtual void ReleaseSnapshot( Snapshot* snapshot);
-  virtual bool GetProperty( Slice& property, std::string* value);
-  virtual void GetApproximateSizes( Range* range, int n, uint64_t* sizes);
-  virtual void CompactRange( Slice* begin,  Slice* end);
+  virtual Iterator* NewIterator(const ReadOptions&);
+  virtual const Snapshot* GetSnapshot();
+  virtual void ReleaseSnapshot(const Snapshot* snapshot);
+  virtual bool GetProperty(const Slice& property, std::string* value);
+  virtual void GetApproximateSizes(const Range* range, int n, uint64_t* sizes);
+  virtual void CompactRange(const Slice* begin, const Slice* end);
 
   // Extra methods (for testing) that are not in the public DB interface
 
   // Compact any files in the named level that overlap [*begin,*end]
-  void TEST_CompactRange(int level,  Slice* begin,  Slice* end);
+  void TEST_CompactRange(int level, const Slice* begin, const Slice* end);
 
   // Force current memtable contents to be compacted.
   Status TEST_CompactMemTable();
@@ -69,7 +69,7 @@ class DBImpl : public DB {
   struct CompactionState;
   struct Writer;
 
-  Iterator* NewInternalIterator( ReadOptions&,
+  Iterator* NewInternalIterator(const ReadOptions&,
                                 SequenceNumber* latest_snapshot,
                                 uint32_t* seed);
 
@@ -81,7 +81,7 @@ class DBImpl : public DB {
   Status Recover(VersionEdit* edit, bool* save_manifest)
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
-  void MaybeIgnoreError(Status* s) ;
+  void MaybeIgnoreError(Status* s) const;
 
   // Delete any unneeded files and stale in-memory entries.
   void DeleteObsoleteFiles();
@@ -102,7 +102,7 @@ class DBImpl : public DB {
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   WriteBatch* BuildBatchGroup(Writer** last_writer);
 
-  void RecordBackgroundError( Status& s);
+  void RecordBackgroundError(const Status& s);
 
   void MaybeScheduleCompaction() EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   static void BGWork(void* db);
@@ -119,13 +119,13 @@ class DBImpl : public DB {
       EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // Constant after construction
-  Env*  env_;
-   InternalKeyComparator internal_comparator_;
-   InternalFilterPolicy internal_filter_policy_;
-   Options options_;  // options_.comparator == &internal_comparator_
+  Env* const env_;
+  const InternalKeyComparator internal_comparator_;
+  const InternalFilterPolicy internal_filter_policy_;
+  const Options options_;  // options_.comparator == &internal_comparator_
   bool owns_info_log_;
   bool owns_cache_;
-   std::string dbname_;
+  const std::string dbname_;
 
   // table_cache_ provides its own synchronization
   TableCache* table_cache_;
@@ -162,8 +162,8 @@ class DBImpl : public DB {
   struct ManualCompaction {
     int level;
     bool done;
-     InternalKey* begin;   // NULL means beginning of key range
-     InternalKey* end;     // NULL means end of key range
+    const InternalKey* begin;   // NULL means beginning of key range
+    const InternalKey* end;     // NULL means end of key range
     InternalKey tmp_storage;    // Used to keep track of compaction progress
   };
   ManualCompaction* manual_compaction_;
@@ -182,7 +182,7 @@ class DBImpl : public DB {
 
     CompactionStats() : micros(0), bytes_read(0), bytes_written(0) { }
 
-    void Add( CompactionStats& c) {
+    void Add(const CompactionStats& c) {
       this->micros += c.micros;
       this->bytes_read += c.bytes_read;
       this->bytes_written += c.bytes_written;
@@ -191,20 +191,20 @@ class DBImpl : public DB {
   CompactionStats stats_[config::kNumLevels];
 
   // No copying allowed
-  DBImpl( DBImpl&);
-  void operator=( DBImpl&);
+  DBImpl(const DBImpl&);
+  void operator=(const DBImpl&);
 
-   Comparator* user_comparator()  {
+  const Comparator* user_comparator() const {
     return internal_comparator_.user_comparator();
   }
 };
 
 // Sanitize db options.  The caller should delete result.info_log if
 // it is not equal to src.info_log.
-extern Options SanitizeOptions( std::string& db,
-                                InternalKeyComparator* icmp,
-                                InternalFilterPolicy* ipolicy,
-                                Options& src);
+extern Options SanitizeOptions(const std::string& db,
+                               const InternalKeyComparator* icmp,
+                               const InternalFilterPolicy* ipolicy,
+                               const Options& src);
 
 }  // namespace leveldb
 

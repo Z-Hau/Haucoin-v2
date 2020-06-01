@@ -34,7 +34,7 @@ public:
     explicit CCoinControlWidgetItem(int type = Type) : QTreeWidgetItem(type) {}
     explicit CCoinControlWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
 
-    bool operator<( QTreeWidgetItem &other) ;
+    bool operator<(const QTreeWidgetItem &other) const;
 };
 
 
@@ -43,7 +43,7 @@ class CoinControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog( PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit CoinControlDialog(const PlatformStyle *platformStyle, QWidget *parent = 0);
     ~CoinControlDialog();
 
     void setModel(WalletModel *model);
@@ -67,7 +67,7 @@ private:
     QAction *lockAction;
     QAction *unlockAction;
 
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
     void sortView(int, Qt::SortOrder);
     void updateView();
@@ -86,7 +86,7 @@ private:
     friend class CCoinControlWidgetItem;
 
 private Q_SLOTS:
-    void showMenu( QPoint &);
+    void showMenu(const QPoint &);
     void copyAmount();
     void copyLabel();
     void copyAddress();

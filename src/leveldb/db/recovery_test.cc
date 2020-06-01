@@ -28,8 +28,8 @@ class RecoveryTest {
     DestroyDB(dbname_, Options());
   }
 
-  DBImpl* dbfull()  { return reinterpret_cast<DBImpl*>(db_); }
-  Env* env()  { return env_; }
+  DBImpl* dbfull() const { return reinterpret_cast<DBImpl*>(db_); }
+  Env* env() const { return env_; }
 
   bool CanAppend() {
     WritableFile* tmp;
@@ -63,11 +63,11 @@ class RecoveryTest {
     ASSERT_EQ(1, NumLogs());
   }
 
-  Status Put( std::string& k,  std::string& v) {
+  Status Put(const std::string& k, const std::string& v) {
     return db_->Put(WriteOptions(), k, v);
   }
 
-  std::string Get( std::string& k,  Snapshot* snapshot = NULL) {
+  std::string Get(const std::string& k, const Snapshot* snapshot = NULL) {
     std::string result;
     Status s = db_->Get(ReadOptions(), k, &result);
     if (s.IsNotFound()) {
@@ -126,7 +126,7 @@ class RecoveryTest {
     return GetFiles(kTableFile).size();
   }
 
-  uint64_t FileSize( std::string& fname) {
+  uint64_t FileSize(const std::string& fname) {
     uint64_t result;
     ASSERT_OK(env_->GetFileSize(fname, &result)) << fname;
     return result;
@@ -244,7 +244,7 @@ TEST(RecoveryTest, LogFileReuse) {
 
 TEST(RecoveryTest, MultipleMemTables) {
   // Make a large log.
-   int kNum = 1000;
+  const int kNum = 1000;
   for (int i = 0; i < kNum; i++) {
     char buf[100];
     snprintf(buf, sizeof(buf), "%050d", i);

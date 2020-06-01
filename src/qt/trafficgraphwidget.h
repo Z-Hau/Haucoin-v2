@@ -22,7 +22,7 @@ class TrafficGraphWidget : public QWidget
 public:
     explicit TrafficGraphWidget(QWidget *parent = 0);
     void setClientModel(ClientModel *model);
-    int getGraphRangeMins() ;
+    int getGraphRangeMins() const;
 
 protected:
     void paintEvent(QPaintEvent *);

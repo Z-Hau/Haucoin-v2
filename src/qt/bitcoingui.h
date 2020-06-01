@@ -46,10 +46,10 @@ class BitcoinGUI : public QMainWindow
     Q_OBJECT
 
 public:
-    static  QString DEFAULT_WALLET;
-    static  std::string DEFAULT_UIPLATFORM;
+    static const QString DEFAULT_WALLET;
+    static const std::string DEFAULT_UIPLATFORM;
 
-    explicit BitcoinGUI( PlatformStyle *platformStyle,  NetworkStyle *networkStyle, QWidget *parent = 0);
+    explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle *networkStyle, QWidget *parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -62,8 +62,8 @@ public:
         The wallet model represents a bitcoin wallet, and offers access to the list of transactions, address book and sending
         functionality.
     */
-    bool addWallet( QString& name, WalletModel *walletModel);
-    bool setCurrentWallet( QString& name);
+    bool addWallet(const QString& name, WalletModel *walletModel);
+    bool setCurrentWallet(const QString& name);
     void removeAllWallets();
 #endif // ENABLE_WALLET
     bool enableWallet;
@@ -123,7 +123,7 @@ private:
     int prevBlocks;
     int spinnerFrame;
 
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
     /** Create the main UI actions. */
     void createActions();
@@ -132,7 +132,7 @@ private:
     /** Create the toolbars */
     void createToolBars();
     /** Create system tray icon and notification */
-    void createTrayIcon( NetworkStyle *networkStyle);
+    void createTrayIcon(const NetworkStyle *networkStyle);
     /** Create system tray menu (or setup the dock menu) */
     void createTrayIconMenu();
 
@@ -151,7 +151,7 @@ private:
 
 Q_SIGNALS:
     /** Signal raised when a URI was entered or dragged to the GUI */
-    void receivedURI( QString &uri);
+    void receivedURI(const QString &uri);
 
 public Q_SLOTS:
     /** Set number of connections shown in the UI */
@@ -159,7 +159,7 @@ public Q_SLOTS:
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
     /** Set number of blocks and last block date shown in the UI */
-    void setNumBlocks(int count,  QDateTime& blockDate, double nVerificationProgress, bool headers);
+    void setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool headers);
 
     /** Notify the user of an event from the core network or transaction handling code.
        @param[in] title     the message box / notification title
@@ -168,7 +168,7 @@ public Q_SLOTS:
                             @see CClientUIInterface::MessageBoxFlags
        @param[in] ret       pointer to a bool that will be modified to whether Ok was clicked (modal only)
     */
-    void message( QString &title,  QString &message, unsigned int style, bool *ret = nullptr);
+    void message(const QString &title, const QString &message, unsigned int style, bool *ret = nullptr);
 
 #ifdef ENABLE_WALLET
     /** Set the encryption status as shown in the UI.
@@ -183,10 +183,10 @@ public Q_SLOTS:
      */
     void setHDStatus(int hdEnabled);
 
-    bool handlePaymentRequest( SendCoinsRecipient& recipient);
+    bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     /** Show incoming transaction notification for new transactions. */
-    void incomingTransaction( QString& date, int unit,  CAmount& amount,  QString& type,  QString& address,  QString& label);
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
 #endif // ENABLE_WALLET
 
 private Q_SLOTS:
@@ -232,7 +232,7 @@ private Q_SLOTS:
     void detectShutdown();
 
     /** Show progress dialog e.g. for verifychain */
-    void showProgress( QString &title, int nProgress);
+    void showProgress(const QString &title, int nProgress);
     
     /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
     void setTrayIconVisible(bool);
@@ -248,7 +248,7 @@ class UnitDisplayStatusBarControl : public QLabel
     Q_OBJECT
 
 public:
-    explicit UnitDisplayStatusBarControl( PlatformStyle *platformStyle);
+    explicit UnitDisplayStatusBarControl(const PlatformStyle *platformStyle);
     /** Lets the control know about the Options Model (and its signals) */
     void setOptionsModel(OptionsModel *optionsModel);
 
@@ -261,7 +261,7 @@ private:
     QMenu* menu;
 
     /** Shows context menu with Display Unit options by the mouse coordinates */
-    void onDisplayUnitsClicked( QPoint& point);
+    void onDisplayUnitsClicked(const QPoint& point);
     /** Creates context menu, its actions, and wires up all the relevant signals for mouse events. */
     void createContextMenu();
 

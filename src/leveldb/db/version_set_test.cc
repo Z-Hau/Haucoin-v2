@@ -22,7 +22,7 @@ class FindFileTest {
     }
   }
 
-  void Add( char* smallest,  char* largest,
+  void Add(const char* smallest, const char* largest,
            SequenceNumber smallest_seq = 100,
            SequenceNumber largest_seq = 100) {
     FileMetaData* f = new FileMetaData;
@@ -32,13 +32,13 @@ class FindFileTest {
     files_.push_back(f);
   }
 
-  int Find( char* key) {
+  int Find(const char* key) {
     InternalKey target(key, 100, kTypeValue);
     InternalKeyComparator cmp(BytewiseComparator());
     return FindFile(cmp, files_, target.Encode());
   }
 
-  bool Overlaps( char* smallest,  char* largest) {
+  bool Overlaps(const char* smallest, const char* largest) {
     InternalKeyComparator cmp(BytewiseComparator());
     Slice s(smallest != NULL ? smallest : "");
     Slice l(largest != NULL ? largest : "");

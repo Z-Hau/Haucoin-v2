@@ -16,7 +16,7 @@
 #include <utilmoneystr.h>
 #include <utilstrencodings.h>
 
-UniValue ValueFromAmount( CAmount& amount)
+UniValue ValueFromAmount(const CAmount& amount)
 {
     bool sign = amount < 0;
     int64_t n_abs = (sign ? -amount : amount);
@@ -26,7 +26,7 @@ UniValue ValueFromAmount( CAmount& amount)
             strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
 }
 
-std::string FormatScript( CScript& script)
+std::string FormatScript(const CScript& script)
 {
     std::string ret;
     CScript::const_iterator it = script.begin();
@@ -61,7 +61,7 @@ std::string FormatScript( CScript& script)
     return ret.substr(0, ret.size() - 1);
 }
 
- std::map<unsigned char, std::string> mapSigHashTypes = {
+const std::map<unsigned char, std::string> mapSigHashTypes = {
     {static_cast<unsigned char>(SIGHASH_ALL), std::string("ALL")},
     {static_cast<unsigned char>(SIGHASH_ALL|SIGHASH_ANYONECANPAY), std::string("ALL|ANYONECANPAY")},
     {static_cast<unsigned char>(SIGHASH_NONE), std::string("NONE")},
@@ -77,7 +77,7 @@ std::string FormatScript( CScript& script)
  *                                     of a signature. Only pass true for scripts you believe could contain signatures. For example,
  *                                     pass false, or omit the this argument (defaults to false), for scriptPubKeys.
  */
-std::string ScriptToAsmStr( CScript& script,  bool fAttemptSighashDecode)
+std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDecode)
 {
     std::string str;
     opcodetype opcode;
@@ -103,7 +103,7 @@ std::string ScriptToAsmStr( CScript& script,  bool fAttemptSighashDecode)
                     // the restrictions on the pubkey formats (see IsCompressedOrUncompressedPubKey) being incongruous with the
                     // checks in CheckSignatureEncoding.
                     if (CheckSignatureEncoding(vch, SCRIPT_VERIFY_STRICTENC, nullptr)) {
-                         unsigned char chSigHashType = vch.back();
+                        const unsigned char chSigHashType = vch.back();
                         if (mapSigHashTypes.count(chSigHashType)) {
                             strSigHashDecode = "[" + mapSigHashTypes.find(chSigHashType)->second + "]";
                             vch.pop_back(); // remove the sighash type byte. it will be replaced by the decode.
@@ -121,14 +121,14 @@ std::string ScriptToAsmStr( CScript& script,  bool fAttemptSighashDecode)
     return str;
 }
 
-std::string EncodeHexTx( CTransaction& tx,  int serializeFlags)
+std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags)
 {
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION | serializeFlags);
     ssTx << tx;
     return HexStr(ssTx.begin(), ssTx.end());
 }
 
-void ScriptPubKeyToUniv( CScript& scriptPubKey,
+void ScriptPubKeyToUniv(const CScript& scriptPubKey,
                         UniValue& out, bool fIncludeHex)
 {
     txnouttype type;
@@ -148,13 +148,13 @@ void ScriptPubKeyToUniv( CScript& scriptPubKey,
     out.pushKV("type", GetTxnOutputType(type));
 
     UniValue a(UniValue::VARR);
-    for ( CTxDestination& addr : addresses) {
+    for (const CTxDestination& addr : addresses) {
         a.push_back(EncodeDestination(addr));
     }
     out.pushKV("addresses", a);
 }
 
-void TxToUniv( CTransaction& tx,  uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags)
+void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags)
 {
     entry.pushKV("txid", tx.GetHash().GetHex());
     entry.pushKV("hash", tx.GetWitnessHash().GetHex());
@@ -165,7 +165,7 @@ void TxToUniv( CTransaction& tx,  uint256& hashBlock, UniValue& entry, bool incl
 
     UniValue vin(UniValue::VARR);
     for (unsigned int i = 0; i < tx.vin.size(); i++) {
-         CTxIn& txin = tx.vin[i];
+        const CTxIn& txin = tx.vin[i];
         UniValue in(UniValue::VOBJ);
         if (tx.IsCoinBase())
             in.pushKV("coinbase", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()));
@@ -178,7 +178,7 @@ void TxToUniv( CTransaction& tx,  uint256& hashBlock, UniValue& entry, bool incl
             in.pushKV("scriptSig", o);
             if (!tx.vin[i].scriptWitness.IsNull()) {
                 UniValue txinwitness(UniValue::VARR);
-                for ( auto& item : tx.vin[i].scriptWitness.stack) {
+                for (const auto& item : tx.vin[i].scriptWitness.stack) {
                     txinwitness.push_back(HexStr(item.begin(), item.end()));
                 }
                 in.pushKV("txinwitness", txinwitness);
@@ -191,7 +191,7 @@ void TxToUniv( CTransaction& tx,  uint256& hashBlock, UniValue& entry, bool incl
 
     UniValue vout(UniValue::VARR);
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
-         CTxOut& txout = tx.vout[i];
+        const CTxOut& txout = tx.vout[i];
 
         UniValue out(UniValue::VOBJ);
 

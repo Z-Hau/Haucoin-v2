@@ -14,8 +14,8 @@
 #include <QFont>
 #include <QDebug>
 
- QString AddressTableModel::Send = "S";
- QString AddressTableModel::Receive = "R";
+const QString AddressTableModel::Send = "S";
+const QString AddressTableModel::Receive = "R";
 
 struct AddressTableEntry
 {
@@ -30,28 +30,28 @@ struct AddressTableEntry
     QString address;
 
     AddressTableEntry() {}
-    AddressTableEntry(Type _type,  QString &_label,  QString &_address):
+    AddressTableEntry(Type _type, const QString &_label, const QString &_address):
         type(_type), label(_label), address(_address) {}
 };
 
 struct AddressTableEntryLessThan
 {
-    bool operator()( AddressTableEntry &a,  AddressTableEntry &b) 
+    bool operator()(const AddressTableEntry &a, const AddressTableEntry &b) const
     {
         return a.address < b.address;
     }
-    bool operator()( AddressTableEntry &a,  QString &b) 
+    bool operator()(const AddressTableEntry &a, const QString &b) const
     {
         return a.address < b;
     }
-    bool operator()( QString &a,  AddressTableEntry &b) 
+    bool operator()(const QString &a, const AddressTableEntry &b) const
     {
         return a < b.address;
     }
 };
 
 /* Determine address type from address purpose */
-static AddressTableEntry::Type translateTransactionType( QString &strPurpose, bool isMine)
+static AddressTableEntry::Type translateTransactionType(const QString &strPurpose, bool isMine)
 {
     AddressTableEntry::Type addressType = AddressTableEntry::Hidden;
     // "refund" addresses aren't shown, and change addresses aren't in mapAddressBook at all.
@@ -80,13 +80,13 @@ public:
         cachedAddressTable.clear();
         {
             LOCK(wallet->cs_wallet);
-            for ( std::pair<CTxDestination, CAddressBookData>& item : wallet->mapAddressBook)
+            for (const std::pair<CTxDestination, CAddressBookData>& item : wallet->mapAddressBook)
             {
-                 CTxDestination& address = item.first;
+                const CTxDestination& address = item.first;
                 bool fMine = IsMine(*wallet, address);
                 AddressTableEntry::Type addressType = translateTransactionType(
                         QString::fromStdString(item.second.purpose), fMine);
-                 std::string& strName = item.second.name;
+                const std::string& strName = item.second.name;
                 cachedAddressTable.append(AddressTableEntry(addressType,
                                   QString::fromStdString(strName),
                                   QString::fromStdString(EncodeDestination(address))));
@@ -98,7 +98,7 @@ public:
         qSort(cachedAddressTable.begin(), cachedAddressTable.end(), AddressTableEntryLessThan());
     }
 
-    void updateEntry( QString &address,  QString &label, bool isMine,  QString &purpose, int status)
+    void updateEntry(const QString &address, const QString &label, bool isMine, const QString &purpose, int status)
     {
         // Find address / label in model
         QList<AddressTableEntry>::iterator lower = qLowerBound(
@@ -176,19 +176,19 @@ AddressTableModel::~AddressTableModel()
     delete priv;
 }
 
-int AddressTableModel::rowCount( QModelIndex &parent) 
+int AddressTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return priv->size();
 }
 
-int AddressTableModel::columnCount( QModelIndex &parent) 
+int AddressTableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return columns.length();
 }
 
-QVariant AddressTableModel::data( QModelIndex &index, int role) 
+QVariant AddressTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
         return QVariant();
@@ -235,7 +235,7 @@ QVariant AddressTableModel::data( QModelIndex &index, int role)
     return QVariant();
 }
 
-bool AddressTableModel::setData( QModelIndex &index,  QVariant &value, int role)
+bool AddressTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if(!index.isValid())
         return false;
@@ -291,7 +291,7 @@ bool AddressTableModel::setData( QModelIndex &index,  QVariant &value, int role)
     return false;
 }
 
-QVariant AddressTableModel::headerData(int section, Qt::Orientation orientation, int role) 
+QVariant AddressTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(orientation == Qt::Horizontal)
     {
@@ -303,7 +303,7 @@ QVariant AddressTableModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-Qt::ItemFlags AddressTableModel::flags( QModelIndex &index) 
+Qt::ItemFlags AddressTableModel::flags(const QModelIndex &index) const
 {
     if(!index.isValid())
         return 0;
@@ -320,7 +320,7 @@ Qt::ItemFlags AddressTableModel::flags( QModelIndex &index)
     return retval;
 }
 
-QModelIndex AddressTableModel::index(int row, int column,  QModelIndex &parent) 
+QModelIndex AddressTableModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     AddressTableEntry *data = priv->index(row);
@@ -334,14 +334,14 @@ QModelIndex AddressTableModel::index(int row, int column,  QModelIndex &parent)
     }
 }
 
-void AddressTableModel::updateEntry( QString &address,
-         QString &label, bool isMine,  QString &purpose, int status)
+void AddressTableModel::updateEntry(const QString &address,
+        const QString &label, bool isMine, const QString &purpose, int status)
 {
     // Update address book model from Bitcoin core
     priv->updateEntry(address, label, isMine, purpose, status);
 }
 
-QString AddressTableModel::addRow( QString &type,  QString &label,  QString &address,  OutputType address_type)
+QString AddressTableModel::addRow(const QString &type, const QString &label, const QString &address, const OutputType address_type)
 {
     std::string strLabel = label.toStdString();
     std::string strAddress = address.toStdString();
@@ -401,7 +401,7 @@ QString AddressTableModel::addRow( QString &type,  QString &label,  QString &add
     return QString::fromStdString(strAddress);
 }
 
-bool AddressTableModel::removeRows(int row, int count,  QModelIndex &parent)
+bool AddressTableModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent);
     AddressTableEntry *rec = priv->index(row);
@@ -420,7 +420,7 @@ bool AddressTableModel::removeRows(int row, int count,  QModelIndex &parent)
 
 /* Look up label for address in address book, if not found return empty string.
  */
-QString AddressTableModel::labelForAddress( QString &address) 
+QString AddressTableModel::labelForAddress(const QString &address) const
 {
     {
         LOCK(wallet->cs_wallet);
@@ -434,7 +434,7 @@ QString AddressTableModel::labelForAddress( QString &address)
     return QString();
 }
 
-int AddressTableModel::lookupAddress( QString &address) 
+int AddressTableModel::lookupAddress(const QString &address) const
 {
     QModelIndexList lst = match(index(0, Address, QModelIndex()),
                                 Qt::EditRole, address, 1, Qt::MatchExactly);

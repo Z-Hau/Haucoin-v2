@@ -58,7 +58,7 @@ std::string GetWalletHelpString(bool showDebug)
 bool WalletParameterInteraction()
 {
     if (gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET)) {
-        for ( std::string& wallet : gArgs.GetArgs("-wallet")) {
+        for (const std::string& wallet : gArgs.GetArgs("-wallet")) {
             LogPrintf("%s: parameter interaction: -disablewallet -> ignoring -wallet=%s\n", __func__, wallet);
         }
 
@@ -66,7 +66,7 @@ bool WalletParameterInteraction()
     }
 
     gArgs.SoftSetArg("-wallet", DEFAULT_WALLET_DAT);
-     bool is_multiwallet = gArgs.GetArgs("-wallet").size() > 1;
+    const bool is_multiwallet = gArgs.GetArgs("-wallet").size() > 1;
 
     if (gArgs.GetBoolArg("-blocksonly", DEFAULT_BLOCKSONLY) && gArgs.SoftSetBoolArg("-walletbroadcast", false)) {
         LogPrintf("%s: parameter interaction: -blocksonly=1 -> setting -walletbroadcast=0\n", __func__);
@@ -225,7 +225,7 @@ bool VerifyWallets()
     // Keep track of each wallet absolute path to detect duplicates.
     std::set<fs::path> wallet_paths;
 
-    for ( std::string& walletFile : gArgs.GetArgs("-wallet")) {
+    for (const std::string& walletFile : gArgs.GetArgs("-wallet")) {
         if (boost::filesystem::path(walletFile).filename() != walletFile) {
             return InitError(strprintf(_("Error loading wallet %s. -wallet parameter must only specify a filename (not a path)."), walletFile));
         }
@@ -279,8 +279,8 @@ bool OpenWallets()
         return true;
     }
 
-    for ( std::string& walletFile : gArgs.GetArgs("-wallet")) {
-        CWallet *  pwallet = CWallet::CreateWalletFromFile(walletFile);
+    for (const std::string& walletFile : gArgs.GetArgs("-wallet")) {
+        CWallet * const pwallet = CWallet::CreateWalletFromFile(walletFile);
         if (!pwallet) {
             return false;
         }

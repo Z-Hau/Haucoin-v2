@@ -14,14 +14,14 @@ namespace test {
 
 namespace {
 struct Test {
-   char* base;
-   char* name;
+  const char* base;
+  const char* name;
   void (*func)();
 };
 std::vector<Test>* tests;
 }
 
-bool RegisterTest( char* base,  char* name, void (*func)()) {
+bool RegisterTest(const char* base, const char* name, void (*func)()) {
   if (tests == NULL) {
     tests = new std::vector<Test>;
   }
@@ -34,12 +34,12 @@ bool RegisterTest( char* base,  char* name, void (*func)()) {
 }
 
 int RunAllTests() {
-   char* matcher = getenv("LEVELDB_TESTS");
+  const char* matcher = getenv("LEVELDB_TESTS");
 
   int num = 0;
   if (tests != NULL) {
     for (size_t i = 0; i < tests->size(); i++) {
-       Test& t = (*tests)[i];
+      const Test& t = (*tests)[i];
       if (matcher != NULL) {
         std::string name = t.base;
         name.push_back('.');
@@ -65,7 +65,7 @@ std::string TmpDir() {
 }
 
 int RandomSeed() {
-   char* env = getenv("TEST_RANDOM_SEED");
+  const char* env = getenv("TEST_RANDOM_SEED");
   int result = (env != NULL ? atoi(env) : 301);
   if (result <= 0) {
     result = 301;

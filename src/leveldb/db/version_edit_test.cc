@@ -7,7 +7,7 @@
 
 namespace leveldb {
 
-static void TestEncodeDecode( VersionEdit& edit) {
+static void TestEncodeDecode(const VersionEdit& edit) {
   std::string encoded, encoded2;
   edit.EncodeTo(&encoded);
   VersionEdit parsed;
@@ -20,7 +20,7 @@ static void TestEncodeDecode( VersionEdit& edit) {
 class VersionEditTest { };
 
 TEST(VersionEditTest, EncodeDecode) {
-  static  uint64_t kBig = 1ull << 50;
+  static const uint64_t kBig = 1ull << 50;
 
   VersionEdit edit;
   for (int i = 0; i < 4; i++) {

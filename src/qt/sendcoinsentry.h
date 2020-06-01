@@ -26,7 +26,7 @@ class SendCoinsEntry : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit SendCoinsEntry( PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit SendCoinsEntry(const PlatformStyle *platformStyle, QWidget *parent = 0);
     ~SendCoinsEntry();
 
     void setModel(WalletModel *model);
@@ -36,9 +36,9 @@ public:
     /** Return whether the entry is still empty and unedited */
     bool isClear();
 
-    void setValue( SendCoinsRecipient &value);
-    void setAddress( QString &address);
-    void setAmount( CAmount &amount);
+    void setValue(const SendCoinsRecipient &value);
+    void setAddress(const QString &address);
+    void setAmount(const CAmount &amount);
 
     /** Set up the tab chain manually, as Qt messes up the tab chain by default in some cases
      *  (issue https://bugreports.qt-project.org/browse/QTBUG-10907).
@@ -60,7 +60,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void deleteClicked();
     void useAvailableBalanceClicked();
-    void on_payTo_textChanged( QString &address);
+    void on_payTo_textChanged(const QString &address);
     void on_addressBookButton_clicked();
     void on_pasteButton_clicked();
     void updateDisplayUnit();
@@ -69,9 +69,9 @@ private:
     SendCoinsRecipient recipient;
     Ui::SendCoinsEntry *ui;
     WalletModel *model;
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
-    bool updateLabel( QString &address);
+    bool updateLabel(const QString &address);
 };
 
 #endif // BITCOIN_QT_SENDCOINSENTRY_H

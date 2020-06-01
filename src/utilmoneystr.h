@@ -17,8 +17,8 @@
 /* Do not use these functions to represent or parse monetary amounts to or from
  * JSON but use AmountFromValue and ValueFromAmount for that.
  */
-std::string FormatMoney( CAmount& n);
-bool ParseMoney( std::string& str, CAmount& nRet);
-bool ParseMoney( char* pszIn, CAmount& nRet);
+std::string FormatMoney(const CAmount& n);
+bool ParseMoney(const std::string& str, CAmount& nRet);
+bool ParseMoney(const char* pszIn, CAmount& nRet);
 
 #endif // BITCOIN_UTILMONEYSTR_H

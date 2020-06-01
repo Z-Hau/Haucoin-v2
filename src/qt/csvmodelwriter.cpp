@@ -8,18 +8,18 @@
 #include <QFile>
 #include <QTextStream>
 
-CSVModelWriter::CSVModelWriter( QString &_filename, QObject *parent) :
+CSVModelWriter::CSVModelWriter(const QString &_filename, QObject *parent) :
     QObject(parent),
     filename(_filename), model(0)
 {
 }
 
-void CSVModelWriter::setModel( QAbstractItemModel *_model)
+void CSVModelWriter::setModel(const QAbstractItemModel *_model)
 {
     this->model = _model;
 }
 
-void CSVModelWriter::addColumn( QString &title, int column, int role)
+void CSVModelWriter::addColumn(const QString &title, int column, int role)
 {
     Column col;
     col.title = title;
@@ -29,7 +29,7 @@ void CSVModelWriter::addColumn( QString &title, int column, int role)
     columns.append(col);
 }
 
-static void writeValue(QTextStream &f,  QString &value)
+static void writeValue(QTextStream &f, const QString &value)
 {
     QString escaped = value;
     escaped.replace('"', "\"\"");

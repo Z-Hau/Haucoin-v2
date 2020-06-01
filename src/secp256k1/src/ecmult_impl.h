@@ -49,7 +49,7 @@
  *  contain prej[0].z / a.z. The other zr[i] values = prej[i].z / prej[i-1].z.
  *  Prej's Z values are undefined, except for the last value.
  */
-static void secp256k1_ecmult_odd_multiples_table(int n, secp256k1_gej *prej, secp256k1_fe *zr,  secp256k1_gej *a) {
+static void secp256k1_ecmult_odd_multiples_table(int n, secp256k1_gej *prej, secp256k1_fe *zr, const secp256k1_gej *a) {
     secp256k1_gej d;
     secp256k1_ge a_ge, d_ge;
     int i;
@@ -99,7 +99,7 @@ static void secp256k1_ecmult_odd_multiples_table(int n, secp256k1_gej *prej, sec
  *  and for G using the second (which requires an inverse, but it only needs to
  *  happen once).
  */
-static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *pre, secp256k1_fe *globalz,  secp256k1_gej *a) {
+static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *pre, secp256k1_fe *globalz, const secp256k1_gej *a) {
     secp256k1_gej prej[ECMULT_TABLE_SIZE(WINDOW_A)];
     secp256k1_fe zr[ECMULT_TABLE_SIZE(WINDOW_A)];
 
@@ -109,7 +109,7 @@ static void secp256k1_ecmult_odd_multiples_table_globalz_windowa(secp256k1_ge *p
     secp256k1_ge_globalz_set_table_gej(ECMULT_TABLE_SIZE(WINDOW_A), pre, globalz, prej, zr);
 }
 
-static void secp256k1_ecmult_odd_multiples_table_storage_var(int n, secp256k1_ge_storage *pre,  secp256k1_gej *a,  secp256k1_callback *cb) {
+static void secp256k1_ecmult_odd_multiples_table_storage_var(int n, secp256k1_ge_storage *pre, const secp256k1_gej *a, const secp256k1_callback *cb) {
     secp256k1_gej *prej = (secp256k1_gej*)checked_malloc(cb, sizeof(secp256k1_gej) * n);
     secp256k1_ge *prea = (secp256k1_ge*)checked_malloc(cb, sizeof(secp256k1_ge) * n);
     secp256k1_fe *zr = (secp256k1_fe*)checked_malloc(cb, sizeof(secp256k1_fe) * n);
@@ -161,7 +161,7 @@ static void secp256k1_ecmult_context_init(secp256k1_ecmult_context *ctx) {
 #endif
 }
 
-static void secp256k1_ecmult_context_build(secp256k1_ecmult_context *ctx,  secp256k1_callback *cb) {
+static void secp256k1_ecmult_context_build(secp256k1_ecmult_context *ctx, const secp256k1_callback *cb) {
     secp256k1_gej gj;
 
     if (ctx->pre_g != NULL) {
@@ -194,7 +194,7 @@ static void secp256k1_ecmult_context_build(secp256k1_ecmult_context *ctx,  secp2
 }
 
 static void secp256k1_ecmult_context_clone(secp256k1_ecmult_context *dst,
-                                            secp256k1_ecmult_context *src,  secp256k1_callback *cb) {
+                                           const secp256k1_ecmult_context *src, const secp256k1_callback *cb) {
     if (src->pre_g == NULL) {
         dst->pre_g = NULL;
     } else {
@@ -213,7 +213,7 @@ static void secp256k1_ecmult_context_clone(secp256k1_ecmult_context *dst,
 #endif
 }
 
-static int secp256k1_ecmult_context_is_built( secp256k1_ecmult_context *ctx) {
+static int secp256k1_ecmult_context_is_built(const secp256k1_ecmult_context *ctx) {
     return ctx->pre_g != NULL;
 }
 
@@ -232,7 +232,7 @@ static void secp256k1_ecmult_context_clear(secp256k1_ecmult_context *ctx) {
  *  - the number of set values in wnaf is returned. This number is at most 256, and at most one more
  *    than the number of bits in the (absolute value) of the input.
  */
-static int secp256k1_ecmult_wnaf(int *wnaf, int len,  secp256k1_scalar *a, int w) {
+static int secp256k1_ecmult_wnaf(int *wnaf, int len, const secp256k1_scalar *a, int w) {
     secp256k1_scalar s = *a;
     int last_set_bit = -1;
     int bit = 0;
@@ -283,7 +283,7 @@ static int secp256k1_ecmult_wnaf(int *wnaf, int len,  secp256k1_scalar *a, int w
     return last_set_bit + 1;
 }
 
-static void secp256k1_ecmult( secp256k1_ecmult_context *ctx, secp256k1_gej *r,  secp256k1_gej *a,  secp256k1_scalar *na,  secp256k1_scalar *ng) {
+static void secp256k1_ecmult(const secp256k1_ecmult_context *ctx, secp256k1_gej *r, const secp256k1_gej *a, const secp256k1_scalar *na, const secp256k1_scalar *ng) {
     secp256k1_ge pre_a[ECMULT_TABLE_SIZE(WINDOW_A)];
     secp256k1_ge tmpa;
     secp256k1_fe Z;
