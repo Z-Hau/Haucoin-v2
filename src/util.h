@@ -240,7 +240,10 @@ public:
      * @param strDefault (e.g. "1")
      * @return command-line argument or default value
      */
-    std::string GetArg(const std::string& strArg, std::string& strDefault) const;
+    std::string GetArg(const std::string& strArg, const std::string& strDefault) const;
+
+    std::string GetArg(const std::string& strArg,  std::string& strDefault) const;
+
 
     /**
      * Return integer argument or default value
