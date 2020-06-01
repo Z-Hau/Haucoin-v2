@@ -12,14 +12,14 @@ namespace {
 
 class StdoutPrinter : public WritableFile {
  public:
-  virtual Status Append(const Slice& data) {
+  virtual Status Append( Slice& data) {
     fwrite(data.data(), 1, data.size(), stdout);
     return Status::OK();
   }
   virtual Status Close() { return Status::OK(); }
   virtual Status Flush() { return Status::OK(); }
   virtual Status Sync() { return Status::OK(); }
-  virtual std::string GetName() const { return "[stdout]"; }
+  virtual std::string GetName()  { return "[stdout]"; }
 };
 
 bool HandleDumpCommand(Env* env, char** files, int num) {

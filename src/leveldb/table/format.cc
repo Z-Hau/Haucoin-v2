@@ -12,7 +12,7 @@
 
 namespace leveldb {
 
-void BlockHandle::EncodeTo(std::string* dst) const {
+void BlockHandle::EncodeTo(std::string* dst)  {
   // Sanity check that all fields have been set
   assert(offset_ != ~static_cast<uint64_t>(0));
   assert(size_ != ~static_cast<uint64_t>(0));
@@ -29,8 +29,8 @@ Status BlockHandle::DecodeFrom(Slice* input) {
   }
 }
 
-void Footer::EncodeTo(std::string* dst) const {
-  const size_t original_size = dst->size();
+void Footer::EncodeTo(std::string* dst)  {
+   size_t original_size = dst->size();
   metaindex_handle_.EncodeTo(dst);
   index_handle_.EncodeTo(dst);
   dst->resize(2 * BlockHandle::kMaxEncodedLength);  // Padding
@@ -41,10 +41,10 @@ void Footer::EncodeTo(std::string* dst) const {
 }
 
 Status Footer::DecodeFrom(Slice* input) {
-  const char* magic_ptr = input->data() + kEncodedLength - 8;
-  const uint32_t magic_lo = DecodeFixed32(magic_ptr);
-  const uint32_t magic_hi = DecodeFixed32(magic_ptr + 4);
-  const uint64_t magic = ((static_cast<uint64_t>(magic_hi) << 32) |
+   char* magic_ptr = input->data() + kEncodedLength - 8;
+   uint32_t magic_lo = DecodeFixed32(magic_ptr);
+   uint32_t magic_hi = DecodeFixed32(magic_ptr + 4);
+   uint64_t magic = ((static_cast<uint64_t>(magic_hi) << 32) |
                           (static_cast<uint64_t>(magic_lo)));
   if (magic != kTableMagicNumber) {
     return Status::Corruption("not an sstable (bad magic number)");
@@ -56,15 +56,15 @@ Status Footer::DecodeFrom(Slice* input) {
   }
   if (result.ok()) {
     // We skip over any leftover data (just padding for now) in "input"
-    const char* end = magic_ptr + 8;
+     char* end = magic_ptr + 8;
     *input = Slice(end, input->data() + input->size() - end);
   }
   return result;
 }
 
 Status ReadBlock(RandomAccessFile* file,
-                 const ReadOptions& options,
-                 const BlockHandle& handle,
+                  ReadOptions& options,
+                  BlockHandle& handle,
                  BlockContents* result) {
   result->data = Slice();
   result->cachable = false;
@@ -86,10 +86,10 @@ Status ReadBlock(RandomAccessFile* file,
   }
 
   // Check the crc of the type and the block contents
-  const char* data = contents.data();    // Pointer to where Read put the data
+   char* data = contents.data();    // Pointer to where Read put the data
   if (options.verify_checksums) {
-    const uint32_t crc = crc32c::Unmask(DecodeFixed32(data + n + 1));
-    const uint32_t actual = crc32c::Value(data, n + 1);
+     uint32_t crc = crc32c::Unmask(DecodeFixed32(data + n + 1));
+     uint32_t actual = crc32c::Value(data, n + 1);
     if (actual != crc) {
       delete[] buf;
       s = Status::Corruption("block checksum mismatch", file->GetName());

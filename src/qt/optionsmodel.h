@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 class QNetworkProxy;
 QT_END_NAMESPACE
 
-extern const char *DEFAULT_GUI_PROXY_HOST;
+extern  char *DEFAULT_GUI_PROXY_HOST;
 static constexpr unsigned short DEFAULT_GUI_PROXY_PORT = 9050;
 
 /** Interface from Qt to configuration data structure for Bitcoin client.
@@ -55,25 +55,25 @@ public:
     void Init(bool resetSettings = false);
     void Reset();
 
-    int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+    int rowCount( QModelIndex & parent = QModelIndex()) ;
+    QVariant data( QModelIndex & index, int role = Qt::DisplayRole) ;
+    bool setData( QModelIndex & index,  QVariant & value, int role = Qt::EditRole);
     /** Updates current unit in memory, settings and emits displayUnitChanged(newUnit) signal */
-    void setDisplayUnit(const QVariant &value);
+    void setDisplayUnit( QVariant &value);
 
     /* Explicit getters */
-    bool getHideTrayIcon() const { return fHideTrayIcon; }
-    bool getMinimizeToTray() const { return fMinimizeToTray; }
-    bool getMinimizeOnClose() const { return fMinimizeOnClose; }
-    int getDisplayUnit() const { return nDisplayUnit; }
-    QString getThirdPartyTxUrls() const { return strThirdPartyTxUrls; }
-    bool getProxySettings(QNetworkProxy& proxy) const;
-    bool getCoinControlFeatures() const { return fCoinControlFeatures; }
-    const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
+    bool getHideTrayIcon()  { return fHideTrayIcon; }
+    bool getMinimizeToTray()  { return fMinimizeToTray; }
+    bool getMinimizeOnClose()  { return fMinimizeOnClose; }
+    int getDisplayUnit()  { return nDisplayUnit; }
+    QString getThirdPartyTxUrls()  { return strThirdPartyTxUrls; }
+    bool getProxySettings(QNetworkProxy& proxy) ;
+    bool getCoinControlFeatures()  { return fCoinControlFeatures; }
+     QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);
-    bool isRestartRequired() const;
+    bool isRestartRequired() ;
 
 private:
     /* Qt-only settings */
@@ -88,7 +88,7 @@ private:
     QString strOverriddenByCommandLine;
 
     // Add option to list of GUI options overridden through command line/config file
-    void addOverriddenOption(const std::string &option);
+    void addOverriddenOption( std::string &option);
 
     // Check settings version and upgrade default values if required
     void checkAndMigrate();

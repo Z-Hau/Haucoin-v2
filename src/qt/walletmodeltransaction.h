@@ -21,18 +21,18 @@ class CWalletTx;
 class WalletModelTransaction
 {
 public:
-    explicit WalletModelTransaction(const QList<SendCoinsRecipient> &recipients);
+    explicit WalletModelTransaction( QList<SendCoinsRecipient> &recipients);
     ~WalletModelTransaction();
 
-    QList<SendCoinsRecipient> getRecipients() const;
+    QList<SendCoinsRecipient> getRecipients() ;
 
-    CWalletTx *getTransaction() const;
+    CWalletTx *getTransaction() ;
     unsigned int getTransactionSize();
 
-    void setTransactionFee(const CAmount& newFee);
-    CAmount getTransactionFee() const;
+    void setTransactionFee( CAmount& newFee);
+    CAmount getTransactionFee() ;
 
-    CAmount getTotalTransactionAmount() const;
+    CAmount getTotalTransactionAmount() ;
 
     void newPossibleKeyChange(CWallet *wallet);
     CReserveKey *getPossibleKeyChange();

@@ -5,9 +5,9 @@
 // A Status encapsulates the result of an operation.  It may indicate success,
 // or it may indicate an error with an associated error message.
 //
-// Multiple threads can invoke const methods on a Status without
+// Multiple threads can invoke  methods on a Status without
 // external synchronization, but if any of the threads may call a
-// non-const method, all threads accessing the same Status must use
+// non- method, all threads accessing the same Status must use
 // external synchronization.
 
 #ifndef STORAGE_LEVELDB_INCLUDE_STATUS_H_
@@ -25,50 +25,50 @@ class Status {
   ~Status() { delete[] state_; }
 
   // Copy the specified status.
-  Status(const Status& s);
-  void operator=(const Status& s);
+  Status( Status& s);
+  void operator=( Status& s);
 
   // Return a success status.
   static Status OK() { return Status(); }
 
   // Return error status of an appropriate type.
-  static Status NotFound(const Slice& msg, const Slice& msg2 = Slice()) {
+  static Status NotFound( Slice& msg,  Slice& msg2 = Slice()) {
     return Status(kNotFound, msg, msg2);
   }
-  static Status Corruption(const Slice& msg, const Slice& msg2 = Slice()) {
+  static Status Corruption( Slice& msg,  Slice& msg2 = Slice()) {
     return Status(kCorruption, msg, msg2);
   }
-  static Status NotSupported(const Slice& msg, const Slice& msg2 = Slice()) {
+  static Status NotSupported( Slice& msg,  Slice& msg2 = Slice()) {
     return Status(kNotSupported, msg, msg2);
   }
-  static Status InvalidArgument(const Slice& msg, const Slice& msg2 = Slice()) {
+  static Status InvalidArgument( Slice& msg,  Slice& msg2 = Slice()) {
     return Status(kInvalidArgument, msg, msg2);
   }
-  static Status IOError(const Slice& msg, const Slice& msg2 = Slice()) {
+  static Status IOError( Slice& msg,  Slice& msg2 = Slice()) {
     return Status(kIOError, msg, msg2);
   }
 
   // Returns true iff the status indicates success.
-  bool ok() const { return (state_ == NULL); }
+  bool ok()  { return (state_ == NULL); }
 
   // Returns true iff the status indicates a NotFound error.
-  bool IsNotFound() const { return code() == kNotFound; }
+  bool IsNotFound()  { return code() == kNotFound; }
 
   // Returns true iff the status indicates a Corruption error.
-  bool IsCorruption() const { return code() == kCorruption; }
+  bool IsCorruption()  { return code() == kCorruption; }
 
   // Returns true iff the status indicates an IOError.
-  bool IsIOError() const { return code() == kIOError; }
+  bool IsIOError()  { return code() == kIOError; }
 
   // Returns true iff the status indicates a NotSupportedError.
-  bool IsNotSupportedError() const { return code() == kNotSupported; }
+  bool IsNotSupportedError()  { return code() == kNotSupported; }
 
   // Returns true iff the status indicates an InvalidArgument.
-  bool IsInvalidArgument() const { return code() == kInvalidArgument; }
+  bool IsInvalidArgument()  { return code() == kInvalidArgument; }
 
   // Return a string representation of this status suitable for printing.
   // Returns the string "OK" for success.
-  std::string ToString() const;
+  std::string ToString() ;
 
  private:
   // OK status has a NULL state_.  Otherwise, state_ is a new[] array
@@ -76,7 +76,7 @@ class Status {
   //    state_[0..3] == length of message
   //    state_[4]    == code
   //    state_[5..]  == message
-  const char* state_;
+   char* state_;
 
   enum Code {
     kOk = 0,
@@ -87,18 +87,18 @@ class Status {
     kIOError = 5
   };
 
-  Code code() const {
+  Code code()  {
     return (state_ == NULL) ? kOk : static_cast<Code>(state_[4]);
   }
 
-  Status(Code code, const Slice& msg, const Slice& msg2);
-  static const char* CopyState(const char* s);
+  Status(Code code,  Slice& msg,  Slice& msg2);
+  static  char* CopyState( char* s);
 };
 
-inline Status::Status(const Status& s) {
+inline Status::Status( Status& s) {
   state_ = (s.state_ == NULL) ? NULL : CopyState(s.state_);
 }
-inline void Status::operator=(const Status& s) {
+inline void Status::operator=( Status& s) {
   // The following condition catches both aliasing (when this == &s),
   // and the common case where both s and *this are ok.
   if (state_ != s.state_) {

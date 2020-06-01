@@ -76,7 +76,7 @@ extern double NSAppKitVersionNumber;
 
 namespace GUIUtil {
 
-QString dateTimeStr(const QDateTime &date)
+QString dateTimeStr( QDateTime &date)
 {
     return date.date().toString(Qt::SystemLocaleShortDate) + QString(" ") + date.toString("hh:mm");
 }
@@ -102,10 +102,10 @@ QFont fixedPitchFont()
 }
 
 // Just some dummy data to generate an convincing random-looking (but consistent) address
-static const uint8_t dummydata[] = {0xeb,0x15,0x23,0x1d,0xfc,0xeb,0x60,0x92,0x58,0x86,0xb6,0x7d,0x06,0x52,0x99,0x92,0x59,0x15,0xae,0xb1,0x72,0xc0,0x66,0x47};
+static  uint8_t dummydata[] = {0xeb,0x15,0x23,0x1d,0xfc,0xeb,0x60,0x92,0x58,0x86,0xb6,0x7d,0x06,0x52,0x99,0x92,0x59,0x15,0xae,0xb1,0x72,0xc0,0x66,0x47};
 
 // Generate a dummy address with invalid CRC, starting with the network prefix.
-static std::string DummyAddress(const CChainParams &params)
+static std::string DummyAddress( CChainParams &params)
 {
     std::vector<unsigned char> sourcedata = params.Base58Prefix(CChainParams::PUBKEY_ADDRESS);
     sourcedata.insert(sourcedata.end(), dummydata, dummydata + sizeof(dummydata));
@@ -143,7 +143,7 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
     widget->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 }
 
-bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
+bool parseBitcoinURI( QUrl &uri, SendCoinsRecipient *out)
 {
     // return if URI is not valid or is no bitcoin: URI
     if(!uri.isValid() || uri.scheme() != QString("bitcoin"))
@@ -218,7 +218,7 @@ bool parseBitcoinURI(QString uri, SendCoinsRecipient *out)
     return parseBitcoinURI(uriInstance, out);
 }
 
-QString formatBitcoinURI(const SendCoinsRecipient &info)
+QString formatBitcoinURI( SendCoinsRecipient &info)
 {
     QString ret = QString("bitcoin:%1").arg(info.address);
     int paramCount = 0;
@@ -246,7 +246,7 @@ QString formatBitcoinURI(const SendCoinsRecipient &info)
     return ret;
 }
 
-bool isDust(const QString& address, const CAmount& amount)
+bool isDust( QString& address,  CAmount& amount)
 {
     CTxDestination dest = DecodeDestination(address.toStdString());
     CScript script = GetScriptForDestination(dest);
@@ -254,7 +254,7 @@ bool isDust(const QString& address, const CAmount& amount)
     return IsDust(txOut, ::dustRelayFee);
 }
 
-QString HtmlEscape(const QString& str, bool fMultiLine)
+QString HtmlEscape( QString& str, bool fMultiLine)
 {
 #if QT_VERSION < 0x050000
     QString escaped = Qt::escape(str);
@@ -268,7 +268,7 @@ QString HtmlEscape(const QString& str, bool fMultiLine)
     return escaped;
 }
 
-QString HtmlEscape(const std::string& str, bool fMultiLine)
+QString HtmlEscape( std::string& str, bool fMultiLine)
 {
     return HtmlEscape(QString::fromStdString(str), fMultiLine);
 }
@@ -293,8 +293,8 @@ QList<QModelIndex> getEntryData(QAbstractItemView *view, int column)
     return view->selectionModel()->selectedRows(column);
 }
 
-QString getSaveFileName(QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter,
+QString getSaveFileName(QWidget *parent,  QString &caption,  QString &dir,
+     QString &filter,
     QString *selectedSuffixOut)
 {
     QString selectedFilter;
@@ -343,8 +343,8 @@ QString getSaveFileName(QWidget *parent, const QString &caption, const QString &
     return result;
 }
 
-QString getOpenFileName(QWidget *parent, const QString &caption, const QString &dir,
-    const QString &filter,
+QString getOpenFileName(QWidget *parent,  QString &caption,  QString &dir,
+     QString &filter,
     QString *selectedSuffixOut)
 {
     QString selectedFilter;
@@ -390,7 +390,7 @@ Qt::ConnectionType blockingGUIThreadConnection()
     }
 }
 
-bool checkPoint(const QPoint &p, const QWidget *w)
+bool checkPoint( QPoint &p,  QWidget *w)
 {
     QWidget *atW = QApplication::widgetAt(w->mapToGlobal(p));
     if (!atW) return false;
@@ -431,7 +431,7 @@ bool openBitcoinConf()
     return QDesktopServices::openUrl(QUrl::fromLocalFile(boostPathToQString(pathConfig)));
 }
 
-void SubstituteFonts(const QString& language)
+void SubstituteFonts( QString& language)
 {
 #if defined(Q_OS_MAC)
 // Background:
@@ -862,18 +862,18 @@ bool SetStartOnSystemStartup(bool fAutoStart) { return false; }
 
 #endif
 
-void setClipboard(const QString& str)
+void setClipboard( QString& str)
 {
     QApplication::clipboard()->setText(str, QClipboard::Clipboard);
     QApplication::clipboard()->setText(str, QClipboard::Selection);
 }
 
-fs::path qstringToBoostPath(const QString &path)
+fs::path qstringToBoostPath( QString &path)
 {
     return fs::path(path.toStdString(), utf8);
 }
 
-QString boostPathToQString(const fs::path &path)
+QString boostPathToQString( fs::path &path)
 {
     return QString::fromStdString(path.string(utf8));
 }
@@ -950,10 +950,10 @@ QString formatNiceTimeOffset(qint64 secs)
 {
     // Represent time from last generated block in human readable text
     QString timeBehindText;
-    const int HOUR_IN_SECONDS = 60*60;
-    const int DAY_IN_SECONDS = 24*60*60;
-    const int WEEK_IN_SECONDS = 7*24*60*60;
-    const int YEAR_IN_SECONDS = 31556952; // Average length of year in Gregorian calendar
+     int HOUR_IN_SECONDS = 60*60;
+     int DAY_IN_SECONDS = 24*60*60;
+     int WEEK_IN_SECONDS = 7*24*60*60;
+     int YEAR_IN_SECONDS = 31556952; // Average length of year in Gregorian calendar
     if(secs < 60)
     {
         timeBehindText = QObject::tr("%n second(s)","",secs);
@@ -995,7 +995,7 @@ QString formatBytes(uint64_t bytes)
     return QString(QObject::tr("%1 GB")).arg(bytes / 1024 / 1024 / 1024);
 }
 
-qreal calculateIdealFontSize(int width, const QString& text, QFont font, qreal minPointSize, qreal font_size) {
+qreal calculateIdealFontSize(int width,  QString& text, QFont font, qreal minPointSize, qreal font_size) {
     while(font_size >= minPointSize) {
         font.setPointSizeF(font_size);
         QFontMetrics fm(font);

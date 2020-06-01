@@ -19,12 +19,12 @@ class reverse_range
 public:
     explicit reverse_range(T &x) : m_x(x) {}
     
-    auto begin() const -> decltype(this->m_x.rbegin())
+    auto begin()  -> decltype(this->m_x.rbegin())
     {
         return m_x.rbegin();
     }
     
-    auto end() const -> decltype(this->m_x.rend())
+    auto end()  -> decltype(this->m_x.rend())
     {
         return m_x.rend();
     }

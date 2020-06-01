@@ -29,7 +29,7 @@
 #    always_inline
 #    artificial
 #    cold
-#    const
+#    
 #    constructor
 #    constructor_priority for constructor attribute with priority
 #    deprecated
@@ -101,7 +101,7 @@ AC_DEFUN([AX_GCC_FUNC_ATTRIBUTE], [
                 [cold], [
                     int foo( void ) __attribute__(($1));
                 ],
-                [const], [
+                [], [
                     int foo( void ) __attribute__(($1));
                 ],
                 [constructor_priority], [
@@ -132,10 +132,10 @@ AC_DEFUN([AX_GCC_FUNC_ATTRIBUTE], [
                     int foo( void ) __attribute__(($1));
                 ],
                 [format], [
-                    int foo(const char *p, ...) __attribute__(($1(printf, 1, 2)));
+                    int foo( char *p, ...) __attribute__(($1(printf, 1, 2)));
                 ],
                 [format_arg], [
-                    char *foo(const char *p) __attribute__(($1(1)));
+                    char *foo( char *p) __attribute__(($1(1)));
                 ],
                 [gnu_inline], [
                     inline __attribute__(($1)) int foo( void ) { return 0; }

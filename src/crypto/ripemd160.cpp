@@ -51,7 +51,7 @@ void inline R42(uint32_t& a, uint32_t b, uint32_t& c, uint32_t d, uint32_t e, ui
 void inline R52(uint32_t& a, uint32_t b, uint32_t& c, uint32_t d, uint32_t e, uint32_t x, int r) { Round(a, b, c, d, e, f1(b, c, d), x, 0, r); }
 
 /** Perform a RIPEMD-160 transformation, processing a 64-byte chunk. */
-void Transform(uint32_t* s, const unsigned char* chunk)
+void Transform(uint32_t* s,  unsigned char* chunk)
 {
     uint32_t a1 = s[0], b1 = s[1], c1 = s[2], d1 = s[3], e1 = s[4];
     uint32_t a2 = a1, b2 = b1, c2 = c1, d2 = d1, e2 = e1;
@@ -244,9 +244,9 @@ CRIPEMD160::CRIPEMD160() : bytes(0)
     ripemd160::Initialize(s);
 }
 
-CRIPEMD160& CRIPEMD160::Write(const unsigned char* data, size_t len)
+CRIPEMD160& CRIPEMD160::Write( unsigned char* data, size_t len)
 {
-    const unsigned char* end = data + len;
+     unsigned char* end = data + len;
     size_t bufsize = bytes % 64;
     if (bufsize && bufsize + len >= 64) {
         // Fill the buffer, and process it.
@@ -272,7 +272,7 @@ CRIPEMD160& CRIPEMD160::Write(const unsigned char* data, size_t len)
 
 void CRIPEMD160::Finalize(unsigned char hash[OUTPUT_SIZE])
 {
-    static const unsigned char pad[64] = {0x80};
+    static  unsigned char pad[64] = {0x80};
     unsigned char sizedesc[8];
     WriteLE64(sizedesc, bytes << 3);
     Write(pad, 1 + ((119 - (bytes % 64)) % 64));

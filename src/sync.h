@@ -71,17 +71,17 @@ public:
 };
 
 #ifdef DEBUG_LOCKORDER
-void EnterCritical(const char* pszName, const char* pszFile, int nLine, void* cs, bool fTry = false);
+void EnterCritical( char* pszName,  char* pszFile, int nLine, void* cs, bool fTry = false);
 void LeaveCritical();
 std::string LocksHeld();
-void AssertLockHeldInternal(const char* pszName, const char* pszFile, int nLine, void* cs);
-void AssertLockNotHeldInternal(const char* pszName, const char* pszFile, int nLine, void* cs);
+void AssertLockHeldInternal( char* pszName,  char* pszFile, int nLine, void* cs);
+void AssertLockNotHeldInternal( char* pszName,  char* pszFile, int nLine, void* cs);
 void DeleteLock(void* cs);
 #else
-void static inline EnterCritical(const char* pszName, const char* pszFile, int nLine, void* cs, bool fTry = false) {}
+void static inline EnterCritical( char* pszName,  char* pszFile, int nLine, void* cs, bool fTry = false) {}
 void static inline LeaveCritical() {}
-void static inline AssertLockHeldInternal(const char* pszName, const char* pszFile, int nLine, void* cs) {}
-void static inline AssertLockNotHeldInternal(const char* pszName, const char* pszFile, int nLine, void* cs) {}
+void static inline AssertLockHeldInternal( char* pszName,  char* pszFile, int nLine, void* cs) {}
+void static inline AssertLockNotHeldInternal( char* pszName,  char* pszFile, int nLine, void* cs) {}
 void static inline DeleteLock(void* cs) {}
 #endif
 #define AssertLockHeld(cs) AssertLockHeldInternal(#cs, __FILE__, __LINE__, &cs)
@@ -109,7 +109,7 @@ typedef std::condition_variable CConditionVariable;
 typedef std::unique_lock<std::mutex> WaitableLock;
 
 #ifdef DEBUG_LOCKCONTENTION
-void PrintLockContention(const char* pszName, const char* pszFile, int nLine);
+void PrintLockContention( char* pszName,  char* pszFile, int nLine);
 #endif
 
 /** Wrapper around std::unique_lock<CCriticalSection> */
@@ -118,7 +118,7 @@ class SCOPED_LOCKABLE CCriticalBlock
 private:
     std::unique_lock<CCriticalSection> lock;
 
-    void Enter(const char* pszName, const char* pszFile, int nLine)
+    void Enter( char* pszName,  char* pszFile, int nLine)
     {
         EnterCritical(pszName, pszFile, nLine, (void*)(lock.mutex()));
 #ifdef DEBUG_LOCKCONTENTION
@@ -131,7 +131,7 @@ private:
 #endif
     }
 
-    bool TryEnter(const char* pszName, const char* pszFile, int nLine)
+    bool TryEnter( char* pszName,  char* pszFile, int nLine)
     {
         EnterCritical(pszName, pszFile, nLine, (void*)(lock.mutex()), true);
         lock.try_lock();
@@ -141,7 +141,7 @@ private:
     }
 
 public:
-    CCriticalBlock(CCriticalSection& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(mutexIn) : lock(mutexIn, std::defer_lock)
+    CCriticalBlock(CCriticalSection& mutexIn,  char* pszName,  char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(mutexIn) : lock(mutexIn, std::defer_lock)
     {
         if (fTry)
             TryEnter(pszName, pszFile, nLine);
@@ -149,7 +149,7 @@ public:
             Enter(pszName, pszFile, nLine);
     }
 
-    CCriticalBlock(CCriticalSection* pmutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(pmutexIn)
+    CCriticalBlock(CCriticalSection* pmutexIn,  char* pszName,  char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(pmutexIn)
     {
         if (!pmutexIn) return;
 
@@ -281,7 +281,7 @@ public:
         Release();
     }
 
-    operator bool() const
+    operator bool() 
     {
         return fHaveGrant;
     }

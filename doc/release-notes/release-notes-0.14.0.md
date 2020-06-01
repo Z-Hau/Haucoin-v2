@@ -599,7 +599,7 @@ and git merge commit are mentioned.
 - #8977 `6a1343f` Refactor wallet/init interaction (Reaccept wtx, flush thread) (jonasschnelli)
 - #9036 `ed0cc50` Change default confirm target from 2 to 6 (laanwj)
 - #9071 `d1871da` Declare wallet.h functions inline (sipa)
-- #9132 `f54e460` Make strWalletFile const (jonasschnelli)
+- #9132 `f54e460` Make strWalletFile  (jonasschnelli)
 - #9141 `5ea5e04` Remove unnecessary calls to CheckFinalTx (jonasschnelli)
 - #9165 `c01f16a` SendMoney: use already-calculated balance (instagibbs)
 - #9311 `a336d13` Flush wallet after abandontransaction (morcos)

@@ -12,7 +12,7 @@
 #include <boost/test/unit_test.hpp>
 
 // Test if a string consists entirely of null characters
-bool is_null_key(const std::vector<unsigned char>& key) {
+bool is_null_key( std::vector<unsigned char>& key) {
     bool isnull = true;
 
     for (unsigned int i = 0; i < key.size(); i++)
@@ -243,13 +243,13 @@ struct StringContentsSerializer {
     // This is a terrible idea
     std::string str;
     StringContentsSerializer() {}
-    explicit StringContentsSerializer(const std::string& inp) : str(inp) {}
+    explicit StringContentsSerializer( std::string& inp) : str(inp) {}
 
-    StringContentsSerializer& operator+=(const std::string& s) {
+    StringContentsSerializer& operator+=( std::string& s) {
         str += s;
         return *this;
     }
-    StringContentsSerializer& operator+=(const StringContentsSerializer& s) { return *this += s.str; }
+    StringContentsSerializer& operator+=( StringContentsSerializer& s) { return *this += s.str; }
 
     ADD_SERIALIZE_METHODS;
 
@@ -262,7 +262,7 @@ struct StringContentsSerializer {
                 try {
                     READWRITE(c);
                     str.push_back(c);
-                } catch (const std::ios_base::failure& e) {
+                } catch ( std::ios_base::failure& e) {
                     break;
                 }
             }

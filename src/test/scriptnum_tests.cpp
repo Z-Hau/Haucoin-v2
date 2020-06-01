@@ -14,16 +14,16 @@ BOOST_FIXTURE_TEST_SUITE(scriptnum_tests, BasicTestingSetup)
 
 /** A selection of numbers that do not trigger int64_t overflow
  *  when added/subtracted. */
-static const int64_t values[] = { 0, 1, -2, 127, 128, -255, 256, (1LL << 15) - 1, -(1LL << 16), (1LL << 24) - 1, (1LL << 31), 1 - (1LL << 32), 1LL << 40 };
+static  int64_t values[] = { 0, 1, -2, 127, 128, -255, 256, (1LL << 15) - 1, -(1LL << 16), (1LL << 24) - 1, (1LL << 31), 1 - (1LL << 32), 1LL << 40 };
 
-static const int64_t offsets[] = { 1, 0x79, 0x80, 0x81, 0xFF, 0x7FFF, 0x8000, 0xFFFF, 0x10000};
+static  int64_t offsets[] = { 1, 0x79, 0x80, 0x81, 0xFF, 0x7FFF, 0x8000, 0xFFFF, 0x10000};
 
-static bool verify(const CScriptNum10& bignum, const CScriptNum& scriptnum)
+static bool verify( CScriptNum10& bignum,  CScriptNum& scriptnum)
 {
     return bignum.getvch() == scriptnum.getvch() && bignum.getint() == scriptnum.getint();
 }
 
-static void CheckCreateVch(const int64_t& num)
+static void CheckCreateVch( int64_t& num)
 {
     CScriptNum10 bignum(num);
     CScriptNum scriptnum(num);
@@ -38,7 +38,7 @@ static void CheckCreateVch(const int64_t& num)
     BOOST_CHECK(verify(bignum3, scriptnum3));
 }
 
-static void CheckCreateInt(const int64_t& num)
+static void CheckCreateInt( int64_t& num)
 {
     CScriptNum10 bignum(num);
     CScriptNum scriptnum(num);
@@ -49,12 +49,12 @@ static void CheckCreateInt(const int64_t& num)
 }
 
 
-static void CheckAdd(const int64_t& num1, const int64_t& num2)
+static void CheckAdd( int64_t& num1,  int64_t& num2)
 {
-    const CScriptNum10 bignum1(num1);
-    const CScriptNum10 bignum2(num2);
-    const CScriptNum scriptnum1(num1);
-    const CScriptNum scriptnum2(num2);
+     CScriptNum10 bignum1(num1);
+     CScriptNum10 bignum2(num2);
+     CScriptNum scriptnum1(num1);
+     CScriptNum scriptnum2(num2);
     CScriptNum10 bignum3(num1);
     CScriptNum10 bignum4(num1);
     CScriptNum scriptnum3(num1);
@@ -71,22 +71,22 @@ static void CheckAdd(const int64_t& num1, const int64_t& num2)
     }
 }
 
-static void CheckNegate(const int64_t& num)
+static void CheckNegate( int64_t& num)
 {
-    const CScriptNum10 bignum(num);
-    const CScriptNum scriptnum(num);
+     CScriptNum10 bignum(num);
+     CScriptNum scriptnum(num);
 
     // -INT64_MIN is undefined
     if (num != std::numeric_limits<int64_t>::min())
         BOOST_CHECK(verify(-bignum, -scriptnum));
 }
 
-static void CheckSubtract(const int64_t& num1, const int64_t& num2)
+static void CheckSubtract( int64_t& num1,  int64_t& num2)
 {
-    const CScriptNum10 bignum1(num1);
-    const CScriptNum10 bignum2(num2);
-    const CScriptNum scriptnum1(num1);
-    const CScriptNum scriptnum2(num2);
+     CScriptNum10 bignum1(num1);
+     CScriptNum10 bignum2(num2);
+     CScriptNum scriptnum1(num1);
+     CScriptNum scriptnum2(num2);
 
     // int64_t overflow is undefined.
     bool invalid = ((num2 > 0 && num1 < std::numeric_limits<int64_t>::min() + num2) ||
@@ -106,12 +106,12 @@ static void CheckSubtract(const int64_t& num1, const int64_t& num2)
     }
 }
 
-static void CheckCompare(const int64_t& num1, const int64_t& num2)
+static void CheckCompare( int64_t& num1,  int64_t& num2)
 {
-    const CScriptNum10 bignum1(num1);
-    const CScriptNum10 bignum2(num2);
-    const CScriptNum scriptnum1(num1);
-    const CScriptNum scriptnum2(num2);
+     CScriptNum10 bignum1(num1);
+     CScriptNum10 bignum2(num2);
+     CScriptNum scriptnum1(num1);
+     CScriptNum scriptnum2(num2);
 
     BOOST_CHECK((bignum1 == bignum1) == (scriptnum1 == scriptnum1));
     BOOST_CHECK((bignum1 != bignum1) ==  (scriptnum1 != scriptnum1));
@@ -142,7 +142,7 @@ static void CheckCompare(const int64_t& num1, const int64_t& num2)
     BOOST_CHECK((bignum1 <= bignum2) ==  (scriptnum1 <= num2));
 }
 
-static void RunCreate(const int64_t& num)
+static void RunCreate( int64_t& num)
 {
     CheckCreateInt(num);
     CScriptNum scriptnum(num);
@@ -154,7 +154,7 @@ static void RunCreate(const int64_t& num)
     }
 }
 
-static void RunOperators(const int64_t& num1, const int64_t& num2)
+static void RunOperators( int64_t& num1,  int64_t& num2)
 {
     CheckAdd(num1, num2);
     CheckSubtract(num1, num2);

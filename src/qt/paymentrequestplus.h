@@ -18,7 +18,7 @@
 #include <QList>
 #include <QString>
 
-static const bool DEFAULT_SELFSIGNED_ROOTCERTS = false;
+static  bool DEFAULT_SELFSIGNED_ROOTCERTS = false;
 
 //
 // Wraps dumb protocol buffer paymentRequest
@@ -30,18 +30,18 @@ class PaymentRequestPlus
 public:
     PaymentRequestPlus() { }
 
-    bool parse(const QByteArray& data);
-    bool SerializeToString(std::string* output) const;
+    bool parse( QByteArray& data);
+    bool SerializeToString(std::string* output) ;
 
-    bool IsInitialized() const;
+    bool IsInitialized() ;
     // Returns true if merchant's identity is authenticated, and
     // returns human-readable merchant identity in merchant
-    bool getMerchant(X509_STORE* certStore, QString& merchant) const;
+    bool getMerchant(X509_STORE* certStore, QString& merchant) ;
 
     // Returns list of outputs, amount
-    QList<std::pair<CScript,CAmount> > getPayTo() const;
+    QList<std::pair<CScript,CAmount> > getPayTo() ;
 
-    const payments::PaymentDetails& getDetails() const { return details; }
+     payments::PaymentDetails& getDetails()  { return details; }
 
 private:
     payments::PaymentRequest paymentRequest;

@@ -5,7 +5,7 @@
 #ifndef BITCOIN_RPC_SAFEMODE_H
 #define BITCOIN_RPC_SAFEMODE_H
 
-static const bool DEFAULT_DISABLE_SAFEMODE = true;
+static  bool DEFAULT_DISABLE_SAFEMODE = true;
 
 void ObserveSafeMode();
 

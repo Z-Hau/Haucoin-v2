@@ -18,7 +18,7 @@ TEST(ArenaTest, Empty) {
 TEST(ArenaTest, Simple) {
   std::vector<std::pair<size_t, char*> > allocated;
   Arena arena;
-  const int N = 100000;
+   int N = 100000;
   size_t bytes = 0;
   Random rnd(301);
   for (int i = 0; i < N; i++) {
@@ -53,7 +53,7 @@ TEST(ArenaTest, Simple) {
   }
   for (size_t i = 0; i < allocated.size(); i++) {
     size_t num_bytes = allocated[i].first;
-    const char* p = allocated[i].second;
+     char* p = allocated[i].second;
     for (size_t b = 0; b < num_bytes; b++) {
       // Check the "i"th allocation for the known bit pattern
       ASSERT_EQ(int(p[b]) & 0xff, i % 256);

@@ -30,7 +30,7 @@ namespace {
 //! (https://docs.oracle.com/cd/E17275_01/html/programmer_reference/program_copy.html),
 //! so bitcoin should never create different databases with the same fileid, but
 //! this error can be triggered if users manually copy database files.
-void CheckUniqueFileid(const CDBEnv& env, const std::string& filename, Db& db)
+void CheckUniqueFileid( CDBEnv& env,  std::string& filename, Db& db)
 {
     if (env.IsMock()) return;
 
@@ -40,11 +40,11 @@ void CheckUniqueFileid(const CDBEnv& env, const std::string& filename, Db& db)
         throw std::runtime_error(strprintf("CDB: Can't open database %s (get_fileid failed with %d)", filename, ret));
     }
 
-    for (const auto& item : env.mapDb) {
+    for ( auto& item : env.mapDb) {
         u_int8_t item_fileid[DB_FILE_ID_LEN];
         if (item.second && item.second->get_mpf()->get_fileid(item_fileid) == 0 &&
             memcmp(fileid, item_fileid, sizeof(fileid)) == 0) {
-            const char* item_filename = nullptr;
+             char* item_filename = nullptr;
             item.second->get_dbname(&item_filename, nullptr);
             throw std::runtime_error(strprintf("CDB: Can't open database %s (duplicates fileid %s from %s)", filename,
                 HexStr(std::begin(item_fileid), std::end(item_fileid)),
@@ -95,7 +95,7 @@ void CDBEnv::Close()
     EnvShutdown();
 }
 
-bool CDBEnv::Open(const fs::path& pathIn, bool retry)
+bool CDBEnv::Open( fs::path& pathIn, bool retry)
 {
     if (fDbEnvInit)
         return true;
@@ -146,7 +146,7 @@ bool CDBEnv::Open(const fs::path& pathIn, bool retry)
             try {
                 fs::rename(pathLogDir, pathDatabaseBak);
                 LogPrintf("Moved old %s to %s. Retrying.\n", pathLogDir.string(), pathDatabaseBak.string());
-            } catch (const fs::filesystem_error&) {
+            } catch ( fs::filesystem_error&) {
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
             // try opening it again one more time
@@ -196,7 +196,7 @@ void CDBEnv::MakeMock()
     fMockDb = true;
 }
 
-CDBEnv::VerifyResult CDBEnv::Verify(const std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename)
+CDBEnv::VerifyResult CDBEnv::Verify( std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename)
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
@@ -213,7 +213,7 @@ CDBEnv::VerifyResult CDBEnv::Verify(const std::string& strFile, recoverFunc_type
     return (fRecovered ? RECOVER_OK : RECOVER_FAIL);
 }
 
-bool CDB::Recover(const std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& newFilename)
+bool CDB::Recover( std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& newFilename)
 {
     // Recovery procedure:
     // move wallet file to walletfilename.timestamp.bak
@@ -279,7 +279,7 @@ bool CDB::Recover(const std::string& filename, void *callbackDataIn, bool (*reco
     return fSuccess;
 }
 
-bool CDB::VerifyEnvironment(const std::string& walletFile, const fs::path& walletDir, std::string& errorStr)
+bool CDB::VerifyEnvironment( std::string& walletFile,  fs::path& walletDir, std::string& errorStr)
 {
     LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
     LogPrintf("Using wallet %s\n", walletFile);
@@ -299,7 +299,7 @@ bool CDB::VerifyEnvironment(const std::string& walletFile, const fs::path& walle
     return true;
 }
 
-bool CDB::VerifyDatabaseFile(const std::string& walletFile, const fs::path& walletDir, std::string& warningStr, std::string& errorStr, CDBEnv::recoverFunc_type recoverFunc)
+bool CDB::VerifyDatabaseFile( std::string& walletFile,  fs::path& walletDir, std::string& warningStr, std::string& errorStr, CDBEnv::recoverFunc_type recoverFunc)
 {
     if (fs::exists(walletDir / walletFile))
     {
@@ -324,11 +324,11 @@ bool CDB::VerifyDatabaseFile(const std::string& walletFile, const fs::path& wall
 }
 
 /* End of headers, beginning of key/value data */
-static const char *HEADER_END = "HEADER=END";
+static  char *HEADER_END = "HEADER=END";
 /* End of key/value data */
-static const char *DATA_END = "DATA=END";
+static  char *DATA_END = "DATA=END";
 
-bool CDBEnv::Salvage(const std::string& strFile, bool fAggressive, std::vector<CDBEnv::KeyValPair>& vResult)
+bool CDBEnv::Salvage( std::string& strFile, bool fAggressive, std::vector<CDBEnv::KeyValPair>& vResult)
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
@@ -389,7 +389,7 @@ bool CDBEnv::Salvage(const std::string& strFile, bool fAggressive, std::vector<C
 }
 
 
-void CDBEnv::CheckpointLSN(const std::string& strFile)
+void CDBEnv::CheckpointLSN( std::string& strFile)
 {
     dbenv->txn_checkpoint(0, 0, 0);
     if (fMockDb)
@@ -398,7 +398,7 @@ void CDBEnv::CheckpointLSN(const std::string& strFile)
 }
 
 
-CDB::CDB(CWalletDBWrapper& dbw, const char* pszMode, bool fFlushOnCloseIn) : pdb(nullptr), activeTxn(nullptr)
+CDB::CDB(CWalletDBWrapper& dbw,  char* pszMode, bool fFlushOnCloseIn) : pdb(nullptr), activeTxn(nullptr)
 {
     fReadOnly = (!strchr(pszMode, '+') && !strchr(pszMode, 'w'));
     fFlushOnClose = fFlushOnCloseIn;
@@ -406,7 +406,7 @@ CDB::CDB(CWalletDBWrapper& dbw, const char* pszMode, bool fFlushOnCloseIn) : pdb
     if (dbw.IsDummy()) {
         return;
     }
-    const std::string &strFilename = dbw.strFile;
+     std::string &strFilename = dbw.strFile;
 
     bool fCreate = strchr(pszMode, 'c') != nullptr;
     unsigned int nFlags = DB_THREAD;
@@ -495,7 +495,7 @@ void CDB::Close()
     }
 }
 
-void CDBEnv::CloseDb(const std::string& strFile)
+void CDBEnv::CloseDb( std::string& strFile)
 {
     {
         LOCK(cs_db);
@@ -509,13 +509,13 @@ void CDBEnv::CloseDb(const std::string& strFile)
     }
 }
 
-bool CDB::Rewrite(CWalletDBWrapper& dbw, const char* pszSkip)
+bool CDB::Rewrite(CWalletDBWrapper& dbw,  char* pszSkip)
 {
     if (dbw.IsDummy()) {
         return true;
     }
     CDBEnv *env = dbw.env;
-    const std::string& strFile = dbw.strFile;
+     std::string& strFile = dbw.strFile;
     while (true) {
         {
             LOCK(env->cs_db);
@@ -645,7 +645,7 @@ bool CDB::PeriodicFlush(CWalletDBWrapper& dbw)
     }
     bool ret = false;
     CDBEnv *env = dbw.env;
-    const std::string& strFile = dbw.strFile;
+     std::string& strFile = dbw.strFile;
     TRY_LOCK(bitdb.cs_db,lockDb);
     if (lockDb)
     {
@@ -681,12 +681,12 @@ bool CDB::PeriodicFlush(CWalletDBWrapper& dbw)
     return ret;
 }
 
-bool CWalletDBWrapper::Rewrite(const char* pszSkip)
+bool CWalletDBWrapper::Rewrite( char* pszSkip)
 {
     return CDB::Rewrite(*this, pszSkip);
 }
 
-bool CWalletDBWrapper::Backup(const std::string& strDest)
+bool CWalletDBWrapper::Backup( std::string& strDest)
 {
     if (IsDummy()) {
         return false;
@@ -717,7 +717,7 @@ bool CWalletDBWrapper::Backup(const std::string& strDest)
                     fs::copy_file(pathSrc, pathDest, fs::copy_option::overwrite_if_exists);
                     LogPrintf("copied %s to %s\n", strFile, pathDest.string());
                     return true;
-                } catch (const fs::filesystem_error& e) {
+                } catch ( fs::filesystem_error& e) {
                     LogPrintf("error copying %s to %s - %s\n", strFile, pathDest.string(), e.what());
                     return false;
                 }

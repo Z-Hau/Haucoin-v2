@@ -78,7 +78,7 @@
 namespace leveldb {
 namespace port {
 
-static const bool kLittleEndian = PLATFORM_IS_LITTLE_ENDIAN;
+static  bool kLittleEndian = PLATFORM_IS_LITTLE_ENDIAN;
 #undef PLATFORM_IS_LITTLE_ENDIAN
 
 class CondVar;
@@ -97,8 +97,8 @@ class Mutex {
   pthread_mutex_t mu_;
 
   // No copying
-  Mutex(const Mutex&);
-  void operator=(const Mutex&);
+  Mutex( Mutex&);
+  void operator=( Mutex&);
 };
 
 class CondVar {
@@ -117,7 +117,7 @@ typedef pthread_once_t OnceType;
 #define LEVELDB_ONCE_INIT PTHREAD_ONCE_INIT
 extern void InitOnce(OnceType* once, void (*initializer)());
 
-inline bool Snappy_Compress(const char* input, size_t length,
+inline bool Snappy_Compress( char* input, size_t length,
                             ::std::string* output) {
 #ifdef SNAPPY
   output->resize(snappy::MaxCompressedLength(length));
@@ -130,7 +130,7 @@ inline bool Snappy_Compress(const char* input, size_t length,
   return false;
 }
 
-inline bool Snappy_GetUncompressedLength(const char* input, size_t length,
+inline bool Snappy_GetUncompressedLength( char* input, size_t length,
                                          size_t* result) {
 #ifdef SNAPPY
   return snappy::GetUncompressedLength(input, length, result);
@@ -139,7 +139,7 @@ inline bool Snappy_GetUncompressedLength(const char* input, size_t length,
 #endif
 }
 
-inline bool Snappy_Uncompress(const char* input, size_t length,
+inline bool Snappy_Uncompress( char* input, size_t length,
                               char* output) {
 #ifdef SNAPPY
   return snappy::RawUncompress(input, length, output);
@@ -148,12 +148,12 @@ inline bool Snappy_Uncompress(const char* input, size_t length,
 #endif
 }
 
-inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
+inline bool GetHeapProfile(void (*func)(void*,  char*, int), void* arg) {
   return false;
 }
 
 bool HasAcceleratedCRC32C();
-uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size);
+uint32_t AcceleratedCRC32C(uint32_t crc,  char* buf, size_t size);
 
 } // namespace port
 } // namespace leveldb

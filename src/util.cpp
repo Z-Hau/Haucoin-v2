@@ -80,11 +80,11 @@
 #include <openssl/conf.h>
 
 // Application startup time (used for uptime calculation)
-const int64_t nStartupTime = GetTime();
+ int64_t nStartupTime = GetTime();
 
-const char * const BITCOIN_CONF_FILENAME = "bitcoin.conf";
-const char * const BITCOIN_PID_FILENAME = "bitcoind.pid";
-const char * const DEFAULT_DEBUGLOGFILE = "debug.log";
+ char *  BITCOIN_CONF_FILENAME = "bitcoin.conf";
+ char *  BITCOIN_PID_FILENAME = "bitcoind.pid";
+ char *  DEFAULT_DEBUGLOGFILE = "debug.log";
 
 ArgsManager gArgs;
 bool fPrintToConsole = false;
@@ -101,7 +101,7 @@ std::atomic<uint32_t> logCategories(0);
 
 /** Init OpenSSL library multithreading support */
 static std::unique_ptr<CCriticalSection[]> ppmutexOpenSSL;
-void locking_callback(int mode, int i, const char* file, int line) NO_THREAD_SAFETY_ANALYSIS
+void locking_callback(int mode, int i,  char* file, int line) NO_THREAD_SAFETY_ANALYSIS
 {
     if (mode & CRYPTO_LOCK) {
         ENTER_CRITICAL_SECTION(ppmutexOpenSSL[i]);
@@ -173,7 +173,7 @@ static FILE* fileout = nullptr;
 static boost::mutex* mutexDebugLog = nullptr;
 static std::list<std::string>* vMsgsBeforeOpenLog;
 
-static int FileWriteStr(const std::string &str, FILE *fp)
+static int FileWriteStr( std::string &str, FILE *fp)
 {
     return fwrite(str.data(), 1, str.size(), fp);
 }
@@ -227,7 +227,7 @@ struct CLogCategoryDesc
     std::string category;
 };
 
-const CLogCategoryDesc LogCategories[] =
+ CLogCategoryDesc LogCategories[] =
 {
     {BCLog::NONE, "0"},
     {BCLog::NONE, "none"},
@@ -256,7 +256,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::ALL, "all"},
 };
 
-bool GetLogCategory(uint32_t *f, const std::string *str)
+bool GetLogCategory(uint32_t *f,  std::string *str)
 {
     if (f && str) {
         if (*str == "") {
@@ -308,7 +308,7 @@ std::vector<CLogCategoryActive> ListActiveLogCategories()
  * suppress printing of the timestamp when multiple calls are made that don't
  * end in a newline. Initialize it to true, and hold it, in the calling context.
  */
-static std::string LogTimestampStr(const std::string &str, std::atomic_bool *fStartedNewLine)
+static std::string LogTimestampStr( std::string &str, std::atomic_bool *fStartedNewLine)
 {
     std::string strStamped;
 
@@ -336,7 +336,7 @@ static std::string LogTimestampStr(const std::string &str, std::atomic_bool *fSt
     return strStamped;
 }
 
-int LogPrintStr(const std::string &str)
+int LogPrintStr( std::string &str)
 {
     int ret = 0; // Returns total number of characters written
     static std::atomic_bool fStartedNewLine(true);
@@ -385,7 +385,7 @@ static std::map<std::string, std::unique_ptr<boost::interprocess::file_lock>> di
 /** Mutex to protect dir_locks. */
 static std::mutex cs_dir_locks;
 
-bool LockDirectory(const fs::path& directory, const std::string lockfile_name, bool probe_only)
+bool LockDirectory( fs::path& directory,  std::string lockfile_name, bool probe_only)
 {
     std::lock_guard<std::mutex> ulock(cs_dir_locks);
     fs::path pathLockFile = directory / lockfile_name;
@@ -408,7 +408,7 @@ bool LockDirectory(const fs::path& directory, const std::string lockfile_name, b
             // Lock successful and we're not just probing, put it into the map
             dir_locks.emplace(pathLockFile.string(), std::move(lock));
         }
-    } catch (const boost::interprocess::interprocess_exception& e) {
+    } catch ( boost::interprocess::interprocess_exception& e) {
         return error("Error while attempting to lock directory %s: %s", directory.string(), e.what());
     }
     return true;
@@ -421,7 +421,7 @@ void ReleaseDirectoryLocks()
 }
 
 /** Interpret string as boolean, for argument parsing */
-static bool InterpretBool(const std::string& strValue)
+static bool InterpretBool( std::string& strValue)
 {
     if (strValue.empty())
         return true;
@@ -438,7 +438,7 @@ static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
     }
 }
 
-void ArgsManager::ParseParameters(int argc, const char* const argv[])
+void ArgsManager::ParseParameters(int argc,  char*  argv[])
 {
     LOCK(cs_args);
     mapArgs.clear();
@@ -474,7 +474,7 @@ void ArgsManager::ParseParameters(int argc, const char* const argv[])
     }
 }
 
-std::vector<std::string> ArgsManager::GetArgs(const std::string& strArg) const
+std::vector<std::string> ArgsManager::GetArgs( std::string& strArg) 
 {
     LOCK(cs_args);
     auto it = mapMultiArgs.find(strArg);
@@ -482,13 +482,13 @@ std::vector<std::string> ArgsManager::GetArgs(const std::string& strArg) const
     return {};
 }
 
-bool ArgsManager::IsArgSet(const std::string& strArg) const
+bool ArgsManager::IsArgSet( std::string& strArg) 
 {
     LOCK(cs_args);
     return mapArgs.count(strArg);
 }
 
-std::string ArgsManager::GetArg(const std::string& strArg, const std::string& strDefault) const
+std::string ArgsManager::GetArg( std::string& strArg,  std::string& strDefault) 
 {
     LOCK(cs_args);
     auto it = mapArgs.find(strArg);
@@ -496,7 +496,7 @@ std::string ArgsManager::GetArg(const std::string& strArg, const std::string& st
     return strDefault;
 }
 
-int64_t ArgsManager::GetArg(const std::string& strArg, int64_t nDefault) const
+int64_t ArgsManager::GetArg( std::string& strArg, int64_t nDefault) 
 {
     LOCK(cs_args);
     auto it = mapArgs.find(strArg);
@@ -504,7 +504,7 @@ int64_t ArgsManager::GetArg(const std::string& strArg, int64_t nDefault) const
     return nDefault;
 }
 
-bool ArgsManager::GetBoolArg(const std::string& strArg, bool fDefault) const
+bool ArgsManager::GetBoolArg( std::string& strArg, bool fDefault) 
 {
     LOCK(cs_args);
     auto it = mapArgs.find(strArg);
@@ -512,7 +512,7 @@ bool ArgsManager::GetBoolArg(const std::string& strArg, bool fDefault) const
     return fDefault;
 }
 
-bool ArgsManager::SoftSetArg(const std::string& strArg, const std::string& strValue)
+bool ArgsManager::SoftSetArg( std::string& strArg,  std::string& strValue)
 {
     LOCK(cs_args);
     if (IsArgSet(strArg)) return false;
@@ -520,7 +520,7 @@ bool ArgsManager::SoftSetArg(const std::string& strArg, const std::string& strVa
     return true;
 }
 
-bool ArgsManager::SoftSetBoolArg(const std::string& strArg, bool fValue)
+bool ArgsManager::SoftSetBoolArg( std::string& strArg, bool fValue)
 {
     if (fValue)
         return SoftSetArg(strArg, std::string("1"));
@@ -528,7 +528,7 @@ bool ArgsManager::SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("0"));
 }
 
-void ArgsManager::ForceSetArg(const std::string& strArg, const std::string& strValue)
+void ArgsManager::ForceSetArg( std::string& strArg,  std::string& strValue)
 {
     LOCK(cs_args);
     mapArgs[strArg] = strValue;
@@ -537,28 +537,28 @@ void ArgsManager::ForceSetArg(const std::string& strArg, const std::string& strV
 
 
 
-static const int screenWidth = 79;
-static const int optIndent = 2;
-static const int msgIndent = 7;
+static  int screenWidth = 79;
+static  int optIndent = 2;
+static  int msgIndent = 7;
 
-std::string HelpMessageGroup(const std::string &message) {
+std::string HelpMessageGroup( std::string &message) {
     return std::string(message) + std::string("\n\n");
 }
 
-std::string HelpMessageOpt(const std::string &option, const std::string &message) {
+std::string HelpMessageOpt( std::string &option,  std::string &message) {
     return std::string(optIndent,' ') + std::string(option) +
            std::string("\n") + std::string(msgIndent,' ') +
            FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
            std::string("\n\n");
 }
 
-static std::string FormatException(const std::exception* pex, const char* pszThread)
+static std::string FormatException( std::exception* pex,  char* pszThread)
 {
 #ifdef WIN32
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(nullptr, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "bitcoin";
+     char* pszModule = "bitcoin";
 #endif
     if (pex)
         return strprintf(
@@ -568,7 +568,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
             "UNKNOWN EXCEPTION       \n%s in %s       \n", pszModule, pszThread);
 }
 
-void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
+void PrintExceptionContinue( std::exception* pex,  char* pszThread)
 {
     std::string message = FormatException(pex, pszThread);
     LogPrintf("\n\n************************\n%s\n", message);
@@ -605,7 +605,7 @@ static fs::path pathCached;
 static fs::path pathCachedNetSpecific;
 static CCriticalSection csPathCached;
 
-const fs::path &GetDataDir(bool fNetSpecific)
+ fs::path &GetDataDir(bool fNetSpecific)
 {
 
     LOCK(csPathCached);
@@ -645,7 +645,7 @@ void ClearDatadirCache()
     pathCachedNetSpecific = fs::path();
 }
 
-fs::path GetConfigFile(const std::string& confPath)
+fs::path GetConfigFile( std::string& confPath)
 {
     fs::path pathConfigFile(confPath);
     if (!pathConfigFile.is_complete())
@@ -654,7 +654,7 @@ fs::path GetConfigFile(const std::string& confPath)
     return pathConfigFile;
 }
 
-void ArgsManager::ReadConfigFile(const std::string& confPath)
+void ArgsManager::ReadConfigFile( std::string& confPath)
 {
     fs::ifstream streamConfig(GetConfigFile(confPath));
     if (!streamConfig.good())
@@ -691,7 +691,7 @@ fs::path GetPidFile()
     return pathPidFile;
 }
 
-void CreatePidFile(const fs::path &path, pid_t pid)
+void CreatePidFile( fs::path &path, pid_t pid)
 {
     FILE* file = fsbridge::fopen(path, "w");
     if (file)
@@ -718,12 +718,12 @@ bool RenameOver(fs::path src, fs::path dest)
  * Specifically handles case where path p exists, but it wasn't possible for the user to
  * write to the parent directory.
  */
-bool TryCreateDirectories(const fs::path& p)
+bool TryCreateDirectories( fs::path& p)
 {
     try
     {
         return fs::create_directories(p);
-    } catch (const fs::filesystem_error&) {
+    } catch ( fs::filesystem_error&) {
         if (!fs::exists(p) || !fs::is_directory(p))
             throw;
     }
@@ -814,7 +814,7 @@ void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length) {
 #else
     // Fallback version
     // TODO: just write one byte per block
-    static const char buf[65536] = {};
+    static  char buf[65536] = {};
     fseek(file, offset, SEEK_SET);
     while (length > 0) {
         unsigned int now = 65536;
@@ -869,7 +869,7 @@ fs::path GetSpecialFolderPath(int nFolder, bool fCreate)
 }
 #endif
 
-void runCommand(const std::string& strCommand)
+void runCommand( std::string& strCommand)
 {
     if (strCommand.empty()) return;
     int nErr = ::system(strCommand.c_str());
@@ -877,7 +877,7 @@ void runCommand(const std::string& strCommand)
         LogPrintf("runCommand error: system(%s) returned %d\n", strCommand, nErr);
 }
 
-void RenameThread(const char* name)
+void RenameThread( char* name)
 {
 #if defined(PR_SET_NAME)
     // Only the first 15 characters are used (16 - NUL terminator)
@@ -910,7 +910,7 @@ void SetupEnvironment()
 #if !defined(WIN32) && !defined(MAC_OSX) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
     try {
         std::locale(""); // Raises a runtime error if current locale is invalid
-    } catch (const std::runtime_error&) {
+    } catch ( std::runtime_error&) {
         setenv("LC_ALL", "C", 1);
     }
 #endif
@@ -943,7 +943,7 @@ int GetNumCores()
 #endif
 }
 
-std::string CopyrightHolders(const std::string& strPrefix)
+std::string CopyrightHolders( std::string& strPrefix)
 {
     std::string strCopyrightHolders = strPrefix + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
 

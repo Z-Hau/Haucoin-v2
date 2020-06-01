@@ -24,11 +24,11 @@ CAmount GetRequiredFee(unsigned int nTxBytes);
  * Estimate the minimum fee considering user set parameters
  * and the required fee
  */
-CAmount GetMinimumFee(unsigned int nTxBytes, const CCoinControl& coin_control, const CTxMemPool& pool, const CBlockPolicyEstimator& estimator, FeeCalculation *feeCalc);
+CAmount GetMinimumFee(unsigned int nTxBytes,  CCoinControl& coin_control,  CTxMemPool& pool,  CBlockPolicyEstimator& estimator, FeeCalculation *feeCalc);
 
 /**
  * Return the maximum feerate for discarding change.
  */
-CFeeRate GetDiscardRate(const CBlockPolicyEstimator& estimator);
+CFeeRate GetDiscardRate( CBlockPolicyEstimator& estimator);
 
 #endif // BITCOIN_WALLET_FEES_H

@@ -650,7 +650,7 @@ Miscellaneous:
 - `5b9f842` Upgrade leveldb to 1.18, make chainstate databases compatible between ARM and x86 (issue #2293)
 - `4e7c219` Catch UTXO set read errors and shutdown
 - `867c600` Catch LevelDB errors during flush
-- `06ca065` Fix CScriptID(const CScript& in) in empty script case
+- `06ca065` Fix CScriptID( CScript& in) in empty script case
 
 Credits
 =======

@@ -10,10 +10,10 @@ namespace
 typedef std::vector<uint8_t> data;
 
 /** The Bech32 character set for encoding. */
-const char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+ char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 
 /** The Bech32 character set for decoding. */
-const int8_t CHARSET_REV[128] = {
+ int8_t CHARSET_REV[128] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -25,7 +25,7 @@ const int8_t CHARSET_REV[128] = {
 };
 
 /** Concatenate two byte arrays. */
-data Cat(data x, const data& y)
+data Cat(data x,  data& y)
 {
     x.insert(x.end(), y.begin(), y.end());
     return x;
@@ -34,7 +34,7 @@ data Cat(data x, const data& y)
 /** This function will compute what 6 5-bit values to XOR into the last 6 input values, in order to
  *  make the checksum 0. These 6 values are packed together in a single 30-bit integer. The higher
  *  bits correspond to earlier values. */
-uint32_t PolyMod(const data& v)
+uint32_t PolyMod( data& v)
 {
     // The input is interpreted as a list of coefficients of a polynomial over F = GF(32), with an
     // implicit 1 in front. If the input is [v0,v1,v2,v3,v4], that polynomial is v(x) =
@@ -100,7 +100,7 @@ inline unsigned char LowerCase(unsigned char c)
 }
 
 /** Expand a HRP for use in checksum computation. */
-data ExpandHRP(const std::string& hrp)
+data ExpandHRP( std::string& hrp)
 {
     data ret;
     ret.reserve(hrp.size() + 90);
@@ -115,7 +115,7 @@ data ExpandHRP(const std::string& hrp)
 }
 
 /** Verify a checksum. */
-bool VerifyChecksum(const std::string& hrp, const data& values)
+bool VerifyChecksum( std::string& hrp,  data& values)
 {
     // PolyMod computes what value to xor into the final values to make the checksum 0. However,
     // if we required that the checksum was 0, it would be the case that appending a 0 to a valid
@@ -125,7 +125,7 @@ bool VerifyChecksum(const std::string& hrp, const data& values)
 }
 
 /** Create a checksum. */
-data CreateChecksum(const std::string& hrp, const data& values)
+data CreateChecksum( std::string& hrp,  data& values)
 {
     data enc = Cat(ExpandHRP(hrp), values);
     enc.resize(enc.size() + 6); // Append 6 zeroes
@@ -144,7 +144,7 @@ namespace bech32
 {
 
 /** Encode a Bech32 string. */
-std::string Encode(const std::string& hrp, const data& values) {
+std::string Encode( std::string& hrp,  data& values) {
     data checksum = CreateChecksum(hrp, values);
     data combined = Cat(values, checksum);
     std::string ret = hrp + '1';
@@ -156,7 +156,7 @@ std::string Encode(const std::string& hrp, const data& values) {
 }
 
 /** Decode a Bech32 string. */
-std::pair<std::string, data> Decode(const std::string& str) {
+std::pair<std::string, data> Decode( std::string& str) {
     bool lower = false, upper = false;
     for (size_t i = 0; i < str.size(); ++i) {
         unsigned char c = str[i];

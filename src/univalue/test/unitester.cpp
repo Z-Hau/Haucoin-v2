@@ -30,7 +30,7 @@ static std::string rtrim(std::string s)
     return s;
 }
 
-static void runtest(string filename, const string& jdata)
+static void runtest(string filename,  string& jdata)
 {
         string prefix = filename.substr(0, 4);
 
@@ -54,7 +54,7 @@ static void runtest(string filename, const string& jdata)
         }
 }
 
-static void runtest_file(const char *filename_)
+static void runtest_file( char *filename_)
 {
         string basename(filename_);
         string filename = srcdir + "/" + basename;
@@ -78,7 +78,7 @@ static void runtest_file(const char *filename_)
         runtest(basename, jdata);
 }
 
-static const char *filenames[] = {
+static  char *filenames[] = {
         "fail10.json",
         "fail11.json",
         "fail12.json",

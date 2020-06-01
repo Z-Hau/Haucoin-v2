@@ -18,8 +18,8 @@ class QValueComboBox : public QComboBox
 public:
     explicit QValueComboBox(QWidget *parent = 0);
 
-    QVariant value() const;
-    void setValue(const QVariant &value);
+    QVariant value() ;
+    void setValue( QVariant &value);
 
     /** Specify model role to use as ordinal value (defaults to Qt::UserRole) */
     void setRole(int role);

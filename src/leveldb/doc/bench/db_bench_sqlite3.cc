@@ -24,7 +24,7 @@
 //   readseq       -- read N times sequentially
 //   readrandom    -- read N times in random order
 //   readrand100K  -- read N/1000 100K values in sequential order in async mode
-static const char* FLAGS_benchmarks =
+static  char* FLAGS_benchmarks =
     "fillseq,"
     "fillseqsync,"
     "fillseqbatch,"
@@ -76,7 +76,7 @@ static bool FLAGS_transaction = true;
 static bool FLAGS_WAL_enabled = true;
 
 // Use the db with the following name.
-static const char* FLAGS_db = NULL;
+static  char* FLAGS_db = NULL;
 
 inline
 static void ExecErrorCheck(int status, char *err_msg) {
@@ -179,7 +179,7 @@ class Benchmark {
   int next_report_;     // When to report next
 
   void PrintHeader() {
-    const int kKeySize = 16;
+     int kKeySize = 16;
     PrintEnvironment();
     fprintf(stdout, "Keys:       %d bytes each\n", kKeySize);
     fprintf(stdout, "Values:     %d bytes each\n", FLAGS_value_size);
@@ -217,7 +217,7 @@ class Benchmark {
       std::string cpu_type;
       std::string cache_size;
       while (fgets(line, sizeof(line), cpuinfo) != NULL) {
-        const char* sep = strchr(line, ':');
+         char* sep = strchr(line, ':');
         if (sep == NULL) {
           continue;
         }
@@ -273,7 +273,7 @@ class Benchmark {
     }
   }
 
-  void Stop(const Slice& name) {
+  void Stop( Slice& name) {
     double finish = Env::Default()->NowMicros() * 1e-6;
 
     // Pretend at least one op was done in case we are running a benchmark
@@ -344,9 +344,9 @@ class Benchmark {
     PrintHeader();
     Open();
 
-    const char* benchmarks = FLAGS_benchmarks;
+     char* benchmarks = FLAGS_benchmarks;
     while (benchmarks != NULL) {
-      const char* sep = strchr(benchmarks, ',');
+       char* sep = strchr(benchmarks, ',');
       Slice name;
       if (sep == NULL) {
         name = benchmarks;
@@ -532,10 +532,10 @@ class Benchmark {
 
       // Create and execute SQL statements
       for (int j = 0; j < entries_per_batch; j++) {
-        const char* value = gen_.Generate(value_size).data();
+         char* value = gen_.Generate(value_size).data();
 
         // Create values for key-value pair
-        const int k = (order == SEQUENTIAL) ? i + j :
+         int k = (order == SEQUENTIAL) ? i + j :
                       (rand_.Next() % num_entries);
         char key[100];
         snprintf(key, sizeof(key), "%016d", k);

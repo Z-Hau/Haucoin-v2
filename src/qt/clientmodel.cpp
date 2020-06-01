@@ -53,7 +53,7 @@ ClientModel::~ClientModel()
     unsubscribeFromCoreSignals();
 }
 
-int ClientModel::getNumConnections(unsigned int flags) const
+int ClientModel::getNumConnections(unsigned int flags) 
 {
     CConnman::NumConnections connections = CConnman::CONNECTIONS_NONE;
 
@@ -69,13 +69,13 @@ int ClientModel::getNumConnections(unsigned int flags) const
     return 0;
 }
 
-int ClientModel::getNumBlocks() const
+int ClientModel::getNumBlocks() 
 {
     LOCK(cs_main);
     return chainActive.Height();
 }
 
-int ClientModel::getHeaderTipHeight() const
+int ClientModel::getHeaderTipHeight() 
 {
     if (cachedBestHeaderHeight == -1) {
         // make sure we initially populate the cache via a cs_main lock
@@ -89,7 +89,7 @@ int ClientModel::getHeaderTipHeight() const
     return cachedBestHeaderHeight;
 }
 
-int64_t ClientModel::getHeaderTipTime() const
+int64_t ClientModel::getHeaderTipTime() 
 {
     if (cachedBestHeaderTime == -1) {
         LOCK(cs_main);
@@ -101,21 +101,21 @@ int64_t ClientModel::getHeaderTipTime() const
     return cachedBestHeaderTime;
 }
 
-quint64 ClientModel::getTotalBytesRecv() const
+quint64 ClientModel::getTotalBytesRecv() 
 {
     if(!g_connman)
         return 0;
     return g_connman->GetTotalBytesRecv();
 }
 
-quint64 ClientModel::getTotalBytesSent() const
+quint64 ClientModel::getTotalBytesSent() 
 {
     if(!g_connman)
         return 0;
     return g_connman->GetTotalBytesSent();
 }
 
-QDateTime ClientModel::getLastBlockDate() const
+QDateTime ClientModel::getLastBlockDate() 
 {
     LOCK(cs_main);
 
@@ -125,17 +125,17 @@ QDateTime ClientModel::getLastBlockDate() const
     return QDateTime::fromTime_t(Params().GenesisBlock().GetBlockTime()); // Genesis block's time of current network
 }
 
-long ClientModel::getMempoolSize() const
+long ClientModel::getMempoolSize() 
 {
     return mempool.size();
 }
 
-size_t ClientModel::getMempoolDynamicUsage() const
+size_t ClientModel::getMempoolDynamicUsage() 
 {
     return mempool.DynamicMemoryUsage();
 }
 
-double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
+double ClientModel::getVerificationProgress( CBlockIndex *tipIn) 
 {
     CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
     if (!tip)
@@ -169,12 +169,12 @@ void ClientModel::updateAlert()
     Q_EMIT alertsChanged(getStatusBarWarnings());
 }
 
-bool ClientModel::inInitialBlockDownload() const
+bool ClientModel::inInitialBlockDownload() 
 {
     return IsInitialBlockDownload();
 }
 
-enum BlockSource ClientModel::getBlockSource() const
+enum BlockSource ClientModel::getBlockSource() 
 {
     if (fReindex)
         return BLOCK_SOURCE_REINDEX;
@@ -193,7 +193,7 @@ void ClientModel::setNetworkActive(bool active)
     }
 }
 
-bool ClientModel::getNetworkActive() const
+bool ClientModel::getNetworkActive() 
 {
     if (g_connman) {
         return g_connman->GetNetworkActive();
@@ -201,7 +201,7 @@ bool ClientModel::getNetworkActive() const
     return false;
 }
 
-QString ClientModel::getStatusBarWarnings() const
+QString ClientModel::getStatusBarWarnings() 
 {
     return QString::fromStdString(GetWarnings("gui"));
 }
@@ -221,27 +221,27 @@ BanTableModel *ClientModel::getBanTableModel()
     return banTableModel;
 }
 
-QString ClientModel::formatFullVersion() const
+QString ClientModel::formatFullVersion() 
 {
     return QString::fromStdString(FormatFullVersion());
 }
 
-QString ClientModel::formatSubVersion() const
+QString ClientModel::formatSubVersion() 
 {
     return QString::fromStdString(strSubVersion);
 }
 
-bool ClientModel::isReleaseVersion() const
+bool ClientModel::isReleaseVersion() 
 {
     return CLIENT_VERSION_IS_RELEASE;
 }
 
-QString ClientModel::formatClientStartupTime() const
+QString ClientModel::formatClientStartupTime() 
 {
     return QDateTime::fromTime_t(GetStartupTime()).toString();
 }
 
-QString ClientModel::dataDir() const
+QString ClientModel::dataDir() 
 {
     return GUIUtil::boostPathToQString(GetDataDir());
 }
@@ -252,7 +252,7 @@ void ClientModel::updateBanlist()
 }
 
 // Handlers for core signals
-static void ShowProgress(ClientModel *clientmodel, const std::string &title, int nProgress)
+static void ShowProgress(ClientModel *clientmodel,  std::string &title, int nProgress)
 {
     // emits signal "showProgress"
     QMetaObject::invokeMethod(clientmodel, "showProgress", Qt::QueuedConnection,
@@ -285,7 +285,7 @@ static void BannedListChanged(ClientModel *clientmodel)
     QMetaObject::invokeMethod(clientmodel, "updateBanlist", Qt::QueuedConnection);
 }
 
-static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CBlockIndex *pIndex, bool fHeader)
+static void BlockTipChanged(ClientModel *clientmodel, bool initialSync,  CBlockIndex *pIndex, bool fHeader)
 {
     // lock free async UI updates in case we have a new block tip
     // during initial sync, only update the UI if the last update

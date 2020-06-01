@@ -48,37 +48,37 @@ public:
     BanTableModel *getBanTableModel();
 
     //! Return number of connections, default is in- and outbound (total)
-    int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
-    int getNumBlocks() const;
-    int getHeaderTipHeight() const;
-    int64_t getHeaderTipTime() const;
+    int getNumConnections(unsigned int flags = CONNECTIONS_ALL) ;
+    int getNumBlocks() ;
+    int getHeaderTipHeight() ;
+    int64_t getHeaderTipTime() ;
     //! Return number of transactions in the mempool
-    long getMempoolSize() const;
+    long getMempoolSize() ;
     //! Return the dynamic memory usage of the mempool
-    size_t getMempoolDynamicUsage() const;
+    size_t getMempoolDynamicUsage() ;
     
-    quint64 getTotalBytesRecv() const;
-    quint64 getTotalBytesSent() const;
+    quint64 getTotalBytesRecv() ;
+    quint64 getTotalBytesSent() ;
 
-    double getVerificationProgress(const CBlockIndex *tip) const;
-    QDateTime getLastBlockDate() const;
+    double getVerificationProgress( CBlockIndex *tip) ;
+    QDateTime getLastBlockDate() ;
 
     //! Return true if core is doing initial block download
-    bool inInitialBlockDownload() const;
+    bool inInitialBlockDownload() ;
     //! Returns enum BlockSource of the current importing/syncing state
-    enum BlockSource getBlockSource() const;
+    enum BlockSource getBlockSource() ;
     //! Return true if network activity in core is enabled
-    bool getNetworkActive() const;
+    bool getNetworkActive() ;
     //! Toggle network activity state in core
     void setNetworkActive(bool active);
     //! Return warnings to be displayed in status bar
-    QString getStatusBarWarnings() const;
+    QString getStatusBarWarnings() ;
 
-    QString formatFullVersion() const;
-    QString formatSubVersion() const;
-    bool isReleaseVersion() const;
-    QString formatClientStartupTime() const;
-    QString dataDir() const;
+    QString formatFullVersion() ;
+    QString formatSubVersion() ;
+    bool isReleaseVersion() ;
+    QString formatClientStartupTime() ;
+    QString dataDir() ;
 
     // caches for the best header
     mutable std::atomic<int> cachedBestHeaderHeight;
@@ -96,17 +96,17 @@ private:
 
 Q_SIGNALS:
     void numConnectionsChanged(int count);
-    void numBlocksChanged(int count, const QDateTime& blockDate, double nVerificationProgress, bool header);
+    void numBlocksChanged(int count,  QDateTime& blockDate, double nVerificationProgress, bool header);
     void mempoolSizeChanged(long count, size_t mempoolSizeInBytes);
     void networkActiveChanged(bool networkActive);
-    void alertsChanged(const QString &warnings);
+    void alertsChanged( QString &warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
 
     //! Fired when a message should be reported to the user
-    void message(const QString &title, const QString &message, unsigned int style);
+    void message( QString &title,  QString &message, unsigned int style);
 
     // Show progress dialog e.g. for verifychain
-    void showProgress(const QString &title, int nProgress);
+    void showProgress( QString &title, int nProgress);
 
 public Q_SLOTS:
     void updateTimer();

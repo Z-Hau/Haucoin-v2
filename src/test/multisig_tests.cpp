@@ -25,7 +25,7 @@ sign_multisig(CScript scriptPubKey, std::vector<CKey> keys, CTransaction transac
 
     CScript result;
     result << OP_0; // CHECKMULTISIG bug workaround
-    for (const CKey &key : keys)
+    for ( CKey &key : keys)
     {
         std::vector<unsigned char> vchSig;
         BOOST_CHECK(key.Sign(hash, vchSig));

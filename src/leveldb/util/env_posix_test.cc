@@ -10,9 +10,9 @@
 
 namespace leveldb {
 
-static const int kDelayMicros = 100000;
-static const int kReadOnlyFileLimit = 4;
-static const int kMMapLimit = 4;
+static  int kDelayMicros = 100000;
+static  int kReadOnlyFileLimit = 4;
+static  int kMMapLimit = 4;
 
 class EnvPosixTest {
  public:
@@ -33,13 +33,13 @@ TEST(EnvPosixTest, TestOpenOnRead) {
 
   FILE* f = fopen(test_file.c_str(), "w");
   ASSERT_TRUE(f != NULL);
-  const char kFileData[] = "abcdefghijklmnopqrstuvwxyz";
+   char kFileData[] = "abcdefghijklmnopqrstuvwxyz";
   fputs(kFileData, f);
   fclose(f);
 
   // Open test file some number above the sum of the two limits to force
   // open-on-read behavior of POSIX Env leveldb::RandomAccessFile.
-  const int kNumFiles = kReadOnlyFileLimit + kMMapLimit + 5;
+   int kNumFiles = kReadOnlyFileLimit + kMMapLimit + 5;
   leveldb::RandomAccessFile* files[kNumFiles] = {0};
   for (int i = 0; i < kNumFiles; i++) {
     ASSERT_OK(env_->NewRandomAccessFile(test_file, &files[i]));

@@ -20,7 +20,7 @@ Slice RandomString(Random* rnd, int len, std::string* dst) {
 std::string RandomKey(Random* rnd, int len) {
   // Make sure to generate a wide variety of characters so we
   // test the boundary conditions for short-key optimizations.
-  static const char kTestChars[] = {
+  static  char kTestChars[] = {
     '\0', '\1', 'a', 'b', 'c', 'd', 'e', '\xfd', '\xfe', '\xff'
   };
   std::string result;

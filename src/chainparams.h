@@ -51,27 +51,27 @@ public:
         MAX_BASE58_TYPES
     };
 
-    const Consensus::Params& GetConsensus() const { return consensus; }
-    const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
-    int GetDefaultPort() const { return nDefaultPort; }
+     Consensus::Params& GetConsensus()  { return consensus; }
+     CMessageHeader::MessageStartChars& MessageStart()  { return pchMessageStart; }
+    int GetDefaultPort()  { return nDefaultPort; }
 
-    const CBlock& GenesisBlock() const { return genesis; }
+     CBlock& GenesisBlock()  { return genesis; }
     /** Default value for -checkmempool and -checkblockindex argument */
-    bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }
+    bool DefaultConsistencyChecks()  { return fDefaultConsistencyChecks; }
     /** Policy: Filter transactions that do not match well-defined patterns */
-    bool RequireStandard() const { return fRequireStandard; }
-    uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
+    bool RequireStandard()  { return fRequireStandard; }
+    uint64_t PruneAfterHeight()  { return nPruneAfterHeight; }
     /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
-    bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
+    bool MineBlocksOnDemand()  { return fMineBlocksOnDemand; }
     /** Return the BIP70 network string (main, test or regtest) */
-    std::string NetworkIDString() const { return strNetworkID; }
+    std::string NetworkIDString()  { return strNetworkID; }
     /** Return the list of hostnames to look up for DNS seeds */
-    const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
-    const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
-    const std::string& Bech32HRP() const { return bech32_hrp; }
-    const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
-    const CCheckpointData& Checkpoints() const { return checkpointData; }
-    const ChainTxData& TxData() const { return chainTxData; }
+     std::vector<std::string>& DNSSeeds()  { return vSeeds; }
+     std::vector<unsigned char>& Base58Prefix(Base58Type type)  { return base58Prefixes[type]; }
+     std::string& Bech32HRP()  { return bech32_hrp; }
+     std::vector<SeedSpec6>& FixedSeeds()  { return vFixedSeeds; }
+     CCheckpointData& Checkpoints()  { return checkpointData; }
+     ChainTxData& TxData()  { return chainTxData; }
     void UpdateVersionBitsParameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout);
 protected:
     CChainParams() {}
@@ -98,19 +98,19 @@ protected:
  * @returns a CChainParams* of the chosen chain.
  * @throws a std::runtime_error if the chain is not supported.
  */
-std::unique_ptr<CChainParams> CreateChainParams(const std::string& chain);
+std::unique_ptr<CChainParams> CreateChainParams( std::string& chain);
 
 /**
  * Return the currently selected parameters. This won't change after app
  * startup, except for unit tests.
  */
-const CChainParams &Params();
+ CChainParams &Params();
 
 /**
  * Sets the params returned by Params() to those for the given BIP70 chain name.
  * @throws std::runtime_error when the chain is not supported.
  */
-void SelectParams(const std::string& chain);
+void SelectParams( std::string& chain);
 
 /**
  * Allows modifying the Version Bits regtest parameters.

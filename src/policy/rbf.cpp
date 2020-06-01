@@ -4,9 +4,9 @@
 
 #include <policy/rbf.h>
 
-bool SignalsOptInRBF(const CTransaction &tx)
+bool SignalsOptInRBF( CTransaction &tx)
 {
-    for (const CTxIn &txin : tx.vin) {
+    for ( CTxIn &txin : tx.vin) {
         if (txin.nSequence < std::numeric_limits<unsigned int>::max()-1) {
             return true;
         }
@@ -14,7 +14,7 @@ bool SignalsOptInRBF(const CTransaction &tx)
     return false;
 }
 
-RBFTransactionState IsRBFOptIn(const CTransaction &tx, CTxMemPool &pool)
+RBFTransactionState IsRBFOptIn( CTransaction &tx, CTxMemPool &pool)
 {
     AssertLockHeld(pool.cs);
 

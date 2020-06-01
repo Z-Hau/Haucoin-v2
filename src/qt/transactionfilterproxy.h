@@ -19,11 +19,11 @@ public:
     explicit TransactionFilterProxy(QObject *parent = 0);
 
     /** Earliest date that can be represented (far in the past) */
-    static const QDateTime MIN_DATE;
+    static  QDateTime MIN_DATE;
     /** Last date that can be represented (far in the future) */
-    static const QDateTime MAX_DATE;
+    static  QDateTime MAX_DATE;
     /** Type filter bit field (all types) */
-    static const quint32 ALL_TYPES = 0xFFFFFFFF;
+    static  quint32 ALL_TYPES = 0xFFFFFFFF;
 
     static quint32 TYPE(int type) { return 1<<type; }
 
@@ -34,13 +34,13 @@ public:
         WatchOnlyFilter_No
     };
 
-    void setDateRange(const QDateTime &from, const QDateTime &to);
-    void setSearchString(const QString &);
+    void setDateRange( QDateTime &from,  QDateTime &to);
+    void setSearchString( QString &);
     /**
       @note Type filter takes a bit field created with TYPE() or ALL_TYPES
      */
     void setTypeFilter(quint32 modes);
-    void setMinAmount(const CAmount& minimum);
+    void setMinAmount( CAmount& minimum);
     void setWatchOnlyFilter(WatchOnlyFilter filter);
 
     /** Set maximum number of rows returned, -1 if unlimited. */
@@ -49,10 +49,10 @@ public:
     /** Set whether to show conflicted transactions. */
     void setShowInactive(bool showInactive);
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount( QModelIndex &parent = QModelIndex()) ;
 
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex & source_parent) const;
+    bool filterAcceptsRow(int source_row,  QModelIndex & source_parent) ;
 
 private:
     QDateTime dateFrom;

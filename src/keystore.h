@@ -24,26 +24,26 @@ public:
     virtual ~CKeyStore() {}
 
     //! Add a key to the store.
-    virtual bool AddKeyPubKey(const CKey &key, const CPubKey &pubkey) =0;
-    virtual bool AddKey(const CKey &key);
+    virtual bool AddKeyPubKey( CKey &key,  CPubKey &pubkey) =0;
+    virtual bool AddKey( CKey &key);
 
     //! Check whether a key corresponding to a given address is present in the store.
-    virtual bool HaveKey(const CKeyID &address) const =0;
-    virtual bool GetKey(const CKeyID &address, CKey& keyOut) const =0;
-    virtual std::set<CKeyID> GetKeys() const =0;
-    virtual bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const =0;
+    virtual bool HaveKey( CKeyID &address)  =0;
+    virtual bool GetKey( CKeyID &address, CKey& keyOut)  =0;
+    virtual std::set<CKeyID> GetKeys()  =0;
+    virtual bool GetPubKey( CKeyID &address, CPubKey& vchPubKeyOut)  =0;
 
     //! Support for BIP 0013 : see https://github.com/bitcoin/bips/blob/master/bip-0013.mediawiki
-    virtual bool AddCScript(const CScript& redeemScript) =0;
-    virtual bool HaveCScript(const CScriptID &hash) const =0;
-    virtual std::set<CScriptID> GetCScripts() const =0;
-    virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const =0;
+    virtual bool AddCScript( CScript& redeemScript) =0;
+    virtual bool HaveCScript( CScriptID &hash)  =0;
+    virtual std::set<CScriptID> GetCScripts()  =0;
+    virtual bool GetCScript( CScriptID &hash, CScript& redeemScriptOut)  =0;
 
     //! Support for Watch-only addresses
-    virtual bool AddWatchOnly(const CScript &dest) =0;
-    virtual bool RemoveWatchOnly(const CScript &dest) =0;
-    virtual bool HaveWatchOnly(const CScript &dest) const =0;
-    virtual bool HaveWatchOnly() const =0;
+    virtual bool AddWatchOnly( CScript &dest) =0;
+    virtual bool RemoveWatchOnly( CScript &dest) =0;
+    virtual bool HaveWatchOnly( CScript &dest)  =0;
+    virtual bool HaveWatchOnly()  =0;
 };
 
 typedef std::map<CKeyID, CKey> KeyMap;
@@ -60,29 +60,29 @@ protected:
     ScriptMap mapScripts;
     WatchOnlySet setWatchOnly;
 
-    void ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey);
+    void ImplicitlyLearnRelatedKeyScripts( CPubKey& pubkey);
 
 public:
-    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
-    bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
-    bool HaveKey(const CKeyID &address) const override;
-    std::set<CKeyID> GetKeys() const override;
-    bool GetKey(const CKeyID &address, CKey &keyOut) const override;
-    bool AddCScript(const CScript& redeemScript) override;
-    bool HaveCScript(const CScriptID &hash) const override;
-    std::set<CScriptID> GetCScripts() const override;
-    bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const override;
+    bool AddKeyPubKey( CKey& key,  CPubKey &pubkey) override;
+    bool GetPubKey( CKeyID &address, CPubKey& vchPubKeyOut)  override;
+    bool HaveKey( CKeyID &address)  override;
+    std::set<CKeyID> GetKeys()  override;
+    bool GetKey( CKeyID &address, CKey &keyOut)  override;
+    bool AddCScript( CScript& redeemScript) override;
+    bool HaveCScript( CScriptID &hash)  override;
+    std::set<CScriptID> GetCScripts()  override;
+    bool GetCScript( CScriptID &hash, CScript& redeemScriptOut)  override;
 
-    bool AddWatchOnly(const CScript &dest) override;
-    bool RemoveWatchOnly(const CScript &dest) override;
-    bool HaveWatchOnly(const CScript &dest) const override;
-    bool HaveWatchOnly() const override;
+    bool AddWatchOnly( CScript &dest) override;
+    bool RemoveWatchOnly( CScript &dest) override;
+    bool HaveWatchOnly( CScript &dest)  override;
+    bool HaveWatchOnly()  override;
 };
 
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;
 typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > CryptedKeyMap;
 
 /** Return the CKeyID of the key involved in a script (if there is a unique one). */
-CKeyID GetKeyForDestination(const CKeyStore& store, const CTxDestination& dest);
+CKeyID GetKeyForDestination( CKeyStore& store,  CTxDestination& dest);
 
 #endif // BITCOIN_KEYSTORE_H

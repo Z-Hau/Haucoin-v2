@@ -72,13 +72,13 @@ public:
     };
 
     /** Show message box. */
-    boost::signals2::signal<bool (const std::string& message, const std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeMessageBox;
+    boost::signals2::signal<bool ( std::string& message,  std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeMessageBox;
 
     /** If possible, ask the user a question. If not, falls back to ThreadSafeMessageBox(noninteractive_message, caption, style) and returns false. */
-    boost::signals2::signal<bool (const std::string& message, const std::string& noninteractive_message, const std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeQuestion;
+    boost::signals2::signal<bool ( std::string& message,  std::string& noninteractive_message,  std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeQuestion;
 
     /** Progress message during initialization. */
-    boost::signals2::signal<void (const std::string &message)> InitMessage;
+    boost::signals2::signal<void ( std::string &message)> InitMessage;
 
     /** Number of network connections changed. */
     boost::signals2::signal<void (int newNumConnections)> NotifyNumConnectionsChanged;
@@ -98,27 +98,27 @@ public:
      * Show progress e.g. for verifychain.
      * resume_possible indicates shutting down now will result in the current progress action resuming upon restart.
      */
-    boost::signals2::signal<void (const std::string &title, int nProgress, bool resume_possible)> ShowProgress;
+    boost::signals2::signal<void ( std::string &title, int nProgress, bool resume_possible)> ShowProgress;
 
     /** New block has been accepted */
-    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyBlockTip;
+    boost::signals2::signal<void (bool,  CBlockIndex *)> NotifyBlockTip;
 
     /** Best header has changed */
-    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyHeaderTip;
+    boost::signals2::signal<void (bool,  CBlockIndex *)> NotifyHeaderTip;
 
     /** Banlist did change. */
     boost::signals2::signal<void (void)> BannedListChanged;
 };
 
 /** Show warning message **/
-void InitWarning(const std::string& str);
+void InitWarning( std::string& str);
 
 /** Show error message **/
-bool InitError(const std::string& str);
+bool InitError( std::string& str);
 
-std::string AmountHighWarn(const std::string& optname);
+std::string AmountHighWarn( std::string& optname);
 
-std::string AmountErrMsg(const char* const optname, const std::string& strValue);
+std::string AmountErrMsg( char*  optname,  std::string& strValue);
 
 extern CClientUIInterface uiInterface;
 

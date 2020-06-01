@@ -24,16 +24,16 @@ public:
         return new T();
     }
 
-    std::string GetType() const { return type; }
-    void SetType(const std::string &t) { type = t; }
-    std::string GetAddress() const { return address; }
-    void SetAddress(const std::string &a) { address = a; }
+    std::string GetType()  { return type; }
+    void SetType( std::string &t) { type = t; }
+    std::string GetAddress()  { return address; }
+    void SetAddress( std::string &a) { address = a; }
 
     virtual bool Initialize(void *pcontext) = 0;
     virtual void Shutdown() = 0;
 
-    virtual bool NotifyBlock(const CBlockIndex *pindex);
-    virtual bool NotifyTransaction(const CTransaction &transaction);
+    virtual bool NotifyBlock( CBlockIndex *pindex);
+    virtual bool NotifyTransaction( CTransaction &transaction);
 
 protected:
     void *psocket;

@@ -9,7 +9,7 @@
 #include <pubkey.h>
 #include <script/standard.h>
 
-bool CScriptCompressor::IsToKeyID(CKeyID &hash) const
+bool CScriptCompressor::IsToKeyID(CKeyID &hash) 
 {
     if (script.size() == 25 && script[0] == OP_DUP && script[1] == OP_HASH160
                             && script[2] == 20 && script[23] == OP_EQUALVERIFY
@@ -20,7 +20,7 @@ bool CScriptCompressor::IsToKeyID(CKeyID &hash) const
     return false;
 }
 
-bool CScriptCompressor::IsToScriptID(CScriptID &hash) const
+bool CScriptCompressor::IsToScriptID(CScriptID &hash) 
 {
     if (script.size() == 23 && script[0] == OP_HASH160 && script[1] == 20
                             && script[22] == OP_EQUAL) {
@@ -30,7 +30,7 @@ bool CScriptCompressor::IsToScriptID(CScriptID &hash) const
     return false;
 }
 
-bool CScriptCompressor::IsToPubKey(CPubKey &pubkey) const
+bool CScriptCompressor::IsToPubKey(CPubKey &pubkey) 
 {
     if (script.size() == 35 && script[0] == 33 && script[34] == OP_CHECKSIG
                             && (script[1] == 0x02 || script[1] == 0x03)) {
@@ -45,7 +45,7 @@ bool CScriptCompressor::IsToPubKey(CPubKey &pubkey) const
     return false;
 }
 
-bool CScriptCompressor::Compress(std::vector<unsigned char> &out) const
+bool CScriptCompressor::Compress(std::vector<unsigned char> &out) 
 {
     CKeyID keyID;
     if (IsToKeyID(keyID)) {
@@ -76,7 +76,7 @@ bool CScriptCompressor::Compress(std::vector<unsigned char> &out) const
     return false;
 }
 
-unsigned int CScriptCompressor::GetSpecialSize(unsigned int nSize) const
+unsigned int CScriptCompressor::GetSpecialSize(unsigned int nSize) 
 {
     if (nSize == 0 || nSize == 1)
         return 20;
@@ -85,7 +85,7 @@ unsigned int CScriptCompressor::GetSpecialSize(unsigned int nSize) const
     return 0;
 }
 
-bool CScriptCompressor::Decompress(unsigned int nSize, const std::vector<unsigned char> &in)
+bool CScriptCompressor::Decompress(unsigned int nSize,  std::vector<unsigned char> &in)
 {
     switch(nSize) {
     case 0x00:

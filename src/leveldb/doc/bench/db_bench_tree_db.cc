@@ -23,7 +23,7 @@
 //   readseq100K   -- read N/1000 100K values in sequential order in async mode
 //   readrand100K  -- read N/1000 100K values in sequential order in async mode
 //   readrandom    -- read N times in random order
-static const char* FLAGS_benchmarks =
+static  char* FLAGS_benchmarks =
     "fillseq,"
     "fillseqsync,"
     "fillrandsync,"
@@ -69,7 +69,7 @@ static bool FLAGS_use_existing_db = false;
 static bool FLAGS_compression = true;
 
 // Use the db with the following name.
-static const char* FLAGS_db = NULL;
+static  char* FLAGS_db = NULL;
 
 inline
 static void DBSynchronize(kyotocabinet::TreeDB* db_)
@@ -149,7 +149,7 @@ class Benchmark {
   int next_report_;     // When to report next
 
   void PrintHeader() {
-    const int kKeySize = 16;
+     int kKeySize = 16;
     PrintEnvironment();
     fprintf(stdout, "Keys:       %d bytes each\n", kKeySize);
     fprintf(stdout, "Values:     %d bytes each (%d bytes after compression)\n",
@@ -193,7 +193,7 @@ class Benchmark {
       std::string cpu_type;
       std::string cache_size;
       while (fgets(line, sizeof(line), cpuinfo) != NULL) {
-        const char* sep = strchr(line, ':');
+         char* sep = strchr(line, ':');
         if (sep == NULL) {
           continue;
         }
@@ -249,7 +249,7 @@ class Benchmark {
     }
   }
 
-  void Stop(const Slice& name) {
+  void Stop( Slice& name) {
     double finish = Env::Default()->NowMicros() * 1e-6;
 
     // Pretend at least one op was done in case we are running a benchmark
@@ -320,9 +320,9 @@ class Benchmark {
     PrintHeader();
     Open(false);
 
-    const char* benchmarks = FLAGS_benchmarks;
+     char* benchmarks = FLAGS_benchmarks;
     while (benchmarks != NULL) {
-      const char* sep = strchr(benchmarks, ',');
+       char* sep = strchr(benchmarks, ',');
       Slice name;
       if (sep == NULL) {
         name = benchmarks;
@@ -444,7 +444,7 @@ class Benchmark {
     // Write to database
     for (int i = 0; i < num_entries; i++)
     {
-      const int k = (order == SEQUENTIAL) ? i : (rand_.Next() % num_entries);
+       int k = (order == SEQUENTIAL) ? i : (rand_.Next() % num_entries);
       char key[100];
       snprintf(key, sizeof(key), "%016d", k);
       bytes_ += value_size + strlen(key);
@@ -471,7 +471,7 @@ class Benchmark {
     std::string value;
     for (int i = 0; i < reads_; i++) {
       char key[100];
-      const int k = rand_.Next() % reads_;
+       int k = rand_.Next() % reads_;
       snprintf(key, sizeof(key), "%016d", k);
       db_->get(key, &value);
       FinishedSingleOp();

@@ -13,7 +13,7 @@ namespace
 //   matches the original.
 bool sanity_test_widen(char testchar)
 {
-    const std::ctype<char>& test(std::use_facet<std::ctype<char> >(std::locale()));
+     std::ctype<char>& test(std::use_facet<std::ctype<char> >(std::locale()));
     return test.narrow(test.widen(testchar), 'b') == testchar;
 }
 
@@ -48,7 +48,7 @@ bool sanity_test_range_fmt()
     std::string test;
     try {
         test.at(1);
-    } catch (const std::out_of_range&) {
+    } catch ( std::out_of_range&) {
         return true;
     } catch (...) {
     }

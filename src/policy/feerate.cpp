@@ -7,9 +7,9 @@
 
 #include <tinyformat.h>
 
-const std::string CURRENCY_UNIT = "BTC";
+ std::string CURRENCY_UNIT = "BTC";
 
-CFeeRate::CFeeRate(const CAmount& nFeePaid, size_t nBytes_)
+CFeeRate::CFeeRate( CAmount& nFeePaid, size_t nBytes_)
 {
     assert(nBytes_ <= uint64_t(std::numeric_limits<int64_t>::max()));
     int64_t nSize = int64_t(nBytes_);
@@ -20,7 +20,7 @@ CFeeRate::CFeeRate(const CAmount& nFeePaid, size_t nBytes_)
         nSatoshisPerK = 0;
 }
 
-CAmount CFeeRate::GetFee(size_t nBytes_) const
+CAmount CFeeRate::GetFee(size_t nBytes_) 
 {
     assert(nBytes_ <= uint64_t(std::numeric_limits<int64_t>::max()));
     int64_t nSize = int64_t(nBytes_);
@@ -37,7 +37,7 @@ CAmount CFeeRate::GetFee(size_t nBytes_) const
     return nFee;
 }
 
-std::string CFeeRate::ToString() const
+std::string CFeeRate::ToString() 
 {
     return strprintf("%d.%08d %s/kB", nSatoshisPerK / COIN, nSatoshisPerK % COIN, CURRENCY_UNIT);
 }
