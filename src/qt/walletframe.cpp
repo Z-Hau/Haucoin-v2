@@ -13,7 +13,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-WalletFrame::WalletFrame(const PlatformStyle *_platformStyle, BitcoinGUI *_gui) :
+WalletFrame::WalletFrame( PlatformStyle *_platformStyle, BitcoinGUI *_gui) :
     QFrame(_gui),
     gui(_gui),
     platformStyle(_platformStyle)
@@ -39,7 +39,7 @@ void WalletFrame::setClientModel(ClientModel *_clientModel)
     this->clientModel = _clientModel;
 }
 
-bool WalletFrame::addWallet(const QString& name, WalletModel *walletModel)
+bool WalletFrame::addWallet( QString& name, WalletModel *walletModel)
 {
     if (!gui || !clientModel || !walletModel || mapWalletViews.count(name) > 0)
         return false;
@@ -63,7 +63,7 @@ bool WalletFrame::addWallet(const QString& name, WalletModel *walletModel)
     return true;
 }
 
-bool WalletFrame::setCurrentWallet(const QString& name)
+bool WalletFrame::setCurrentWallet( QString& name)
 {
     if (mapWalletViews.count(name) == 0)
         return false;
@@ -75,7 +75,7 @@ bool WalletFrame::setCurrentWallet(const QString& name)
     return true;
 }
 
-bool WalletFrame::removeWallet(const QString &name)
+bool WalletFrame::removeWallet( QString &name)
 {
     if (mapWalletViews.count(name) == 0)
         return false;
@@ -93,7 +93,7 @@ void WalletFrame::removeAllWallets()
     mapWalletViews.clear();
 }
 
-bool WalletFrame::handlePaymentRequest(const SendCoinsRecipient &recipient)
+bool WalletFrame::handlePaymentRequest( SendCoinsRecipient &recipient)
 {
     WalletView *walletView = currentWalletView();
     if (!walletView)

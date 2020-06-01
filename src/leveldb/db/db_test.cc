@@ -88,7 +88,7 @@ class SpecialEnv : public EnvWrapper {
     manifest_write_error_.Release_Store(NULL);
   }
 
-  Status NewWritableFile(const std::string& f, WritableFile** r) {
+  Status NewWritableFile( std::string& f, WritableFile** r) {
     class DataFile : public WritableFile {
      private:
       SpecialEnv* env_;
@@ -100,7 +100,7 @@ class SpecialEnv : public EnvWrapper {
             base_(base) {
       }
       ~DataFile() { delete base_; }
-      Status Append(const Slice& data) {
+      Status Append( Slice& data) {
         if (env_->no_space_.Acquire_Load() != NULL) {
           // Drop writes on the floor
           return Status::OK();
@@ -127,7 +127,7 @@ class SpecialEnv : public EnvWrapper {
      public:
       ManifestFile(SpecialEnv* env, WritableFile* b) : env_(env), base_(b) { }
       ~ManifestFile() { delete base_; }
-      Status Append(const Slice& data) {
+      Status Append( Slice& data) {
         if (env_->manifest_write_error_.Acquire_Load() != NULL) {
           return Status::IOError("simulated writer error");
         } else {
@@ -161,7 +161,7 @@ class SpecialEnv : public EnvWrapper {
     return s;
   }
 
-  Status NewRandomAccessFile(const std::string& f, RandomAccessFile** r) {
+  Status NewRandomAccessFile( std::string& f, RandomAccessFile** r) {
     class CountingFile : public RandomAccessFile {
      private:
       RandomAccessFile* target_;
@@ -172,7 +172,7 @@ class SpecialEnv : public EnvWrapper {
       }
       virtual ~CountingFile() { delete target_; }
       virtual Status Read(uint64_t offset, size_t n, Slice* result,
-                          char* scratch) const {
+                          char* scratch)  {
         counter_->Increment();
         return target_->Read(offset, n, result, scratch);
       }
@@ -188,7 +188,7 @@ class SpecialEnv : public EnvWrapper {
 
 class DBTest {
  private:
-  const FilterPolicy* filter_policy_;
+   FilterPolicy* filter_policy_;
 
   // Sequence of option configurations to try
   enum OptionConfig {
@@ -290,15 +290,15 @@ class DBTest {
     return DB::Open(opts, dbname_, &db_);
   }
 
-  Status Put(const std::string& k, const std::string& v) {
+  Status Put( std::string& k,  std::string& v) {
     return db_->Put(WriteOptions(), k, v);
   }
 
-  Status Delete(const std::string& k) {
+  Status Delete( std::string& k) {
     return db_->Delete(WriteOptions(), k);
   }
 
-  std::string Get(const std::string& k, const Snapshot* snapshot = NULL) {
+  std::string Get( std::string& k,  Snapshot* snapshot = NULL) {
     ReadOptions options;
     options.snapshot = snapshot;
     std::string result;
@@ -338,7 +338,7 @@ class DBTest {
     return result;
   }
 
-  std::string AllEntriesFor(const Slice& user_key) {
+  std::string AllEntriesFor( Slice& user_key) {
     Iterator* iter = dbfull()->TEST_NewInternalIterator();
     InternalKey target(user_key, kMaxSequenceNumber, kTypeValue);
     iter->Seek(target.Encode());
@@ -419,20 +419,20 @@ class DBTest {
     return static_cast<int>(files.size());
   }
 
-  uint64_t Size(const Slice& start, const Slice& limit) {
+  uint64_t Size( Slice& start,  Slice& limit) {
     Range r(start, limit);
     uint64_t size;
     db_->GetApproximateSizes(&r, 1, &size);
     return size;
   }
 
-  void Compact(const Slice& start, const Slice& limit) {
+  void Compact( Slice& start,  Slice& limit) {
     db_->CompactRange(&start, &limit);
   }
 
   // Do n memtable compactions, each of which produces an sstable
   // covering the range [small,large].
-  void MakeTables(int n, const std::string& small, const std::string& large) {
+  void MakeTables(int n,  std::string& small,  std::string& large) {
     for (int i = 0; i < n; i++) {
       Put(small, "begin");
       Put(large, "end");
@@ -442,11 +442,11 @@ class DBTest {
 
   // Prevent pushing of new sstables into deeper levels by adding
   // tables that cover a specified range to all levels.
-  void FillLevels(const std::string& smallest, const std::string& largest) {
+  void FillLevels( std::string& smallest,  std::string& largest) {
     MakeTables(config::kNumLevels, smallest, largest);
   }
 
-  void DumpFileCounts(const char* label) {
+  void DumpFileCounts( char* label) {
     fprintf(stderr, "---\n%s:\n", label);
     fprintf(stderr, "maxoverlap: %lld\n",
             static_cast<long long>(
@@ -498,8 +498,8 @@ class DBTest {
     int files_renamed = 0;
     for (size_t i = 0; i < filenames.size(); i++) {
       if (ParseFileName(filenames[i], &number, &type) && type == kTableFile) {
-        const std::string from = TableFileName(dbname_, number);
-        const std::string to = SSTTableFileName(dbname_, number);
+         std::string from = TableFileName(dbname_, number);
+         std::string to = SSTTableFileName(dbname_, number);
         ASSERT_OK(env_->RenameFile(from, to));
         files_renamed++;
       }
@@ -580,7 +580,7 @@ TEST(DBTest, GetSnapshot) {
     for (int i = 0; i < 2; i++) {
       std::string key = (i == 0) ? std::string("foo") : std::string(200, 'x');
       ASSERT_OK(Put(key, "v1"));
-      const Snapshot* s1 = db_->GetSnapshot();
+       Snapshot* s1 = db_->GetSnapshot();
       ASSERT_OK(Put(key, "v2"));
       ASSERT_EQ("v2", Get(key));
       ASSERT_EQ("v1", Get(key, s1));
@@ -932,7 +932,7 @@ TEST(DBTest, MinorCompactionsHappen) {
   options.write_buffer_size = 10000;
   Reopen(&options);
 
-  const int N = 500;
+   int N = 500;
 
   int starting_num_tables = TotalTableFiles();
   for (int i = 0; i < N; i++) {
@@ -1010,7 +1010,7 @@ TEST(DBTest, RepeatedWritesToSameKey) {
 
   // We must have at most one file per level except for level-0,
   // which may have up to kL0_StopWritesTrigger files.
-  const int kMaxFiles = config::kNumLevels + config::kL0_StopWritesTrigger;
+   int kMaxFiles = config::kNumLevels + config::kL0_StopWritesTrigger;
 
   Random rnd(301);
   std::string value = RandomString(&rnd, 2 * options.write_buffer_size);
@@ -1034,7 +1034,7 @@ TEST(DBTest, SparseMerge) {
   //    small amount of data with prefix C
   // and that recent updates have made small changes to all three prefixes.
   // Check that we do not do a compaction that merges all of B in one shot.
-  const std::string value(1000, 'x');
+   std::string value(1000, 'x');
   Put("A", "va");
   // Write approximately 100MB of "B" values
   for (int i = 0; i < 100000; i++) {
@@ -1085,9 +1085,9 @@ TEST(DBTest, ApproximateSizes) {
 
     // Write 8MB (80 values, each 100K)
     ASSERT_EQ(NumTableFilesAtLevel(0), 0);
-    const int N = 80;
-    static const int S1 = 100000;
-    static const int S2 = 105000;  // Allow some expansion from metadata
+     int N = 80;
+    static  int S1 = 100000;
+    static  int S2 = 105000;  // Allow some expansion from metadata
     Random rnd(301);
     for (int i = 0; i < N; i++) {
       ASSERT_OK(Put(Key(i), RandomString(&rnd, S1)));
@@ -1198,11 +1198,11 @@ TEST(DBTest, IteratorPinsRef) {
 TEST(DBTest, Snapshot) {
   do {
     Put("foo", "v1");
-    const Snapshot* s1 = db_->GetSnapshot();
+     Snapshot* s1 = db_->GetSnapshot();
     Put("foo", "v2");
-    const Snapshot* s2 = db_->GetSnapshot();
+     Snapshot* s2 = db_->GetSnapshot();
     Put("foo", "v3");
-    const Snapshot* s3 = db_->GetSnapshot();
+     Snapshot* s3 = db_->GetSnapshot();
 
     Put("foo", "v4");
     ASSERT_EQ("v1", Get("foo", s1));
@@ -1232,7 +1232,7 @@ TEST(DBTest, HiddenValuesAreRemoved) {
     std::string big = RandomString(&rnd, 50000);
     Put("foo", big);
     Put("pastfoo", "v");
-    const Snapshot* snapshot = db_->GetSnapshot();
+     Snapshot* snapshot = db_->GetSnapshot();
     Put("foo", "tiny");
     Put("pastfoo2", "v2");        // Advance sequence number one more
 
@@ -1258,7 +1258,7 @@ TEST(DBTest, HiddenValuesAreRemoved) {
 TEST(DBTest, DeletionMarkers1) {
   Put("foo", "v1");
   ASSERT_OK(dbfull()->TEST_CompactMemTable());
-  const int last = config::kMaxMemCompactLevel;
+   int last = config::kMaxMemCompactLevel;
   ASSERT_EQ(NumTableFilesAtLevel(last), 1);   // foo => v1 is now in last level
 
   // Place a table at level last-1 to prevent merging with preceding mutation
@@ -1287,7 +1287,7 @@ TEST(DBTest, DeletionMarkers1) {
 TEST(DBTest, DeletionMarkers2) {
   Put("foo", "v1");
   ASSERT_OK(dbfull()->TEST_CompactMemTable());
-  const int last = config::kMaxMemCompactLevel;
+   int last = config::kMaxMemCompactLevel;
   ASSERT_EQ(NumTableFilesAtLevel(last), 1);   // foo => v1 is now in last level
 
   // Place a table at level last-1 to prevent merging with preceding mutation
@@ -1397,14 +1397,14 @@ TEST(DBTest, L0_CompactionBug_Issue44_b) {
 TEST(DBTest, ComparatorCheck) {
   class NewComparator : public Comparator {
    public:
-    virtual const char* Name() const { return "leveldb.NewComparator"; }
-    virtual int Compare(const Slice& a, const Slice& b) const {
+    virtual  char* Name()  { return "leveldb.NewComparator"; }
+    virtual int Compare( Slice& a,  Slice& b)  {
       return BytewiseComparator()->Compare(a, b);
     }
-    virtual void FindShortestSeparator(std::string* s, const Slice& l) const {
+    virtual void FindShortestSeparator(std::string* s,  Slice& l)  {
       BytewiseComparator()->FindShortestSeparator(s, l);
     }
-    virtual void FindShortSuccessor(std::string* key) const {
+    virtual void FindShortSuccessor(std::string* key)  {
       BytewiseComparator()->FindShortSuccessor(key);
     }
   };
@@ -1420,19 +1420,19 @@ TEST(DBTest, ComparatorCheck) {
 TEST(DBTest, CustomComparator) {
   class NumberComparator : public Comparator {
    public:
-    virtual const char* Name() const { return "test.NumberComparator"; }
-    virtual int Compare(const Slice& a, const Slice& b) const {
+    virtual  char* Name()  { return "test.NumberComparator"; }
+    virtual int Compare( Slice& a,  Slice& b)  {
       return ToNumber(a) - ToNumber(b);
     }
-    virtual void FindShortestSeparator(std::string* s, const Slice& l) const {
+    virtual void FindShortestSeparator(std::string* s,  Slice& l)  {
       ToNumber(*s);     // Check format
       ToNumber(l);      // Check format
     }
-    virtual void FindShortSuccessor(std::string* key) const {
+    virtual void FindShortSuccessor(std::string* key)  {
       ToNumber(*key);   // Check format
     }
    private:
-    static int ToNumber(const Slice& x) {
+    static int ToNumber( Slice& x) {
       // Check that there are no extra characters.
       ASSERT_TRUE(x.size() >= 2 && x[0] == '[' && x[x.size()-1] == ']')
           << EscapeString(x);
@@ -1560,7 +1560,7 @@ TEST(DBTest, NoSpace) {
   ASSERT_OK(Put("foo", "v1"));
   ASSERT_EQ("v1", Get("foo"));
   Compact("a", "z");
-  const int num_files = CountFiles();
+   int num_files = CountFiles();
   env_->no_space_.Release_Store(env_);   // Force out-of-space errors
   for (int i = 0; i < 10; i++) {
     for (int level = 0; level < config::kNumLevels-1; level++) {
@@ -1648,7 +1648,7 @@ TEST(DBTest, ManifestWriteError) {
     // Memtable compaction (will succeed)
     dbfull()->TEST_CompactMemTable();
     ASSERT_EQ("bar", Get("foo"));
-    const int last = config::kMaxMemCompactLevel;
+     int last = config::kMaxMemCompactLevel;
     ASSERT_EQ(NumTableFilesAtLevel(last), 1);   // foo=>bar is now in last level
 
     // Merging compaction (will fail)
@@ -1700,7 +1700,7 @@ TEST(DBTest, StillReadSST) {
 TEST(DBTest, FilesDeletedAfterCompaction) {
   ASSERT_OK(Put("foo", "v2"));
   Compact("a", "z");
-  const int num_files = CountFiles();
+   int num_files = CountFiles();
   for (int i = 0; i < 10; i++) {
     ASSERT_OK(Put("foo", "v2"));
     Compact("a", "z");
@@ -1717,7 +1717,7 @@ TEST(DBTest, BloomFilter) {
   Reopen(&options);
 
   // Populate multiple layers
-  const int N = 10000;
+   int N = 10000;
   for (int i = 0; i < N; i++) {
     ASSERT_OK(Put(Key(i), Key(i)));
   }
@@ -1758,9 +1758,9 @@ TEST(DBTest, BloomFilter) {
 // Multi-threaded test:
 namespace {
 
-static const int kNumThreads = 4;
-static const int kTestSeconds = 10;
-static const int kNumKeys = 1000;
+static  int kNumThreads = 4;
+static  int kTestSeconds = 10;
+static  int kNumKeys = 1000;
 
 struct MTState {
   DBTest* test;
@@ -1864,47 +1864,47 @@ class ModelDB: public DB {
     KVMap map_;
   };
 
-  explicit ModelDB(const Options& options): options_(options) { }
+  explicit ModelDB( Options& options): options_(options) { }
   ~ModelDB() { }
-  virtual Status Put(const WriteOptions& o, const Slice& k, const Slice& v) {
+  virtual Status Put( WriteOptions& o,  Slice& k,  Slice& v) {
     return DB::Put(o, k, v);
   }
-  virtual Status Delete(const WriteOptions& o, const Slice& key) {
+  virtual Status Delete( WriteOptions& o,  Slice& key) {
     return DB::Delete(o, key);
   }
-  virtual Status Get(const ReadOptions& options,
-                     const Slice& key, std::string* value) {
+  virtual Status Get( ReadOptions& options,
+                      Slice& key, std::string* value) {
     assert(false);      // Not implemented
     return Status::NotFound(key);
   }
-  virtual Iterator* NewIterator(const ReadOptions& options) {
+  virtual Iterator* NewIterator( ReadOptions& options) {
     if (options.snapshot == NULL) {
       KVMap* saved = new KVMap;
       *saved = map_;
       return new ModelIter(saved, true);
     } else {
-      const KVMap* snapshot_state =
-          &(reinterpret_cast<const ModelSnapshot*>(options.snapshot)->map_);
+       KVMap* snapshot_state =
+          &(reinterpret_cast< ModelSnapshot*>(options.snapshot)->map_);
       return new ModelIter(snapshot_state, false);
     }
   }
-  virtual const Snapshot* GetSnapshot() {
+  virtual  Snapshot* GetSnapshot() {
     ModelSnapshot* snapshot = new ModelSnapshot;
     snapshot->map_ = map_;
     return snapshot;
   }
 
-  virtual void ReleaseSnapshot(const Snapshot* snapshot) {
-    delete reinterpret_cast<const ModelSnapshot*>(snapshot);
+  virtual void ReleaseSnapshot( Snapshot* snapshot) {
+    delete reinterpret_cast< ModelSnapshot*>(snapshot);
   }
-  virtual Status Write(const WriteOptions& options, WriteBatch* batch) {
+  virtual Status Write( WriteOptions& options, WriteBatch* batch) {
     class Handler : public WriteBatch::Handler {
      public:
       KVMap* map_;
-      virtual void Put(const Slice& key, const Slice& value) {
+      virtual void Put( Slice& key,  Slice& value) {
         (*map_)[key.ToString()] = value.ToString();
       }
-      virtual void Delete(const Slice& key) {
+      virtual void Delete( Slice& key) {
         map_->erase(key.ToString());
       }
     };
@@ -1913,27 +1913,27 @@ class ModelDB: public DB {
     return batch->Iterate(&handler);
   }
 
-  virtual bool GetProperty(const Slice& property, std::string* value) {
+  virtual bool GetProperty( Slice& property, std::string* value) {
     return false;
   }
-  virtual void GetApproximateSizes(const Range* r, int n, uint64_t* sizes) {
+  virtual void GetApproximateSizes( Range* r, int n, uint64_t* sizes) {
     for (int i = 0; i < n; i++) {
       sizes[i] = 0;
     }
   }
-  virtual void CompactRange(const Slice* start, const Slice* end) {
+  virtual void CompactRange( Slice* start,  Slice* end) {
   }
 
  private:
   class ModelIter: public Iterator {
    public:
-    ModelIter(const KVMap* map, bool owned)
+    ModelIter( KVMap* map, bool owned)
         : map_(map), owned_(owned), iter_(map_->end()) {
     }
     ~ModelIter() {
       if (owned_) delete map_;
     }
-    virtual bool Valid() const { return iter_ != map_->end(); }
+    virtual bool Valid()  { return iter_ != map_->end(); }
     virtual void SeekToFirst() { iter_ = map_->begin(); }
     virtual void SeekToLast() {
       if (map_->empty()) {
@@ -1942,20 +1942,20 @@ class ModelDB: public DB {
         iter_ = map_->find(map_->rbegin()->first);
       }
     }
-    virtual void Seek(const Slice& k) {
+    virtual void Seek( Slice& k) {
       iter_ = map_->lower_bound(k.ToString());
     }
     virtual void Next() { ++iter_; }
     virtual void Prev() { --iter_; }
-    virtual Slice key() const { return iter_->first; }
-    virtual Slice value() const { return iter_->second; }
-    virtual Status status() const { return Status::OK(); }
+    virtual Slice key()  { return iter_->first; }
+    virtual Slice value()  { return iter_->second; }
+    virtual Status status()  { return Status::OK(); }
    private:
-    const KVMap* const map_;
-    const bool owned_;  // Do we own map_
+     KVMap*  map_;
+     bool owned_;  // Do we own map_
     KVMap::const_iterator iter_;
   };
-  const Options options_;
+   Options options_;
   KVMap map_;
 };
 
@@ -1969,8 +1969,8 @@ static std::string RandomKey(Random* rnd) {
 static bool CompareIterators(int step,
                              DB* model,
                              DB* db,
-                             const Snapshot* model_snap,
-                             const Snapshot* db_snap) {
+                              Snapshot* model_snap,
+                              Snapshot* db_snap) {
   ReadOptions options;
   options.snapshot = model_snap;
   Iterator* miter = model->NewIterator(options);
@@ -2018,9 +2018,9 @@ TEST(DBTest, Randomized) {
   Random rnd(test::RandomSeed());
   do {
     ModelDB model(CurrentOptions());
-    const int N = 10000;
-    const Snapshot* model_snap = NULL;
-    const Snapshot* db_snap = NULL;
+     int N = 10000;
+     Snapshot* model_snap = NULL;
+     Snapshot* db_snap = NULL;
     std::string k, v;
     for (int step = 0; step < N; step++) {
       if (step % 100 == 0) {
@@ -2045,7 +2045,7 @@ TEST(DBTest, Randomized) {
 
       } else {                                    // Multi-element batch
         WriteBatch b;
-        const int num = rnd.Uniform(8);
+         int num = rnd.Uniform(8);
         for (int i = 0; i < num; i++) {
           if (i == 0 || !rnd.OneIn(10)) {
             k = RandomKey(&rnd);

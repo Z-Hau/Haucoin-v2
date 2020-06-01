@@ -9,7 +9,7 @@
 
 namespace leveldb {
 
-const double Histogram::kBucketLimit[kNumBuckets] = {
+ double Histogram::kBucketLimit[kNumBuckets] = {
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45,
   50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450,
   500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000,
@@ -55,7 +55,7 @@ void Histogram::Add(double value) {
   sum_squares_ += (value * value);
 }
 
-void Histogram::Merge(const Histogram& other) {
+void Histogram::Merge( Histogram& other) {
   if (other.min_ < min_) min_ = other.min_;
   if (other.max_ > max_) max_ = other.max_;
   num_ += other.num_;
@@ -66,11 +66,11 @@ void Histogram::Merge(const Histogram& other) {
   }
 }
 
-double Histogram::Median() const {
+double Histogram::Median()  {
   return Percentile(50.0);
 }
 
-double Histogram::Percentile(double p) const {
+double Histogram::Percentile(double p)  {
   double threshold = num_ * (p / 100.0);
   double sum = 0;
   for (int b = 0; b < kNumBuckets; b++) {
@@ -91,18 +91,18 @@ double Histogram::Percentile(double p) const {
   return max_;
 }
 
-double Histogram::Average() const {
+double Histogram::Average()  {
   if (num_ == 0.0) return 0;
   return sum_ / num_;
 }
 
-double Histogram::StandardDeviation() const {
+double Histogram::StandardDeviation()  {
   if (num_ == 0.0) return 0;
   double variance = (sum_squares_ * num_ - sum_ * sum_) / (num_ * num_);
   return sqrt(variance);
 }
 
-std::string Histogram::ToString() const {
+std::string Histogram::ToString()  {
   std::string r;
   char buf[200];
   snprintf(buf, sizeof(buf),
@@ -114,7 +114,7 @@ std::string Histogram::ToString() const {
            (num_ == 0.0 ? 0.0 : min_), Median(), max_);
   r.append(buf);
   r.append("------------------------------------------------------\n");
-  const double mult = 100.0 / num_;
+   double mult = 100.0 / num_;
   double sum = 0;
   for (int b = 0; b < kNumBuckets; b++) {
     if (buckets_[b] <= 0.0) continue;

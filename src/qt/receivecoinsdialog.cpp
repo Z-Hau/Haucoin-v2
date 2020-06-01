@@ -22,7 +22,7 @@
 #include <QScrollBar>
 #include <QTextDocument>
 
-ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
+ReceiveCoinsDialog::ReceiveCoinsDialog( PlatformStyle *_platformStyle, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ReceiveCoinsDialog),
     columnResizingFixer(0),
@@ -164,9 +164,9 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
     model->getRecentRequestsTableModel()->addNewRequest(info);
 }
 
-void ReceiveCoinsDialog::on_recentRequestsView_doubleClicked(const QModelIndex &index)
+void ReceiveCoinsDialog::on_recentRequestsView_doubleClicked( QModelIndex &index)
 {
-    const RecentRequestsTableModel *submodel = model->getRecentRequestsTableModel();
+     RecentRequestsTableModel *submodel = model->getRecentRequestsTableModel();
     ReceiveRequestDialog *dialog = new ReceiveRequestDialog(this);
     dialog->setModel(model->getOptionsModel());
     dialog->setInfo(submodel->entry(index.row()).recipient);
@@ -174,7 +174,7 @@ void ReceiveCoinsDialog::on_recentRequestsView_doubleClicked(const QModelIndex &
     dialog->show();
 }
 
-void ReceiveCoinsDialog::recentRequestsView_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void ReceiveCoinsDialog::recentRequestsView_selectionChanged( QItemSelection &selected,  QItemSelection &deselected)
 {
     // Enable Show/Remove buttons only if anything is selected.
     bool enable = !ui->recentRequestsView->selectionModel()->selectedRows().isEmpty();
@@ -188,7 +188,7 @@ void ReceiveCoinsDialog::on_showRequestButton_clicked()
         return;
     QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
 
-    for (const QModelIndex& index : selection) {
+    for ( QModelIndex& index : selection) {
         on_recentRequestsView_doubleClicked(index);
     }
 }
@@ -252,7 +252,7 @@ void ReceiveCoinsDialog::copyColumnToClipboard(int column)
 }
 
 // context menu
-void ReceiveCoinsDialog::showMenu(const QPoint &point)
+void ReceiveCoinsDialog::showMenu( QPoint &point)
 {
     if (!selectedRow().isValid()) {
         return;
@@ -268,8 +268,8 @@ void ReceiveCoinsDialog::copyURI()
         return;
     }
 
-    const RecentRequestsTableModel * const submodel = model->getRecentRequestsTableModel();
-    const QString uri = GUIUtil::formatBitcoinURI(submodel->entry(sel.row()).recipient);
+     RecentRequestsTableModel *  submodel = model->getRecentRequestsTableModel();
+     QString uri = GUIUtil::formatBitcoinURI(submodel->entry(sel.row()).recipient);
     GUIUtil::setClipboard(uri);
 }
 

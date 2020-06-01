@@ -54,13 +54,13 @@ class AtomicPointer {
  public:
   AtomicPointer() { }
   explicit AtomicPointer(void* v) : rep_(v) { }
-  inline void* Acquire_Load() const {
+  inline void* Acquire_Load()  {
     return rep_.load(std::memory_order_acquire);
   }
   inline void Release_Store(void* v) {
     rep_.store(v, std::memory_order_release);
   }
-  inline void* NoBarrier_Load() const {
+  inline void* NoBarrier_Load()  {
     return rep_.load(std::memory_order_relaxed);
   }
   inline void NoBarrier_Store(void* v) {
@@ -153,9 +153,9 @@ class AtomicPointer {
  public:
   AtomicPointer() { }
   explicit AtomicPointer(void* p) : rep_(p) {}
-  inline void* NoBarrier_Load() const { return rep_; }
+  inline void* NoBarrier_Load()  { return rep_; }
   inline void NoBarrier_Store(void* v) { rep_ = v; }
-  inline void* Acquire_Load() const {
+  inline void* Acquire_Load()  {
     void* result = rep_;
     MemoryBarrier();
     return result;
@@ -174,7 +174,7 @@ class AtomicPointer {
  public:
   AtomicPointer() { }
   explicit AtomicPointer(void* v) : rep_(v) { }
-  inline void* Acquire_Load() const {
+  inline void* Acquire_Load()  {
     void* val;
     __asm__ __volatile__ (
         "ldx [%[rep_]], %[val] \n\t"
@@ -192,7 +192,7 @@ class AtomicPointer {
         : [rep_] "r" (&rep_), [v] "r" (v)
         : "memory");
   }
-  inline void* NoBarrier_Load() const { return rep_; }
+  inline void* NoBarrier_Load()  { return rep_; }
   inline void NoBarrier_Store(void* v) { rep_ = v; }
 };
 
@@ -204,7 +204,7 @@ class AtomicPointer {
  public:
   AtomicPointer() { }
   explicit AtomicPointer(void* v) : rep_(v) { }
-  inline void* Acquire_Load() const {
+  inline void* Acquire_Load()  {
     void* val    ;
     __asm__ __volatile__ (
         "ld8.acq %[val] = [%[rep_]] \n\t"
@@ -222,7 +222,7 @@ class AtomicPointer {
         : "memory"
         );
   }
-  inline void* NoBarrier_Load() const { return rep_; }
+  inline void* NoBarrier_Load()  { return rep_; }
   inline void NoBarrier_Store(void* v) { rep_ = v; }
 };
 

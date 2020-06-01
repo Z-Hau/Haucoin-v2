@@ -12,10 +12,10 @@ namespace leveldb {
 // See doc/table_format.md for an explanation of the filter block format.
 
 // Generate new filter every 2KB of data
-static const size_t kFilterBaseLg = 11;
-static const size_t kFilterBase = 1 << kFilterBaseLg;
+static  size_t kFilterBaseLg = 11;
+static  size_t kFilterBase = 1 << kFilterBaseLg;
 
-FilterBlockBuilder::FilterBlockBuilder(const FilterPolicy* policy)
+FilterBlockBuilder::FilterBlockBuilder( FilterPolicy* policy)
     : policy_(policy) {
 }
 
@@ -27,7 +27,7 @@ void FilterBlockBuilder::StartBlock(uint64_t block_offset) {
   }
 }
 
-void FilterBlockBuilder::AddKey(const Slice& key) {
+void FilterBlockBuilder::AddKey( Slice& key) {
   Slice k = key;
   start_.push_back(keys_.size());
   keys_.append(k.data(), k.size());
@@ -39,7 +39,7 @@ Slice FilterBlockBuilder::Finish() {
   }
 
   // Append array of per-filter offsets
-  const uint32_t array_offset = result_.size();
+   uint32_t array_offset = result_.size();
   for (size_t i = 0; i < filter_offsets_.size(); i++) {
     PutFixed32(&result_, filter_offsets_[i]);
   }
@@ -50,7 +50,7 @@ Slice FilterBlockBuilder::Finish() {
 }
 
 void FilterBlockBuilder::GenerateFilter() {
-  const size_t num_keys = start_.size();
+   size_t num_keys = start_.size();
   if (num_keys == 0) {
     // Fast path if there are no keys for this filter
     filter_offsets_.push_back(result_.size());
@@ -61,7 +61,7 @@ void FilterBlockBuilder::GenerateFilter() {
   start_.push_back(keys_.size());  // Simplify length computation
   tmp_keys_.resize(num_keys);
   for (size_t i = 0; i < num_keys; i++) {
-    const char* base = keys_.data() + start_[i];
+     char* base = keys_.data() + start_[i];
     size_t length = start_[i+1] - start_[i];
     tmp_keys_[i] = Slice(base, length);
   }
@@ -75,8 +75,8 @@ void FilterBlockBuilder::GenerateFilter() {
   start_.clear();
 }
 
-FilterBlockReader::FilterBlockReader(const FilterPolicy* policy,
-                                     const Slice& contents)
+FilterBlockReader::FilterBlockReader( FilterPolicy* policy,
+                                      Slice& contents)
     : policy_(policy),
       data_(NULL),
       offset_(NULL),
@@ -92,7 +92,7 @@ FilterBlockReader::FilterBlockReader(const FilterPolicy* policy,
   num_ = (n - 5 - last_word) / 4;
 }
 
-bool FilterBlockReader::KeyMayMatch(uint64_t block_offset, const Slice& key) {
+bool FilterBlockReader::KeyMayMatch(uint64_t block_offset,  Slice& key) {
   uint64_t index = block_offset >> base_lg_;
   if (index < num_) {
     uint32_t start = DecodeFixed32(offset_ + index*4);

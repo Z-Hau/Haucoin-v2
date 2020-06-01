@@ -9,14 +9,14 @@
 #include <serialize.h>
 #include <streams.h>
 
-int CAddrInfo::GetTriedBucket(const uint256& nKey) const
+int CAddrInfo::GetTriedBucket( uint256& nKey) 
 {
     uint64_t hash1 = (CHashWriter(SER_GETHASH, 0) << nKey << GetKey()).GetHash().GetCheapHash();
     uint64_t hash2 = (CHashWriter(SER_GETHASH, 0) << nKey << GetGroup() << (hash1 % ADDRMAN_TRIED_BUCKETS_PER_GROUP)).GetHash().GetCheapHash();
     return hash2 % ADDRMAN_TRIED_BUCKET_COUNT;
 }
 
-int CAddrInfo::GetNewBucket(const uint256& nKey, const CNetAddr& src) const
+int CAddrInfo::GetNewBucket( uint256& nKey,  CNetAddr& src) 
 {
     std::vector<unsigned char> vchSourceGroupKey = src.GetGroup();
     uint64_t hash1 = (CHashWriter(SER_GETHASH, 0) << nKey << GetGroup() << vchSourceGroupKey).GetHash().GetCheapHash();
@@ -24,13 +24,13 @@ int CAddrInfo::GetNewBucket(const uint256& nKey, const CNetAddr& src) const
     return hash2 % ADDRMAN_NEW_BUCKET_COUNT;
 }
 
-int CAddrInfo::GetBucketPosition(const uint256 &nKey, bool fNew, int nBucket) const
+int CAddrInfo::GetBucketPosition( uint256 &nKey, bool fNew, int nBucket) 
 {
     uint64_t hash1 = (CHashWriter(SER_GETHASH, 0) << nKey << (fNew ? 'N' : 'K') << nBucket << GetKey()).GetHash().GetCheapHash();
     return hash1 % ADDRMAN_BUCKET_SIZE;
 }
 
-bool CAddrInfo::IsTerrible(int64_t nNow) const
+bool CAddrInfo::IsTerrible(int64_t nNow) 
 {
     if (nLastTry && nLastTry >= nNow - 60) // never remove things tried in the last minute
         return false;
@@ -50,7 +50,7 @@ bool CAddrInfo::IsTerrible(int64_t nNow) const
     return false;
 }
 
-double CAddrInfo::GetChance(int64_t nNow) const
+double CAddrInfo::GetChance(int64_t nNow) 
 {
     double fChance = 1.0;
     int64_t nSinceLastTry = std::max<int64_t>(nNow - nLastTry, 0);
@@ -65,7 +65,7 @@ double CAddrInfo::GetChance(int64_t nNow) const
     return fChance;
 }
 
-CAddrInfo* CAddrMan::Find(const CNetAddr& addr, int* pnId)
+CAddrInfo* CAddrMan::Find( CNetAddr& addr, int* pnId)
 {
     std::map<CNetAddr, int>::iterator it = mapAddr.find(addr);
     if (it == mapAddr.end())
@@ -78,7 +78,7 @@ CAddrInfo* CAddrMan::Find(const CNetAddr& addr, int* pnId)
     return nullptr;
 }
 
-CAddrInfo* CAddrMan::Create(const CAddress& addr, const CNetAddr& addrSource, int* pnId)
+CAddrInfo* CAddrMan::Create( CAddress& addr,  CNetAddr& addrSource, int* pnId)
 {
     int nId = nIdCount++;
     mapInfo[nId] = CAddrInfo(addr, addrSource);
@@ -187,7 +187,7 @@ void CAddrMan::MakeTried(CAddrInfo& info, int nId)
     info.fInTried = true;
 }
 
-void CAddrMan::Good_(const CService& addr, int64_t nTime)
+void CAddrMan::Good_( CService& addr, int64_t nTime)
 {
     int nId;
 
@@ -239,7 +239,7 @@ void CAddrMan::Good_(const CService& addr, int64_t nTime)
     MakeTried(info, nId);
 }
 
-bool CAddrMan::Add_(const CAddress& addr, const CNetAddr& source, int64_t nTimePenalty)
+bool CAddrMan::Add_( CAddress& addr,  CNetAddr& source, int64_t nTimePenalty)
 {
     if (!addr.IsRoutable())
         return false;
@@ -312,7 +312,7 @@ bool CAddrMan::Add_(const CAddress& addr, const CNetAddr& source, int64_t nTimeP
     return fNew;
 }
 
-void CAddrMan::Attempt_(const CService& addr, bool fCountFailure, int64_t nTime)
+void CAddrMan::Attempt_( CService& addr, bool fCountFailure, int64_t nTime)
 {
     CAddrInfo* pinfo = Find(addr);
 
@@ -390,9 +390,9 @@ int CAddrMan::Check_()
     if (vRandom.size() != (size_t)(nTried + nNew))
         return -7;
 
-    for (const auto& entry : mapInfo) {
+    for ( auto& entry : mapInfo) {
         int n = entry.first;
-        const CAddrInfo& info = entry.second;
+         CAddrInfo& info = entry.second;
         if (info.fInTried) {
             if (!info.nLastSuccess)
                 return -1;
@@ -474,13 +474,13 @@ void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr)
         SwapRandom(n, nRndPos);
         assert(mapInfo.count(vRandom[n]) == 1);
 
-        const CAddrInfo& ai = mapInfo[vRandom[n]];
+         CAddrInfo& ai = mapInfo[vRandom[n]];
         if (!ai.IsTerrible())
             vAddr.push_back(ai);
     }
 }
 
-void CAddrMan::Connected_(const CService& addr, int64_t nTime)
+void CAddrMan::Connected_( CService& addr, int64_t nTime)
 {
     CAddrInfo* pinfo = Find(addr);
 
@@ -500,7 +500,7 @@ void CAddrMan::Connected_(const CService& addr, int64_t nTime)
         info.nTime = nTime;
 }
 
-void CAddrMan::SetServices_(const CService& addr, ServiceFlags nServices)
+void CAddrMan::SetServices_( CService& addr, ServiceFlags nServices)
 {
     CAddrInfo* pinfo = Find(addr);
 

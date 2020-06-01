@@ -16,7 +16,7 @@ class SnapshotList;
 // Each SnapshotImpl corresponds to a particular sequence number.
 class SnapshotImpl : public Snapshot {
  public:
-  SequenceNumber number_;  // const after creation
+  SequenceNumber number_;  //  after creation
 
  private:
   friend class SnapshotList;
@@ -35,11 +35,11 @@ class SnapshotList {
     list_.next_ = &list_;
   }
 
-  bool empty() const { return list_.next_ == &list_; }
-  SnapshotImpl* oldest() const { assert(!empty()); return list_.next_; }
-  SnapshotImpl* newest() const { assert(!empty()); return list_.prev_; }
+  bool empty()  { return list_.next_ == &list_; }
+  SnapshotImpl* oldest()  { assert(!empty()); return list_.next_; }
+  SnapshotImpl* newest()  { assert(!empty()); return list_.prev_; }
 
-  const SnapshotImpl* New(SequenceNumber seq) {
+   SnapshotImpl* New(SequenceNumber seq) {
     SnapshotImpl* s = new SnapshotImpl;
     s->number_ = seq;
     s->list_ = this;
@@ -50,7 +50,7 @@ class SnapshotList {
     return s;
   }
 
-  void Delete(const SnapshotImpl* s) {
+  void Delete( SnapshotImpl* s) {
     assert(s->list_ == this);
     s->prev_->next_ = s->next_;
     s->next_->prev_ = s->prev_;

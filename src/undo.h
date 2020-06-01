@@ -20,11 +20,11 @@
  */
 class TxInUndoSerializer
 {
-    const Coin* txout;
+     Coin* txout;
 
 public:
     template<typename Stream>
-    void Serialize(Stream &s) const {
+    void Serialize(Stream &s)  {
         ::Serialize(s, VARINT(txout->nHeight * 2 + (txout->fCoinBase ? 1 : 0)));
         if (txout->nHeight > 0) {
             // Required to maintain compatibility with older undo format.
@@ -33,7 +33,7 @@ public:
         ::Serialize(s, CTxOutCompressor(REF(txout->out)));
     }
 
-    explicit TxInUndoSerializer(const Coin* coin) : txout(coin) {}
+    explicit TxInUndoSerializer( Coin* coin) : txout(coin) {}
 };
 
 class TxInUndoDeserializer
@@ -60,8 +60,8 @@ public:
     explicit TxInUndoDeserializer(Coin* coin) : txout(coin) {}
 };
 
-static const size_t MIN_TRANSACTION_INPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxIn(), SER_NETWORK, PROTOCOL_VERSION);
-static const size_t MAX_INPUTS_PER_BLOCK = MAX_BLOCK_WEIGHT / MIN_TRANSACTION_INPUT_WEIGHT;
+static  size_t MIN_TRANSACTION_INPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxIn(), SER_NETWORK, PROTOCOL_VERSION);
+static  size_t MAX_INPUTS_PER_BLOCK = MAX_BLOCK_WEIGHT / MIN_TRANSACTION_INPUT_WEIGHT;
 
 /** Undo information for a CTransaction */
 class CTxUndo
@@ -71,11 +71,11 @@ public:
     std::vector<Coin> vprevout;
 
     template <typename Stream>
-    void Serialize(Stream& s) const {
+    void Serialize(Stream& s)  {
         // TODO: avoid reimplementing vector serializer
         uint64_t count = vprevout.size();
         ::Serialize(s, COMPACTSIZE(REF(count)));
-        for (const auto& prevout : vprevout) {
+        for ( auto& prevout : vprevout) {
             ::Serialize(s, REF(TxInUndoSerializer(&prevout)));
         }
     }

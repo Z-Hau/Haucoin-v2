@@ -37,7 +37,7 @@
 #include <univalue.h>
 
 
-void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
+void TxToJSON( CTransaction& tx,  uint256 hashBlock, UniValue& entry)
 {
     // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
     //
@@ -62,7 +62,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
     }
 }
 
-UniValue getrawtransaction(const JSONRPCRequest& request)
+UniValue getrawtransaction( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
         throw std::runtime_error(
@@ -195,7 +195,7 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue gettxoutproof(const JSONRPCRequest& request)
+UniValue gettxoutproof( JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 1 && request.params.size() != 2))
         throw std::runtime_error(
@@ -220,7 +220,7 @@ UniValue gettxoutproof(const JSONRPCRequest& request)
     uint256 oneTxid;
     UniValue txids = request.params[0].get_array();
     for (unsigned int idx = 0; idx < txids.size(); idx++) {
-        const UniValue& txid = txids[idx];
+         UniValue& txid = txids[idx];
         if (txid.get_str().length() != 64 || !IsHex(txid.get_str()))
             throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid txid ")+txid.get_str());
         uint256 hash(uint256S(txid.get_str()));
@@ -243,8 +243,8 @@ UniValue gettxoutproof(const JSONRPCRequest& request)
         pblockindex = mapBlockIndex[hashBlock];
     } else {
         // Loop through txids and try to find which block they're in. Exit loop once a block is found.
-        for (const auto& tx : setTxids) {
-            const Coin& coin = AccessByTxid(*pcoinsTip, tx);
+        for ( auto& tx : setTxids) {
+             Coin& coin = AccessByTxid(*pcoinsTip, tx);
             if (!coin.IsSpent()) {
                 pblockindex = chainActive[coin.nHeight];
                 break;
@@ -267,7 +267,7 @@ UniValue gettxoutproof(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't read block from disk");
 
     unsigned int ntxFound = 0;
-    for (const auto& tx : block.vtx)
+    for ( auto& tx : block.vtx)
         if (setTxids.count(tx->GetHash()))
             ntxFound++;
     if (ntxFound != setTxids.size())
@@ -280,7 +280,7 @@ UniValue gettxoutproof(const JSONRPCRequest& request)
     return strHex;
 }
 
-UniValue verifytxoutproof(const JSONRPCRequest& request)
+UniValue verifytxoutproof( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
@@ -311,7 +311,7 @@ UniValue verifytxoutproof(const JSONRPCRequest& request)
 
     // Check if proof is valid, only add results if so
     if (mapBlockIndex[merkleBlock.header.GetHash()]->nTx == merkleBlock.txn.GetNumTransactions()) {
-        for (const uint256& hash : vMatch) {
+        for ( uint256& hash : vMatch) {
             res.push_back(hash.GetHex());
         }
     }
@@ -319,7 +319,7 @@ UniValue verifytxoutproof(const JSONRPCRequest& request)
     return res;
 }
 
-UniValue createrawtransaction(const JSONRPCRequest& request)
+UniValue createrawtransaction( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
@@ -378,12 +378,12 @@ UniValue createrawtransaction(const JSONRPCRequest& request)
     bool rbfOptIn = request.params[3].isTrue();
 
     for (unsigned int idx = 0; idx < inputs.size(); idx++) {
-        const UniValue& input = inputs[idx];
-        const UniValue& o = input.get_obj();
+         UniValue& input = inputs[idx];
+         UniValue& o = input.get_obj();
 
         uint256 txid = ParseHashO(o, "txid");
 
-        const UniValue& vout_v = find_value(o, "vout");
+         UniValue& vout_v = find_value(o, "vout");
         if (!vout_v.isNum())
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing vout key");
         int nOutput = vout_v.get_int();
@@ -400,7 +400,7 @@ UniValue createrawtransaction(const JSONRPCRequest& request)
         }
 
         // set the sequence number if passed in the parameters object
-        const UniValue& sequenceObj = find_value(o, "sequence");
+         UniValue& sequenceObj = find_value(o, "sequence");
         if (sequenceObj.isNum()) {
             int64_t seqNr64 = sequenceObj.get_int64();
             if (seqNr64 < 0 || seqNr64 > std::numeric_limits<uint32_t>::max()) {
@@ -417,7 +417,7 @@ UniValue createrawtransaction(const JSONRPCRequest& request)
 
     std::set<CTxDestination> destinations;
     std::vector<std::string> addrList = sendTo.getKeys();
-    for (const std::string& name_ : addrList) {
+    for ( std::string& name_ : addrList) {
 
         if (name_ == "data") {
             std::vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
@@ -449,7 +449,7 @@ UniValue createrawtransaction(const JSONRPCRequest& request)
     return EncodeHexTx(rawTx);
 }
 
-UniValue decoderawtransaction(const JSONRPCRequest& request)
+UniValue decoderawtransaction( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
@@ -524,7 +524,7 @@ UniValue decoderawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue decodescript(const JSONRPCRequest& request)
+UniValue decodescript( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
@@ -574,7 +574,7 @@ UniValue decodescript(const JSONRPCRequest& request)
 }
 
 /** Pushes a JSON object for script verification or signing errors to vErrorsRet. */
-static void TxInErrorToJSON(const CTxIn& txin, UniValue& vErrorsRet, const std::string& strMessage)
+static void TxInErrorToJSON( CTxIn& txin, UniValue& vErrorsRet,  std::string& strMessage)
 {
     UniValue entry(UniValue::VOBJ);
     entry.push_back(Pair("txid", txin.prevout.hash.ToString()));
@@ -590,7 +590,7 @@ static void TxInErrorToJSON(const CTxIn& txin, UniValue& vErrorsRet, const std::
     vErrorsRet.push_back(entry);
 }
 
-UniValue combinerawtransaction(const JSONRPCRequest& request)
+UniValue combinerawtransaction( JSONRPCRequest& request)
 {
 
     if (request.fHelp || request.params.size() != 1)
@@ -642,7 +642,7 @@ UniValue combinerawtransaction(const JSONRPCRequest& request)
         CCoinsViewMemPool viewMempool(&viewChain, mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
-        for (const CTxIn& txin : mergedTx.vin) {
+        for ( CTxIn& txin : mergedTx.vin) {
             view.AccessCoin(txin.prevout); // Load entries from viewChain into view; can fail.
         }
 
@@ -651,21 +651,21 @@ UniValue combinerawtransaction(const JSONRPCRequest& request)
 
     // Use CTransaction for the constant parts of the
     // transaction to avoid rehashing.
-    const CTransaction txConst(mergedTx);
+     CTransaction txConst(mergedTx);
     // Sign what we can:
     for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
         CTxIn& txin = mergedTx.vin[i];
-        const Coin& coin = view.AccessCoin(txin.prevout);
+         Coin& coin = view.AccessCoin(txin.prevout);
         if (coin.IsSpent()) {
             throw JSONRPCError(RPC_VERIFY_ERROR, "Input not found or already spent");
         }
-        const CScript& prevPubKey = coin.out.scriptPubKey;
-        const CAmount& amount = coin.out.nValue;
+         CScript& prevPubKey = coin.out.scriptPubKey;
+         CAmount& amount = coin.out.nValue;
 
         SignatureData sigdata;
 
         // ... and merge in other signatures:
-        for (const CMutableTransaction& txv : txVariants) {
+        for ( CMutableTransaction& txv : txVariants) {
             if (txv.vin.size() > i) {
                 sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&txConst, i, amount), sigdata, DataFromTransaction(txv, i));
             }
@@ -677,10 +677,10 @@ UniValue combinerawtransaction(const JSONRPCRequest& request)
     return EncodeHexTx(mergedTx);
 }
 
-UniValue signrawtransaction(const JSONRPCRequest& request)
+UniValue signrawtransaction( JSONRPCRequest& request)
 {
 #ifdef ENABLE_WALLET
-    CWallet * const pwallet = GetWalletForJSONRPCRequest(request);
+    CWallet *  pwallet = GetWalletForJSONRPCRequest(request);
 #endif
 
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 4)
@@ -763,7 +763,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
         CCoinsViewMemPool viewMempool(&viewChain, mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
-        for (const CTxIn& txin : mtx.vin) {
+        for ( CTxIn& txin : mtx.vin) {
             view.AccessCoin(txin.prevout); // Load entries from viewChain into view; can fail.
         }
 
@@ -797,7 +797,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     if (!request.params[1].isNull()) {
         UniValue prevTxs = request.params[1].get_array();
         for (unsigned int idx = 0; idx < prevTxs.size(); idx++) {
-            const UniValue& p = prevTxs[idx];
+             UniValue& p = prevTxs[idx];
             if (!p.isObject())
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "expected object with {\"txid'\",\"vout\",\"scriptPubKey\"}");
 
@@ -821,7 +821,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
             CScript scriptPubKey(pkData.begin(), pkData.end());
 
             {
-                const Coin& coin = view.AccessCoin(out);
+                 Coin& coin = view.AccessCoin(out);
                 if (!coin.IsSpent() && coin.out.scriptPubKey != scriptPubKey) {
                     std::string err("Previous output scriptPubKey mismatch:\n");
                     err = err + ScriptToAsmStr(coin.out.scriptPubKey) + "\nvs:\n"+
@@ -861,9 +861,9 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     }
 
 #ifdef ENABLE_WALLET
-    const CKeyStore& keystore = ((fGivenKeys || !pwallet) ? tempKeystore : *pwallet);
+     CKeyStore& keystore = ((fGivenKeys || !pwallet) ? tempKeystore : *pwallet);
 #else
-    const CKeyStore& keystore = tempKeystore;
+     CKeyStore& keystore = tempKeystore;
 #endif
 
     int nHashType = SIGHASH_ALL;
@@ -890,17 +890,17 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
 
     // Use CTransaction for the constant parts of the
     // transaction to avoid rehashing.
-    const CTransaction txConst(mtx);
+     CTransaction txConst(mtx);
     // Sign what we can:
     for (unsigned int i = 0; i < mtx.vin.size(); i++) {
         CTxIn& txin = mtx.vin[i];
-        const Coin& coin = view.AccessCoin(txin.prevout);
+         Coin& coin = view.AccessCoin(txin.prevout);
         if (coin.IsSpent()) {
             TxInErrorToJSON(txin, vErrors, "Input not found or already spent");
             continue;
         }
-        const CScript& prevPubKey = coin.out.scriptPubKey;
-        const CAmount& amount = coin.out.nValue;
+         CScript& prevPubKey = coin.out.scriptPubKey;
+         CAmount& amount = coin.out.nValue;
 
         SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
@@ -937,7 +937,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue sendrawtransaction(const JSONRPCRequest& request)
+UniValue sendrawtransaction( JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
@@ -971,7 +971,7 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
     if (!DecodeHexTx(mtx, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     CTransactionRef tx(MakeTransactionRef(std::move(mtx)));
-    const uint256& hashTx = tx->GetHash();
+     uint256& hashTx = tx->GetHash();
 
     CAmount nMaxRawTxFee = maxTxFee;
     if (!request.params[1].isNull() && request.params[1].get_bool())
@@ -982,7 +982,7 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
     CCoinsViewCache &view = *pcoinsTip;
     bool fHaveChain = false;
     for (size_t o = 0; !fHaveChain && o < tx->vout.size(); o++) {
-        const Coin& existingCoin = view.AccessCoin(COutPoint(hashTx, o));
+         Coin& existingCoin = view.AccessCoin(COutPoint(hashTx, o));
         fHaveChain = !existingCoin.IsSpent();
     }
     bool fHaveMempool = mempool.exists(hashTx);
@@ -1034,7 +1034,7 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
     return hashTx.GetHex();
 }
 
-static const CRPCCommand commands[] =
+static  CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
     { "rawtransactions",    "getrawtransaction",      &getrawtransaction,      {"txid","verbose","blockhash"} },

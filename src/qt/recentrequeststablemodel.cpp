@@ -21,7 +21,7 @@ RecentRequestsTableModel::RecentRequestsTableModel(CWallet *wallet, WalletModel 
     // Load entries from wallet
     std::vector<std::string> vReceiveRequests;
     parent->loadReceiveRequests(vReceiveRequests);
-    for (const std::string& request : vReceiveRequests)
+    for ( std::string& request : vReceiveRequests)
         addNewRequest(request);
 
     /* These columns must match the indices in the ColumnIndex enumeration */
@@ -35,28 +35,28 @@ RecentRequestsTableModel::~RecentRequestsTableModel()
     /* Intentionally left empty */
 }
 
-int RecentRequestsTableModel::rowCount(const QModelIndex &parent) const
+int RecentRequestsTableModel::rowCount( QModelIndex &parent) 
 {
     Q_UNUSED(parent);
 
     return list.length();
 }
 
-int RecentRequestsTableModel::columnCount(const QModelIndex &parent) const
+int RecentRequestsTableModel::columnCount( QModelIndex &parent) 
 {
     Q_UNUSED(parent);
 
     return columns.length();
 }
 
-QVariant RecentRequestsTableModel::data(const QModelIndex &index, int role) const
+QVariant RecentRequestsTableModel::data( QModelIndex &index, int role) 
 {
     if(!index.isValid() || index.row() >= list.length())
         return QVariant();
 
     if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
-        const RecentRequestEntry *rec = &list[index.row()];
+         RecentRequestEntry *rec = &list[index.row()];
         switch(index.column())
         {
         case Date:
@@ -96,12 +96,12 @@ QVariant RecentRequestsTableModel::data(const QModelIndex &index, int role) cons
     return QVariant();
 }
 
-bool RecentRequestsTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool RecentRequestsTableModel::setData( QModelIndex &index,  QVariant &value, int role)
 {
     return true;
 }
 
-QVariant RecentRequestsTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant RecentRequestsTableModel::headerData(int section, Qt::Orientation orientation, int role) 
 {
     if(orientation == Qt::Horizontal)
     {
@@ -126,20 +126,20 @@ QString RecentRequestsTableModel::getAmountTitle()
     return (this->walletModel->getOptionsModel() != nullptr) ? tr("Requested") + " ("+BitcoinUnits::shortName(this->walletModel->getOptionsModel()->getDisplayUnit()) + ")" : "";
 }
 
-QModelIndex RecentRequestsTableModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex RecentRequestsTableModel::index(int row, int column,  QModelIndex &parent) 
 {
     Q_UNUSED(parent);
 
     return createIndex(row, column);
 }
 
-bool RecentRequestsTableModel::removeRows(int row, int count, const QModelIndex &parent)
+bool RecentRequestsTableModel::removeRows(int row, int count,  QModelIndex &parent)
 {
     Q_UNUSED(parent);
 
     if(count > 0 && row >= 0 && (row+count) <= list.size())
     {
-        const RecentRequestEntry *rec;
+         RecentRequestEntry *rec;
         for (int i = 0; i < count; ++i)
         {
             rec = &list[row+i];
@@ -156,13 +156,13 @@ bool RecentRequestsTableModel::removeRows(int row, int count, const QModelIndex 
     }
 }
 
-Qt::ItemFlags RecentRequestsTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags RecentRequestsTableModel::flags( QModelIndex &index) 
 {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 // called when adding a request from the GUI
-void RecentRequestsTableModel::addNewRequest(const SendCoinsRecipient &recipient)
+void RecentRequestsTableModel::addNewRequest( SendCoinsRecipient &recipient)
 {
     RecentRequestEntry newEntry;
     newEntry.id = ++nReceiveRequestsMaxId;
@@ -179,7 +179,7 @@ void RecentRequestsTableModel::addNewRequest(const SendCoinsRecipient &recipient
 }
 
 // called from ctor when loading from wallet
-void RecentRequestsTableModel::addNewRequest(const std::string &recipient)
+void RecentRequestsTableModel::addNewRequest( std::string &recipient)
 {
     std::vector<char> data(recipient.begin(), recipient.end());
     CDataStream ss(data, SER_DISK, CLIENT_VERSION);
@@ -215,7 +215,7 @@ void RecentRequestsTableModel::updateDisplayUnit()
     updateAmountColumnTitle();
 }
 
-bool RecentRequestEntryLessThan::operator()(RecentRequestEntry &left, RecentRequestEntry &right) const
+bool RecentRequestEntryLessThan::operator()(RecentRequestEntry &left, RecentRequestEntry &right) 
 {
     RecentRequestEntry *pLeft = &left;
     RecentRequestEntry *pRight = &right;

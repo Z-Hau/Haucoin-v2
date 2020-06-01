@@ -11,12 +11,12 @@ CZMQAbstractNotifier::~CZMQAbstractNotifier()
     assert(!psocket);
 }
 
-bool CZMQAbstractNotifier::NotifyBlock(const CBlockIndex * /*CBlockIndex*/)
+bool CZMQAbstractNotifier::NotifyBlock( CBlockIndex * /*CBlockIndex*/)
 {
     return true;
 }
 
-bool CZMQAbstractNotifier::NotifyTransaction(const CTransaction &/*transaction*/)
+bool CZMQAbstractNotifier::NotifyTransaction( CTransaction &/*transaction*/)
 {
     return true;
 }

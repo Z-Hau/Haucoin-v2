@@ -15,12 +15,12 @@ static uint64_t PackSequenceAndType(uint64_t seq, ValueType t) {
   return (seq << 8) | t;
 }
 
-void AppendInternalKey(std::string* result, const ParsedInternalKey& key) {
+void AppendInternalKey(std::string* result,  ParsedInternalKey& key) {
   result->append(key.user_key.data(), key.user_key.size());
   PutFixed64(result, PackSequenceAndType(key.sequence, key.type));
 }
 
-std::string ParsedInternalKey::DebugString() const {
+std::string ParsedInternalKey::DebugString()  {
   char buf[50];
   snprintf(buf, sizeof(buf), "' @ %llu : %d",
            (unsigned long long) sequence,
@@ -31,7 +31,7 @@ std::string ParsedInternalKey::DebugString() const {
   return result;
 }
 
-std::string InternalKey::DebugString() const {
+std::string InternalKey::DebugString()  {
   std::string result;
   ParsedInternalKey parsed;
   if (ParseInternalKey(rep_, &parsed)) {
@@ -43,19 +43,19 @@ std::string InternalKey::DebugString() const {
   return result;
 }
 
-const char* InternalKeyComparator::Name() const {
+ char* InternalKeyComparator::Name()  {
   return "leveldb.InternalKeyComparator";
 }
 
-int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
+int InternalKeyComparator::Compare( Slice& akey,  Slice& bkey)  {
   // Order by:
   //    increasing user key (according to user-supplied comparator)
   //    decreasing sequence number
   //    decreasing type (though sequence# should be enough to disambiguate)
   int r = user_comparator_->Compare(ExtractUserKey(akey), ExtractUserKey(bkey));
   if (r == 0) {
-    const uint64_t anum = DecodeFixed64(akey.data() + akey.size() - 8);
-    const uint64_t bnum = DecodeFixed64(bkey.data() + bkey.size() - 8);
+     uint64_t anum = DecodeFixed64(akey.data() + akey.size() - 8);
+     uint64_t bnum = DecodeFixed64(bkey.data() + bkey.size() - 8);
     if (anum > bnum) {
       r = -1;
     } else if (anum < bnum) {
@@ -67,7 +67,7 @@ int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
 
 void InternalKeyComparator::FindShortestSeparator(
       std::string* start,
-      const Slice& limit) const {
+       Slice& limit)  {
   // Attempt to shorten the user portion of the key
   Slice user_start = ExtractUserKey(*start);
   Slice user_limit = ExtractUserKey(limit);
@@ -84,7 +84,7 @@ void InternalKeyComparator::FindShortestSeparator(
   }
 }
 
-void InternalKeyComparator::FindShortSuccessor(std::string* key) const {
+void InternalKeyComparator::FindShortSuccessor(std::string* key)  {
   Slice user_key = ExtractUserKey(*key);
   std::string tmp(user_key.data(), user_key.size());
   user_comparator_->FindShortSuccessor(&tmp);
@@ -98,12 +98,12 @@ void InternalKeyComparator::FindShortSuccessor(std::string* key) const {
   }
 }
 
-const char* InternalFilterPolicy::Name() const {
+ char* InternalFilterPolicy::Name()  {
   return user_policy_->Name();
 }
 
-void InternalFilterPolicy::CreateFilter(const Slice* keys, int n,
-                                        std::string* dst) const {
+void InternalFilterPolicy::CreateFilter( Slice* keys, int n,
+                                        std::string* dst)  {
   // We rely on the fact that the code in table.cc does not mind us
   // adjusting keys[].
   Slice* mkey = const_cast<Slice*>(keys);
@@ -114,11 +114,11 @@ void InternalFilterPolicy::CreateFilter(const Slice* keys, int n,
   user_policy_->CreateFilter(keys, n, dst);
 }
 
-bool InternalFilterPolicy::KeyMayMatch(const Slice& key, const Slice& f) const {
+bool InternalFilterPolicy::KeyMayMatch( Slice& key,  Slice& f)  {
   return user_policy_->KeyMayMatch(ExtractUserKey(key), f);
 }
 
-LookupKey::LookupKey(const Slice& user_key, SequenceNumber s) {
+LookupKey::LookupKey( Slice& user_key, SequenceNumber s) {
   size_t usize = user_key.size();
   size_t needed = usize + 13;  // A conservative estimate
   char* dst;

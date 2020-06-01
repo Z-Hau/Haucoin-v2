@@ -117,14 +117,14 @@ enum
     SCRIPT_VERIFY_CONST_SCRIPTCODE = (1U << 16),
 };
 
-bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
+bool CheckSignatureEncoding( std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
 
 struct PrecomputedTransactionData
 {
     uint256 hashPrevouts, hashSequence, hashOutputs;
     bool ready = false;
 
-    explicit PrecomputedTransactionData(const CTransaction& tx);
+    explicit PrecomputedTransactionData( CTransaction& tx);
 };
 
 enum SigVersion
@@ -133,22 +133,22 @@ enum SigVersion
     SIGVERSION_WITNESS_V0 = 1,
 };
 
-uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, const CAmount& amount, SigVersion sigversion, const PrecomputedTransactionData* cache = nullptr);
+uint256 SignatureHash( CScript &scriptCode,  CTransaction& txTo, unsigned int nIn, int nHashType,  CAmount& amount, SigVersion sigversion,  PrecomputedTransactionData* cache = nullptr);
 
 class BaseSignatureChecker
 {
 public:
-    virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
+    virtual bool CheckSig( std::vector<unsigned char>& scriptSig,  std::vector<unsigned char>& vchPubKey,  CScript& scriptCode, SigVersion sigversion) 
     {
         return false;
     }
 
-    virtual bool CheckLockTime(const CScriptNum& nLockTime) const
+    virtual bool CheckLockTime( CScriptNum& nLockTime) 
     {
          return false;
     }
 
-    virtual bool CheckSequence(const CScriptNum& nSequence) const
+    virtual bool CheckSequence( CScriptNum& nSequence) 
     {
          return false;
     }
@@ -159,34 +159,34 @@ public:
 class TransactionSignatureChecker : public BaseSignatureChecker
 {
 private:
-    const CTransaction* txTo;
+     CTransaction* txTo;
     unsigned int nIn;
-    const CAmount amount;
-    const PrecomputedTransactionData* txdata;
+     CAmount amount;
+     PrecomputedTransactionData* txdata;
 
 protected:
-    virtual bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;
+    virtual bool VerifySignature( std::vector<unsigned char>& vchSig,  CPubKey& vchPubKey,  uint256& sighash) ;
 
 public:
-    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(nullptr) {}
-    TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, const PrecomputedTransactionData& txdataIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(&txdataIn) {}
-    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override;
-    bool CheckLockTime(const CScriptNum& nLockTime) const override;
-    bool CheckSequence(const CScriptNum& nSequence) const override;
+    TransactionSignatureChecker( CTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(nullptr) {}
+    TransactionSignatureChecker( CTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn,  PrecomputedTransactionData& txdataIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(&txdataIn) {}
+    bool CheckSig( std::vector<unsigned char>& scriptSig,  std::vector<unsigned char>& vchPubKey,  CScript& scriptCode, SigVersion sigversion)  override;
+    bool CheckLockTime( CScriptNum& nLockTime)  override;
+    bool CheckSequence( CScriptNum& nSequence)  override;
 };
 
 class MutableTransactionSignatureChecker : public TransactionSignatureChecker
 {
 private:
-    const CTransaction txTo;
+     CTransaction txTo;
 
 public:
-    MutableTransactionSignatureChecker(const CMutableTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : TransactionSignatureChecker(&txTo, nInIn, amountIn), txTo(*txToIn) {}
+    MutableTransactionSignatureChecker( CMutableTransaction* txToIn, unsigned int nInIn,  CAmount& amountIn) : TransactionSignatureChecker(&txTo, nInIn, amountIn), txTo(*txToIn) {}
 };
 
-bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& script, unsigned int flags, const BaseSignatureChecker& checker, SigVersion sigversion, ScriptError* error = nullptr);
-bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const CScriptWitness* witness, unsigned int flags, const BaseSignatureChecker& checker, ScriptError* serror = nullptr);
+bool EvalScript(std::vector<std::vector<unsigned char> >& stack,  CScript& script, unsigned int flags,  BaseSignatureChecker& checker, SigVersion sigversion, ScriptError* error = nullptr);
+bool VerifyScript( CScript& scriptSig,  CScript& scriptPubKey,  CScriptWitness* witness, unsigned int flags,  BaseSignatureChecker& checker, ScriptError* serror = nullptr);
 
-size_t CountWitnessSigOps(const CScript& scriptSig, const CScript& scriptPubKey, const CScriptWitness* witness, unsigned int flags);
+size_t CountWitnessSigOps( CScript& scriptSig,  CScript& scriptPubKey,  CScriptWitness* witness, unsigned int flags);
 
 #endif // BITCOIN_SCRIPT_INTERPRETER_H

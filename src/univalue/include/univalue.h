@@ -22,7 +22,7 @@ public:
     enum VType { VNULL, VOBJ, VARR, VSTR, VNUM, VBOOL, };
 
     UniValue() { typ = VNULL; }
-    UniValue(UniValue::VType initialType, const std::string& initialStr = "") {
+    UniValue(UniValue::VType initialType,  std::string& initialStr = "") {
         typ = initialType;
         val = initialStr;
     }
@@ -41,10 +41,10 @@ public:
     UniValue(double val_) {
         setFloat(val_);
     }
-    UniValue(const std::string& val_) {
+    UniValue( std::string& val_) {
         setStr(val_);
     }
-    UniValue(const char *val_) {
+    UniValue( char *val_) {
         std::string s(val_);
         setStr(s);
     }
@@ -54,43 +54,43 @@ public:
 
     bool setNull();
     bool setBool(bool val);
-    bool setNumStr(const std::string& val);
+    bool setNumStr( std::string& val);
     bool setInt(uint64_t val);
     bool setInt(int64_t val);
     bool setInt(int val_) { return setInt((int64_t)val_); }
     bool setFloat(double val);
-    bool setStr(const std::string& val);
+    bool setStr( std::string& val);
     bool setArray();
     bool setObject();
 
-    enum VType getType() const { return typ; }
-    const std::string& getValStr() const { return val; }
-    bool empty() const { return (values.size() == 0); }
+    enum VType getType()  { return typ; }
+     std::string& getValStr()  { return val; }
+    bool empty()  { return (values.size() == 0); }
 
-    size_t size() const { return values.size(); }
+    size_t size()  { return values.size(); }
 
-    bool getBool() const { return isTrue(); }
-    void getObjMap(std::map<std::string,UniValue>& kv) const;
-    bool checkObject(const std::map<std::string,UniValue::VType>& memberTypes) const;
-    const UniValue& operator[](const std::string& key) const;
-    const UniValue& operator[](size_t index) const;
-    bool exists(const std::string& key) const { size_t i; return findKey(key, i); }
+    bool getBool()  { return isTrue(); }
+    void getObjMap(std::map<std::string,UniValue>& kv) ;
+    bool checkObject( std::map<std::string,UniValue::VType>& memberTypes) ;
+     UniValue& operator[]( std::string& key) ;
+     UniValue& operator[](size_t index) ;
+    bool exists( std::string& key)  { size_t i; return findKey(key, i); }
 
-    bool isNull() const { return (typ == VNULL); }
-    bool isTrue() const { return (typ == VBOOL) && (val == "1"); }
-    bool isFalse() const { return (typ == VBOOL) && (val != "1"); }
-    bool isBool() const { return (typ == VBOOL); }
-    bool isStr() const { return (typ == VSTR); }
-    bool isNum() const { return (typ == VNUM); }
-    bool isArray() const { return (typ == VARR); }
-    bool isObject() const { return (typ == VOBJ); }
+    bool isNull()  { return (typ == VNULL); }
+    bool isTrue()  { return (typ == VBOOL) && (val == "1"); }
+    bool isFalse()  { return (typ == VBOOL) && (val != "1"); }
+    bool isBool()  { return (typ == VBOOL); }
+    bool isStr()  { return (typ == VSTR); }
+    bool isNum()  { return (typ == VNUM); }
+    bool isArray()  { return (typ == VARR); }
+    bool isObject()  { return (typ == VOBJ); }
 
-    bool push_back(const UniValue& val);
-    bool push_back(const std::string& val_) {
+    bool push_back( UniValue& val);
+    bool push_back( std::string& val_) {
         UniValue tmpVal(VSTR, val_);
         return push_back(tmpVal);
     }
-    bool push_back(const char *val_) {
+    bool push_back( char *val_) {
         std::string s(val_);
         return push_back(s);
     }
@@ -110,42 +110,42 @@ public:
         UniValue tmpVal(val_);
         return push_back(tmpVal);
     }
-    bool push_backV(const std::vector<UniValue>& vec);
+    bool push_backV( std::vector<UniValue>& vec);
 
-    void __pushKV(const std::string& key, const UniValue& val);
-    bool pushKV(const std::string& key, const UniValue& val);
-    bool pushKV(const std::string& key, const std::string& val_) {
+    void __pushKV( std::string& key,  UniValue& val);
+    bool pushKV( std::string& key,  UniValue& val);
+    bool pushKV( std::string& key,  std::string& val_) {
         UniValue tmpVal(VSTR, val_);
         return pushKV(key, tmpVal);
     }
-    bool pushKV(const std::string& key, const char *val_) {
+    bool pushKV( std::string& key,  char *val_) {
         std::string _val(val_);
         return pushKV(key, _val);
     }
-    bool pushKV(const std::string& key, int64_t val_) {
+    bool pushKV( std::string& key, int64_t val_) {
         UniValue tmpVal(val_);
         return pushKV(key, tmpVal);
     }
-    bool pushKV(const std::string& key, uint64_t val_) {
+    bool pushKV( std::string& key, uint64_t val_) {
         UniValue tmpVal(val_);
         return pushKV(key, tmpVal);
     }
-    bool pushKV(const std::string& key, int val_) {
+    bool pushKV( std::string& key, int val_) {
         UniValue tmpVal((int64_t)val_);
         return pushKV(key, tmpVal);
     }
-    bool pushKV(const std::string& key, double val_) {
+    bool pushKV( std::string& key, double val_) {
         UniValue tmpVal(val_);
         return pushKV(key, tmpVal);
     }
-    bool pushKVs(const UniValue& obj);
+    bool pushKVs( UniValue& obj);
 
     std::string write(unsigned int prettyIndent = 0,
-                      unsigned int indentLevel = 0) const;
+                      unsigned int indentLevel = 0) ;
 
-    bool read(const char *raw, size_t len);
-    bool read(const char *raw) { return read(raw, strlen(raw)); }
-    bool read(const std::string& rawStr) {
+    bool read( char *raw, size_t len);
+    bool read( char *raw) { return read(raw, strlen(raw)); }
+    bool read( std::string& rawStr) {
         return read(rawStr.data(), rawStr.size());
     }
 
@@ -155,90 +155,90 @@ private:
     std::vector<std::string> keys;
     std::vector<UniValue> values;
 
-    bool findKey(const std::string& key, size_t& retIdx) const;
-    void writeArray(unsigned int prettyIndent, unsigned int indentLevel, std::string& s) const;
-    void writeObject(unsigned int prettyIndent, unsigned int indentLevel, std::string& s) const;
+    bool findKey( std::string& key, size_t& retIdx) ;
+    void writeArray(unsigned int prettyIndent, unsigned int indentLevel, std::string& s) ;
+    void writeObject(unsigned int prettyIndent, unsigned int indentLevel, std::string& s) ;
 
 public:
     // Strict type-specific getters, these throw std::runtime_error if the
     // value is of unexpected type
-    const std::vector<std::string>& getKeys() const;
-    const std::vector<UniValue>& getValues() const;
-    bool get_bool() const;
-    const std::string& get_str() const;
-    int get_int() const;
-    int64_t get_int64() const;
-    double get_real() const;
-    const UniValue& get_obj() const;
-    const UniValue& get_array() const;
+     std::vector<std::string>& getKeys() ;
+     std::vector<UniValue>& getValues() ;
+    bool get_bool() ;
+     std::string& get_str() ;
+    int get_int() ;
+    int64_t get_int64() ;
+    double get_real() ;
+     UniValue& get_obj() ;
+     UniValue& get_array() ;
 
-    enum VType type() const { return getType(); }
+    enum VType type()  { return getType(); }
     bool push_back(std::pair<std::string,UniValue> pear) {
         return pushKV(pear.first, pear.second);
     }
-    friend const UniValue& find_value( const UniValue& obj, const std::string& name);
+    friend  UniValue& find_value(  UniValue& obj,  std::string& name);
 };
 
 //
 // The following were added for compatibility with json_spirit.
 // Most duplicate other methods, and should be removed.
 //
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, const char *cVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey,  char *cVal)
 {
     std::string key(cKey);
     UniValue uVal(cVal);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, std::string strVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, std::string strVal)
 {
     std::string key(cKey);
     UniValue uVal(strVal);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, uint64_t u64Val)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, uint64_t u64Val)
 {
     std::string key(cKey);
     UniValue uVal(u64Val);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, int64_t i64Val)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, int64_t i64Val)
 {
     std::string key(cKey);
     UniValue uVal(i64Val);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, bool iVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, bool iVal)
 {
     std::string key(cKey);
     UniValue uVal(iVal);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, int iVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, int iVal)
 {
     std::string key(cKey);
     UniValue uVal(iVal);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, double dVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey, double dVal)
 {
     std::string key(cKey);
     UniValue uVal(dVal);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(const char *cKey, const UniValue& uVal)
+static inline std::pair<std::string,UniValue> Pair( char *cKey,  UniValue& uVal)
 {
     std::string key(cKey);
     return std::make_pair(key, uVal);
 }
 
-static inline std::pair<std::string,UniValue> Pair(std::string key, const UniValue& uVal)
+static inline std::pair<std::string,UniValue> Pair(std::string key,  UniValue& uVal)
 {
     return std::make_pair(key, uVal);
 }
@@ -260,8 +260,8 @@ enum jtokentype {
 };
 
 extern enum jtokentype getJsonToken(std::string& tokenVal,
-                                    unsigned int& consumed, const char *raw, const char *end);
-extern const char *uvTypeName(UniValue::VType t);
+                                    unsigned int& consumed,  char *raw,  char *end);
+extern  char *uvTypeName(UniValue::VType t);
 
 static inline bool jsonTokenIsValue(enum jtokentype jtt)
 {
@@ -296,8 +296,8 @@ static inline bool json_isspace(int ch)
     // not reached
 }
 
-extern const UniValue NullUniValue;
+extern  UniValue NullUniValue;
 
-const UniValue& find_value( const UniValue& obj, const std::string& name);
+ UniValue& find_value(  UniValue& obj,  std::string& name);
 
 #endif // __UNIVALUE_H__

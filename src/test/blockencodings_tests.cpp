@@ -119,15 +119,15 @@ public:
     std::vector<uint64_t> shorttxids;
     std::vector<PrefilledTransaction> prefilledtxn;
 
-    explicit TestHeaderAndShortIDs(const CBlockHeaderAndShortTxIDs& orig) {
+    explicit TestHeaderAndShortIDs( CBlockHeaderAndShortTxIDs& orig) {
         CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
         stream << orig;
         stream >> *this;
     }
-    explicit TestHeaderAndShortIDs(const CBlock& block) :
+    explicit TestHeaderAndShortIDs( CBlock& block) :
         TestHeaderAndShortIDs(CBlockHeaderAndShortTxIDs(block, true)) {}
 
-    uint64_t GetShortID(const uint256& txhash) const {
+    uint64_t GetShortID( uint256& txhash)  {
         CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
         stream << *this;
         CBlockHeaderAndShortTxIDs base;

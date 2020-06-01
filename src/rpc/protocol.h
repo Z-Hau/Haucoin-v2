@@ -87,10 +87,10 @@ enum RPCErrorCode
     RPC_WALLET_NOT_SPECIFIED        = -19, //!< No wallet specified (error when there are multiple wallets loaded)
 };
 
-UniValue JSONRPCRequestObj(const std::string& strMethod, const UniValue& params, const UniValue& id);
-UniValue JSONRPCReplyObj(const UniValue& result, const UniValue& error, const UniValue& id);
-std::string JSONRPCReply(const UniValue& result, const UniValue& error, const UniValue& id);
-UniValue JSONRPCError(int code, const std::string& message);
+UniValue JSONRPCRequestObj( std::string& strMethod,  UniValue& params,  UniValue& id);
+UniValue JSONRPCReplyObj( UniValue& result,  UniValue& error,  UniValue& id);
+std::string JSONRPCReply( UniValue& result,  UniValue& error,  UniValue& id);
+UniValue JSONRPCError(int code,  std::string& message);
 
 /** Generate a new RPC authentication cookie and write it to disk */
 bool GenerateAuthCookie(std::string *cookie_out);
@@ -99,6 +99,6 @@ bool GetAuthCookie(std::string *cookie_out);
 /** Delete RPC authentication cookie from disk */
 void DeleteAuthCookie();
 /** Parse JSON-RPC batch reply into a vector */
-std::vector<UniValue> JSONRPCProcessBatchReply(const UniValue &in, size_t num);
+std::vector<UniValue> JSONRPCProcessBatchReply( UniValue &in, size_t num);
 
 #endif // BITCOIN_RPCPROTOCOL_H

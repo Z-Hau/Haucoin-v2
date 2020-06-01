@@ -9,7 +9,7 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
-std::string COutPoint::ToString() const
+std::string COutPoint::ToString() 
 {
     return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10), n);
 }
@@ -28,7 +28,7 @@ CTxIn::CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn, uint32_t nS
     nSequence = nSequenceIn;
 }
 
-std::string CTxIn::ToString() const
+std::string CTxIn::ToString() 
 {
     std::string str;
     str += "CTxIn(";
@@ -43,31 +43,31 @@ std::string CTxIn::ToString() const
     return str;
 }
 
-CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
+CTxOut::CTxOut( CAmount& nValueIn, CScript scriptPubKeyIn)
 {
     nValue = nValueIn;
     scriptPubKey = scriptPubKeyIn;
 }
 
-std::string CTxOut::ToString() const
+std::string CTxOut::ToString() 
 {
     return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey).substr(0, 30));
 }
 
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}
-CMutableTransaction::CMutableTransaction(const CTransaction& tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
+CMutableTransaction::CMutableTransaction( CTransaction& tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
 
-uint256 CMutableTransaction::GetHash() const
+uint256 CMutableTransaction::GetHash() 
 {
     return SerializeHash(*this, SER_GETHASH, SERIALIZE_TRANSACTION_NO_WITNESS);
 }
 
-uint256 CTransaction::ComputeHash() const
+uint256 CTransaction::ComputeHash() 
 {
     return SerializeHash(*this, SER_GETHASH, SERIALIZE_TRANSACTION_NO_WITNESS);
 }
 
-uint256 CTransaction::GetWitnessHash() const
+uint256 CTransaction::GetWitnessHash() 
 {
     if (!HasWitness()) {
         return GetHash();
@@ -77,13 +77,13 @@ uint256 CTransaction::GetWitnessHash() const
 
 /* For backward compatibility, the hash is initialized to 0. TODO: remove the need for this default constructor entirely. */
 CTransaction::CTransaction() : vin(), vout(), nVersion(CTransaction::CURRENT_VERSION), nLockTime(0), hash() {}
-CTransaction::CTransaction(const CMutableTransaction &tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime), hash(ComputeHash()) {}
+CTransaction::CTransaction( CMutableTransaction &tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime), hash(ComputeHash()) {}
 CTransaction::CTransaction(CMutableTransaction &&tx) : vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nLockTime(tx.nLockTime), hash(ComputeHash()) {}
 
-CAmount CTransaction::GetValueOut() const
+CAmount CTransaction::GetValueOut() 
 {
     CAmount nValueOut = 0;
-    for (const auto& tx_out : vout) {
+    for ( auto& tx_out : vout) {
         nValueOut += tx_out.nValue;
         if (!MoneyRange(tx_out.nValue) || !MoneyRange(nValueOut))
             throw std::runtime_error(std::string(__func__) + ": value out of range");
@@ -91,12 +91,12 @@ CAmount CTransaction::GetValueOut() const
     return nValueOut;
 }
 
-unsigned int CTransaction::GetTotalSize() const
+unsigned int CTransaction::GetTotalSize() 
 {
     return ::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION);
 }
 
-std::string CTransaction::ToString() const
+std::string CTransaction::ToString() 
 {
     std::string str;
     str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
@@ -105,11 +105,11 @@ std::string CTransaction::ToString() const
         vin.size(),
         vout.size(),
         nLockTime);
-    for (const auto& tx_in : vin)
+    for ( auto& tx_in : vin)
         str += "    " + tx_in.ToString() + "\n";
-    for (const auto& tx_in : vin)
+    for ( auto& tx_in : vin)
         str += "    " + tx_in.scriptWitness.ToString() + "\n";
-    for (const auto& tx_out : vout)
+    for ( auto& tx_out : vout)
         str += "    " + tx_out.ToString() + "\n";
     return str;
 }

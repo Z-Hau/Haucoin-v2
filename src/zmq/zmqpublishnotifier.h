@@ -22,7 +22,7 @@ public:
           * data
           * message sequence number
     */
-    bool SendMessage(const char *command, const void* data, size_t size);
+    bool SendMessage( char *command,  void* data, size_t size);
 
     bool Initialize(void *pcontext) override;
     void Shutdown() override;
@@ -31,25 +31,25 @@ public:
 class CZMQPublishHashBlockNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyBlock(const CBlockIndex *pindex) override;
+    bool NotifyBlock( CBlockIndex *pindex) override;
 };
 
 class CZMQPublishHashTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyTransaction(const CTransaction &transaction) override;
+    bool NotifyTransaction( CTransaction &transaction) override;
 };
 
 class CZMQPublishRawBlockNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyBlock(const CBlockIndex *pindex) override;
+    bool NotifyBlock( CBlockIndex *pindex) override;
 };
 
 class CZMQPublishRawTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyTransaction(const CTransaction &transaction) override;
+    bool NotifyTransaction( CTransaction &transaction) override;
 };
 
 #endif // BITCOIN_ZMQ_ZMQPUBLISHNOTIFIER_H

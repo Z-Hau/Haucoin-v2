@@ -13,7 +13,7 @@
 
 BOOST_FIXTURE_TEST_SUITE(getarg_tests, BasicTestingSetup)
 
-static void ResetArgs(const std::string& strArg)
+static void ResetArgs( std::string& strArg)
 {
     std::vector<std::string> vecArg;
     if (strArg.size())
@@ -23,7 +23,7 @@ static void ResetArgs(const std::string& strArg)
     vecArg.insert(vecArg.begin(), "testbitcoin");
 
     // Convert to char*:
-    std::vector<const char*> vecChar;
+    std::vector< char*> vecChar;
     for (std::string& s : vecArg)
         vecChar.push_back(s.c_str());
 

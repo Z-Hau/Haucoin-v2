@@ -20,7 +20,7 @@ namespace leveldb {
 
 namespace {
 
-bool GuessType(const std::string& fname, FileType* type) {
+bool GuessType( std::string& fname, FileType* type) {
   size_t pos = fname.rfind('/');
   std::string basename;
   if (pos == std::string::npos) {
@@ -36,7 +36,7 @@ bool GuessType(const std::string& fname, FileType* type) {
 class CorruptionReporter : public log::Reader::Reporter {
  public:
   WritableFile* dst_;
-  virtual void Corruption(size_t bytes, const Status& status) {
+  virtual void Corruption(size_t bytes,  Status& status) {
     std::string r = "corruption: ";
     AppendNumberTo(&r, bytes);
     r += " bytes; ";
@@ -47,7 +47,7 @@ class CorruptionReporter : public log::Reader::Reporter {
 };
 
 // Print contents of a log file. (*func)() is called on every record.
-Status PrintLogContents(Env* env, const std::string& fname,
+Status PrintLogContents(Env* env,  std::string& fname,
                         void (*func)(uint64_t, Slice, WritableFile*),
                         WritableFile* dst) {
   SequentialFile* file;
@@ -71,7 +71,7 @@ Status PrintLogContents(Env* env, const std::string& fname,
 class WriteBatchItemPrinter : public WriteBatch::Handler {
  public:
   WritableFile* dst_;
-  virtual void Put(const Slice& key, const Slice& value) {
+  virtual void Put( Slice& key,  Slice& value) {
     std::string r = "  put '";
     AppendEscapedStringTo(&r, key);
     r += "' '";
@@ -79,7 +79,7 @@ class WriteBatchItemPrinter : public WriteBatch::Handler {
     r += "'\n";
     dst_->Append(r);
   }
-  virtual void Delete(const Slice& key) {
+  virtual void Delete( Slice& key) {
     std::string r = "  del '";
     AppendEscapedStringTo(&r, key);
     r += "'\n";
@@ -115,7 +115,7 @@ static void WriteBatchPrinter(uint64_t pos, Slice record, WritableFile* dst) {
   }
 }
 
-Status DumpLog(Env* env, const std::string& fname, WritableFile* dst) {
+Status DumpLog(Env* env,  std::string& fname, WritableFile* dst) {
   return PrintLogContents(env, fname, WriteBatchPrinter, dst);
 }
 
@@ -136,11 +136,11 @@ static void VersionEditPrinter(uint64_t pos, Slice record, WritableFile* dst) {
   dst->Append(r);
 }
 
-Status DumpDescriptor(Env* env, const std::string& fname, WritableFile* dst) {
+Status DumpDescriptor(Env* env,  std::string& fname, WritableFile* dst) {
   return PrintLogContents(env, fname, VersionEditPrinter, dst);
 }
 
-Status DumpTable(Env* env, const std::string& fname, WritableFile* dst) {
+Status DumpTable(Env* env,  std::string& fname, WritableFile* dst) {
   uint64_t file_size;
   RandomAccessFile* file = NULL;
   Table* table = NULL;
@@ -207,7 +207,7 @@ Status DumpTable(Env* env, const std::string& fname, WritableFile* dst) {
 
 }  // namespace
 
-Status DumpFile(Env* env, const std::string& fname, WritableFile* dst) {
+Status DumpFile(Env* env,  std::string& fname, WritableFile* dst) {
   FileType ftype;
   if (!GuessType(fname, &ftype)) {
     return Status::InvalidArgument(fname + ": unknown file type");

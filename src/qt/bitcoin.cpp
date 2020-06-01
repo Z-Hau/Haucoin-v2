@@ -82,7 +82,7 @@ Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 Q_DECLARE_METATYPE(bool*)
 Q_DECLARE_METATYPE(CAmount)
 
-static void InitMessage(const std::string &message)
+static void InitMessage( std::string &message)
 {
     LogPrintf("init message: %s\n", message);
 }
@@ -90,7 +90,7 @@ static void InitMessage(const std::string &message)
 /*
    Translate string to current locale using Qt.
  */
-static std::string Translate(const char* psz)
+static std::string Translate( char* psz)
 {
     return QCoreApplication::translate("bitcoin-core", psz).toStdString();
 }
@@ -150,7 +150,7 @@ static void initTranslations(QTranslator &qtTranslatorBase, QTranslator &qtTrans
 
 /* qDebug() message handler --> debug.log */
 #if QT_VERSION < 0x050000
-void DebugMessageHandler(QtMsgType type, const char *msg)
+void DebugMessageHandler(QtMsgType type,  char *msg)
 {
     if (type == QtDebugMsg) {
         LogPrint(BCLog::QT, "GUI: %s\n", msg);
@@ -159,7 +159,7 @@ void DebugMessageHandler(QtMsgType type, const char *msg)
     }
 }
 #else
-void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
+void DebugMessageHandler(QtMsgType type,  QMessageLogContext& context,  QString &msg)
 {
     Q_UNUSED(context);
     if (type == QtDebugMsg) {
@@ -190,12 +190,12 @@ public Q_SLOTS:
 Q_SIGNALS:
     void initializeResult(bool success);
     void shutdownResult();
-    void runawayException(const QString &message);
+    void runawayException( QString &message);
 
 private:
 
     /// Pass fatal exception message to UI thread
-    void handleRunawayException(const std::exception *e);
+    void handleRunawayException( std::exception *e);
 };
 
 /** Main Bitcoin application object */
@@ -215,9 +215,9 @@ public:
     /// Create options model
     void createOptionsModel(bool resetSettings);
     /// Create main window
-    void createWindow(const NetworkStyle *networkStyle);
+    void createWindow( NetworkStyle *networkStyle);
     /// Create splash screen
-    void createSplashScreen(const NetworkStyle *networkStyle);
+    void createSplashScreen( NetworkStyle *networkStyle);
 
     /// Request core initialization
     void requestInitialize();
@@ -225,16 +225,16 @@ public:
     void requestShutdown();
 
     /// Get process return value
-    int getReturnValue() const { return returnValue; }
+    int getReturnValue()  { return returnValue; }
 
     /// Get window identifier of QMainWindow (BitcoinGUI)
-    WId getMainWinId() const;
+    WId getMainWinId() ;
 
 public Q_SLOTS:
     void initializeResult(bool success);
     void shutdownResult();
     /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
-    void handleRunawayException(const QString &message);
+    void handleRunawayException( QString &message);
 
 Q_SIGNALS:
     void requestedInitialize();
@@ -253,7 +253,7 @@ private:
     WalletModel *walletModel;
 #endif
     int returnValue;
-    const PlatformStyle *platformStyle;
+     PlatformStyle *platformStyle;
     std::unique_ptr<QWidget> shutdownWindow;
 
     void startThread();
@@ -266,7 +266,7 @@ BitcoinCore::BitcoinCore():
 {
 }
 
-void BitcoinCore::handleRunawayException(const std::exception *e)
+void BitcoinCore::handleRunawayException( std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
     Q_EMIT runawayException(QString::fromStdString(GetWarnings("gui")));
@@ -300,7 +300,7 @@ void BitcoinCore::initialize()
         qDebug() << __func__ << ": Running initialization in thread";
         bool rv = AppInitMain();
         Q_EMIT initializeResult(rv);
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
         handleRunawayException(nullptr);
@@ -316,7 +316,7 @@ void BitcoinCore::shutdown()
         Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
         Q_EMIT shutdownResult();
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
         handleRunawayException(nullptr);
@@ -383,7 +383,7 @@ void BitcoinApplication::createOptionsModel(bool resetSettings)
     optionsModel = new OptionsModel(nullptr, resetSettings);
 }
 
-void BitcoinApplication::createWindow(const NetworkStyle *networkStyle)
+void BitcoinApplication::createWindow( NetworkStyle *networkStyle)
 {
     window = new BitcoinGUI(platformStyle, networkStyle, 0);
 
@@ -391,7 +391,7 @@ void BitcoinApplication::createWindow(const NetworkStyle *networkStyle)
     connect(pollShutdownTimer, SIGNAL(timeout()), window, SLOT(detectShutdown()));
 }
 
-void BitcoinApplication::createSplashScreen(const NetworkStyle *networkStyle)
+void BitcoinApplication::createSplashScreen( NetworkStyle *networkStyle)
 {
     SplashScreen *splash = new SplashScreen(0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, but the splash
@@ -489,7 +489,7 @@ void BitcoinApplication::initializeResult(bool success)
             window->setCurrentWallet(BitcoinGUI::DEFAULT_WALLET);
 
             connect(walletModel, SIGNAL(coinsSent(CWallet*,SendCoinsRecipient,QByteArray)),
-                             paymentServer, SLOT(fetchPaymentACK(CWallet*,const SendCoinsRecipient&,QByteArray)));
+                             paymentServer, SLOT(fetchPaymentACK(CWallet*, SendCoinsRecipient&,QByteArray)));
         }
 #endif
 
@@ -527,13 +527,13 @@ void BitcoinApplication::shutdownResult()
     quit(); // Exit second main loop invocation after shutdown finished
 }
 
-void BitcoinApplication::handleRunawayException(const QString &message)
+void BitcoinApplication::handleRunawayException( QString &message)
 {
     QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. Bitcoin can no longer continue safely and will quit.") + QString("\n\n") + message);
     ::exit(EXIT_FAILURE);
 }
 
-WId BitcoinApplication::getMainWinId() const
+WId BitcoinApplication::getMainWinId() 
 {
     if (!window)
         return 0;
@@ -626,7 +626,7 @@ int main(int argc, char *argv[])
     }
     try {
         gArgs.ReadConfigFile(gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME));
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
                               QObject::tr("Error: Cannot parse configuration file: %1. Only use key=value syntax.").arg(e.what()));
         return EXIT_FAILURE;
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
     PaymentServer::ipcParseCommandLine(argc, argv);
 #endif
 
-    QScopedPointer<const NetworkStyle> networkStyle(NetworkStyle::instantiate(QString::fromStdString(Params().NetworkIDString())));
+    QScopedPointer< NetworkStyle> networkStyle(NetworkStyle::instantiate(QString::fromStdString(Params().NetworkIDString())));
     assert(!networkStyle.isNull());
     // Allow for separate UI settings for testnets
     QApplication::setApplicationName(networkStyle->getAppName());
@@ -717,7 +717,7 @@ int main(int argc, char *argv[])
             // A dialog with detailed error will have been shown by InitError()
             rv = EXIT_FAILURE;
         }
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         PrintExceptionContinue(&e, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(GetWarnings("gui")));
     } catch (...) {

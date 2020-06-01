@@ -9,7 +9,7 @@
 #include <QMutex>
 #include <QThread>
 
-static const bool DEFAULT_CHOOSE_DATADIR = false;
+static  bool DEFAULT_CHOOSE_DATADIR = false;
 
 class FreespaceChecker;
 
@@ -30,7 +30,7 @@ public:
     ~Intro();
 
     QString getDataDirectory();
-    void setDataDirectory(const QString &dataDir);
+    void setDataDirectory( QString &dataDir);
 
     /**
      * Determine data directory. Let the user choose if the current one doesn't exist.
@@ -53,10 +53,10 @@ Q_SIGNALS:
     void stopThread();
 
 public Q_SLOTS:
-    void setStatus(int status, const QString &message, quint64 bytesAvailable);
+    void setStatus(int status,  QString &message, quint64 bytesAvailable);
 
 private Q_SLOTS:
-    void on_dataDirectory_textChanged(const QString &arg1);
+    void on_dataDirectory_textChanged( QString &arg1);
     void on_ellipsisButton_clicked();
     void on_dataDirDefault_clicked();
     void on_dataDirCustom_clicked();
@@ -69,7 +69,7 @@ private:
     QString pathToCheck;
 
     void startThread();
-    void checkPath(const QString &dataDir);
+    void checkPath( QString &dataDir);
     QString getPathToCheck();
 
     friend class FreespaceChecker;

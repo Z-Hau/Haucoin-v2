@@ -33,8 +33,8 @@ Writer::Writer(WritableFile* dest, uint64_t dest_length)
 Writer::~Writer() {
 }
 
-Status Writer::AddRecord(const Slice& slice) {
-  const char* ptr = slice.data();
+Status Writer::AddRecord( Slice& slice) {
+   char* ptr = slice.data();
   size_t left = slice.size();
 
   // Fragment the record if necessary and emit it.  Note that if slice
@@ -43,7 +43,7 @@ Status Writer::AddRecord(const Slice& slice) {
   Status s;
   bool begin = true;
   do {
-    const int leftover = kBlockSize - block_offset_;
+     int leftover = kBlockSize - block_offset_;
     assert(leftover >= 0);
     if (leftover < kHeaderSize) {
       // Switch to a new block
@@ -58,11 +58,11 @@ Status Writer::AddRecord(const Slice& slice) {
     // Invariant: we never leave < kHeaderSize bytes in a block.
     assert(kBlockSize - block_offset_ - kHeaderSize >= 0);
 
-    const size_t avail = kBlockSize - block_offset_ - kHeaderSize;
-    const size_t fragment_length = (left < avail) ? left : avail;
+     size_t avail = kBlockSize - block_offset_ - kHeaderSize;
+     size_t fragment_length = (left < avail) ? left : avail;
 
     RecordType type;
-    const bool end = (left == fragment_length);
+     bool end = (left == fragment_length);
     if (begin && end) {
       type = kFullType;
     } else if (begin) {
@@ -81,7 +81,7 @@ Status Writer::AddRecord(const Slice& slice) {
   return s;
 }
 
-Status Writer::EmitPhysicalRecord(RecordType t, const char* ptr, size_t n) {
+Status Writer::EmitPhysicalRecord(RecordType t,  char* ptr, size_t n) {
   assert(n <= 0xffff);  // Must fit in two bytes
   assert(block_offset_ + kHeaderSize + n <= kBlockSize);
 

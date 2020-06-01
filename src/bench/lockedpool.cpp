@@ -16,7 +16,7 @@
 static void BenchLockedPool(benchmark::State& state)
 {
     void *synth_base = reinterpret_cast<void*>(0x08000000);
-    const size_t synth_size = 1024*1024;
+     size_t synth_size = 1024*1024;
     Arena b(synth_base, synth_size, 16);
 
     std::vector<void*> addr;

@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(univalue_constructor)
     BOOST_CHECK(v8.isStr());
     BOOST_CHECK_EQUAL(v8.getValStr(), "yawn");
 
-    const char *vcs = "zappa";
+     char *vcs = "zappa";
     UniValue v9(vcs);
     BOOST_CHECK(v9.isStr());
     BOOST_CHECK_EQUAL(v9.getValStr(), "zappa");
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(univalue_array)
     std::string vStr("zippy");
     BOOST_CHECK(arr.push_back(vStr));
 
-    const char *s = "pippy";
+     char *s = "pippy";
     BOOST_CHECK(arr.push_back(s));
 
     std::vector<UniValue> vec;
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(univalue_object)
     BOOST_CHECK(obj.pushKV(strKey, strVal));
 
     strKey = "last";
-    const char *cVal = "Smith";
+     char *cVal = "Smith";
     BOOST_CHECK(obj.pushKV(strKey, cVal));
 
     strKey = "distance";
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(univalue_object)
 
 }
 
-static const char *json1 =
+static  char *json1 =
 "[1.10000000,{\"key1\":\"str\\u0000\",\"key2\":800,\"key3\":{\"name\":\"martian http://test.com\"}}]";
 
 BOOST_AUTO_TEST_CASE(univalue_readwrite)

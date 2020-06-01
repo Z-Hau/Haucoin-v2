@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <vector>
 
-static const int64_t DEFAULT_MAX_TIME_ADJUSTMENT = 70 * 60;
+static  int64_t DEFAULT_MAX_TIME_ADJUSTMENT = 70 * 60;
 
 class CNetAddr;
 
@@ -46,7 +46,7 @@ public:
         std::sort(vSorted.begin(), vSorted.end());
     }
 
-    T median() const
+    T median() 
     {
         int vSortedSize = vSorted.size();
         assert(vSortedSize > 0);
@@ -59,12 +59,12 @@ public:
         }
     }
 
-    int size() const
+    int size() 
     {
         return vValues.size();
     }
 
-    std::vector<T> sorted() const
+    std::vector<T> sorted() 
     {
         return vSorted;
     }
@@ -73,6 +73,6 @@ public:
 /** Functions to keep track of adjusted P2P time */
 int64_t GetTimeOffset();
 int64_t GetAdjustedTime();
-void AddTimeData(const CNetAddr& ip, int64_t nTime);
+void AddTimeData( CNetAddr& ip, int64_t nTime);
 
 #endif // BITCOIN_TIMEDATA_H

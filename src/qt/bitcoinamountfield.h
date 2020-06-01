@@ -28,11 +28,11 @@ class BitcoinAmountField: public QWidget
 public:
     explicit BitcoinAmountField(QWidget *parent = 0);
 
-    CAmount value(bool *value=0) const;
-    void setValue(const CAmount& value);
+    CAmount value(bool *value=0) ;
+    void setValue( CAmount& value);
 
     /** Set single step in satoshis **/
-    void setSingleStep(const CAmount& step);
+    void setSingleStep( CAmount& step);
 
     /** Make read-only **/
     void setReadOnly(bool fReadOnly);

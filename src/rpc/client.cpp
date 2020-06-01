@@ -24,7 +24,7 @@ public:
  *
  * @note Parameter indexes start from 0.
  */
-static const CRPCConvertParam vRPCConvertParams[] =
+static  CRPCConvertParam vRPCConvertParams[] =
 {
     { "setmocktime", 0, "timestamp" },
     { "generate", 0, "nblocks" },
@@ -154,17 +154,17 @@ private:
 public:
     CRPCConvertTable();
 
-    bool convert(const std::string& method, int idx) {
+    bool convert( std::string& method, int idx) {
         return (members.count(std::make_pair(method, idx)) > 0);
     }
-    bool convert(const std::string& method, const std::string& name) {
+    bool convert( std::string& method,  std::string& name) {
         return (membersByName.count(std::make_pair(method, name)) > 0);
     }
 };
 
 CRPCConvertTable::CRPCConvertTable()
 {
-    const unsigned int n_elem =
+     unsigned int n_elem =
         (sizeof(vRPCConvertParams) / sizeof(vRPCConvertParams[0]));
 
     for (unsigned int i = 0; i < n_elem; i++) {
@@ -180,7 +180,7 @@ static CRPCConvertTable rpcCvtTable;
 /** Non-RFC4627 JSON parser, accepts internal values (such as numbers, true, false, null)
  * as well as objects and arrays.
  */
-UniValue ParseNonRFCJSONValue(const std::string& strVal)
+UniValue ParseNonRFCJSONValue( std::string& strVal)
 {
     UniValue jVal;
     if (!jVal.read(std::string("[")+strVal+std::string("]")) ||
@@ -189,12 +189,12 @@ UniValue ParseNonRFCJSONValue(const std::string& strVal)
     return jVal[0];
 }
 
-UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
+UniValue RPCConvertValues( std::string &strMethod,  std::vector<std::string> &strParams)
 {
     UniValue params(UniValue::VARR);
 
     for (unsigned int idx = 0; idx < strParams.size(); idx++) {
-        const std::string& strVal = strParams[idx];
+         std::string& strVal = strParams[idx];
 
         if (!rpcCvtTable.convert(strMethod, idx)) {
             // insert string value directly
@@ -208,11 +208,11 @@ UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::s
     return params;
 }
 
-UniValue RPCConvertNamedValues(const std::string &strMethod, const std::vector<std::string> &strParams)
+UniValue RPCConvertNamedValues( std::string &strMethod,  std::vector<std::string> &strParams)
 {
     UniValue params(UniValue::VOBJ);
 
-    for (const std::string &s: strParams) {
+    for ( std::string &s: strParams) {
         size_t pos = s.find('=');
         if (pos == std::string::npos) {
             throw(std::runtime_error("No '=' in named argument '"+s+"', this needs to be present for every argument (even if it is empty)"));

@@ -23,9 +23,9 @@ struct zero_after_free_allocator : public std::allocator<T> {
     typedef typename base::const_reference const_reference;
     typedef typename base::value_type value_type;
     zero_after_free_allocator() noexcept {}
-    zero_after_free_allocator(const zero_after_free_allocator& a) noexcept : base(a) {}
+    zero_after_free_allocator( zero_after_free_allocator& a) noexcept : base(a) {}
     template <typename U>
-    zero_after_free_allocator(const zero_after_free_allocator<U>& a) noexcept : base(a)
+    zero_after_free_allocator( zero_after_free_allocator<U>& a) noexcept : base(a)
     {
     }
     ~zero_after_free_allocator() noexcept {}

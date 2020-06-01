@@ -9,7 +9,7 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
-std::string FormatMoney(const CAmount& n)
+std::string FormatMoney( CAmount& n)
 {
     // Note: not using straight sprintf here because we do NOT want
     // localized number formatting.
@@ -31,16 +31,16 @@ std::string FormatMoney(const CAmount& n)
 }
 
 
-bool ParseMoney(const std::string& str, CAmount& nRet)
+bool ParseMoney( std::string& str, CAmount& nRet)
 {
     return ParseMoney(str.c_str(), nRet);
 }
 
-bool ParseMoney(const char* pszIn, CAmount& nRet)
+bool ParseMoney( char* pszIn, CAmount& nRet)
 {
     std::string strWhole;
     int64_t nUnits = 0;
-    const char* p = pszIn;
+     char* p = pszIn;
     while (isspace(*p))
         p++;
     for (; *p; p++)

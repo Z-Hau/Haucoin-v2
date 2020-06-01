@@ -26,7 +26,7 @@ typedef enum BanReason
 class CBanEntry
 {
 public:
-    static const int CURRENT_VERSION=1;
+    static  int CURRENT_VERSION=1;
     int nVersion;
     int64_t nCreateTime;
     int64_t nBanUntil;
@@ -61,7 +61,7 @@ public:
         banReason = BanReasonUnknown;
     }
 
-    std::string banReasonToString() const
+    std::string banReasonToString() 
     {
         switch (banReason) {
         case BanReasonNodeMisbehaving:
@@ -83,7 +83,7 @@ private:
     fs::path pathAddr;
 public:
     CAddrDB();
-    bool Write(const CAddrMan& addr);
+    bool Write( CAddrMan& addr);
     bool Read(CAddrMan& addr);
     static bool Read(CAddrMan& addr, CDataStream& ssPeers);
 };
@@ -95,7 +95,7 @@ private:
     fs::path pathBanlist;
 public:
     CBanDB();
-    bool Write(const banmap_t& banSet);
+    bool Write( banmap_t& banSet);
     bool Read(banmap_t& banSet);
 };
 

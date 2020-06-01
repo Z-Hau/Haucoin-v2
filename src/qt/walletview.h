@@ -36,7 +36,7 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(const PlatformStyle *platformStyle, QWidget *parent);
+    explicit WalletView( PlatformStyle *platformStyle, QWidget *parent);
     ~WalletView();
 
     void setBitcoinGUI(BitcoinGUI *gui);
@@ -50,7 +50,7 @@ public:
     */
     void setWalletModel(WalletModel *walletModel);
 
-    bool handlePaymentRequest(const SendCoinsRecipient& recipient);
+    bool handlePaymentRequest( SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
 
@@ -68,7 +68,7 @@ private:
     TransactionView *transactionView;
 
     QProgressDialog *progressDialog;
-    const PlatformStyle *platformStyle;
+     PlatformStyle *platformStyle;
 
 public Q_SLOTS:
     /** Switch to overview (home) page */
@@ -89,7 +89,7 @@ public Q_SLOTS:
 
         The new items are those between start and end inclusive, under the given parent item.
     */
-    void processNewTransaction(const QModelIndex& parent, int start, int /*end*/);
+    void processNewTransaction( QModelIndex& parent, int start, int /*end*/);
     /** Encrypt the wallet */
     void encryptWallet(bool status);
     /** Backup the wallet */
@@ -108,7 +108,7 @@ public Q_SLOTS:
     void updateEncryptionStatus();
 
     /** Show progress dialog e.g. for rescan */
-    void showProgress(const QString &title, int nProgress);
+    void showProgress( QString &title, int nProgress);
 
     /** User has requested more information about the out of sync state */
     void requestedSyncWarningInfo();
@@ -117,13 +117,13 @@ Q_SIGNALS:
     /** Signal that we want to show the main window */
     void showNormalIfMinimized();
     /**  Fired when a message should be reported to the user */
-    void message(const QString &title, const QString &message, unsigned int style);
+    void message( QString &title,  QString &message, unsigned int style);
     /** Encryption status of wallet changed */
     void encryptionStatusChanged(int status);
     /** HD-Enabled status of wallet changed (only possible during startup) */
     void hdEnabledStatusChanged(int hdEnabled);
     /** Notify that a new transaction appeared */
-    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
+    void incomingTransaction( QString& date, int unit,  CAmount& amount,  QString& type,  QString& address,  QString& label);
     /** Notify that the out of sync warning icon has been pressed */
     void outOfSyncWarningClicked();
 };

@@ -13,38 +13,38 @@
 #endif
 
 namespace NetMsgType {
-const char *VERSION="version";
-const char *VERACK="verack";
-const char *ADDR="addr";
-const char *INV="inv";
-const char *GETDATA="getdata";
-const char *MERKLEBLOCK="merkleblock";
-const char *GETBLOCKS="getblocks";
-const char *GETHEADERS="getheaders";
-const char *TX="tx";
-const char *HEADERS="headers";
-const char *BLOCK="block";
-const char *GETADDR="getaddr";
-const char *MEMPOOL="mempool";
-const char *PING="ping";
-const char *PONG="pong";
-const char *NOTFOUND="notfound";
-const char *FILTERLOAD="filterload";
-const char *FILTERADD="filteradd";
-const char *FILTERCLEAR="filterclear";
-const char *REJECT="reject";
-const char *SENDHEADERS="sendheaders";
-const char *FEEFILTER="feefilter";
-const char *SENDCMPCT="sendcmpct";
-const char *CMPCTBLOCK="cmpctblock";
-const char *GETBLOCKTXN="getblocktxn";
-const char *BLOCKTXN="blocktxn";
+ char *VERSION="version";
+ char *VERACK="verack";
+ char *ADDR="addr";
+ char *INV="inv";
+ char *GETDATA="getdata";
+ char *MERKLEBLOCK="merkleblock";
+ char *GETBLOCKS="getblocks";
+ char *GETHEADERS="getheaders";
+ char *TX="tx";
+ char *HEADERS="headers";
+ char *BLOCK="block";
+ char *GETADDR="getaddr";
+ char *MEMPOOL="mempool";
+ char *PING="ping";
+ char *PONG="pong";
+ char *NOTFOUND="notfound";
+ char *FILTERLOAD="filterload";
+ char *FILTERADD="filteradd";
+ char *FILTERCLEAR="filterclear";
+ char *REJECT="reject";
+ char *SENDHEADERS="sendheaders";
+ char *FEEFILTER="feefilter";
+ char *SENDCMPCT="sendcmpct";
+ char *CMPCTBLOCK="cmpctblock";
+ char *GETBLOCKTXN="getblocktxn";
+ char *BLOCKTXN="blocktxn";
 } // namespace NetMsgType
 
 /** All known message types. Keep this in the same order as the list of
  * messages above and in protocol.h.
  */
-const static std::string allNetMessageTypes[] = {
+ static std::string allNetMessageTypes[] = {
     NetMsgType::VERSION,
     NetMsgType::VERACK,
     NetMsgType::ADDR,
@@ -72,9 +72,9 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::GETBLOCKTXN,
     NetMsgType::BLOCKTXN,
 };
-const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
+ static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
-CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn)
+CMessageHeader::CMessageHeader( MessageStartChars& pchMessageStartIn)
 {
     memcpy(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE);
     memset(pchCommand, 0, sizeof(pchCommand));
@@ -82,7 +82,7 @@ CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn)
     memset(pchChecksum, 0, CHECKSUM_SIZE);
 }
 
-CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn, const char* pszCommand, unsigned int nMessageSizeIn)
+CMessageHeader::CMessageHeader( MessageStartChars& pchMessageStartIn,  char* pszCommand, unsigned int nMessageSizeIn)
 {
     memcpy(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE);
     memset(pchCommand, 0, sizeof(pchCommand));
@@ -91,19 +91,19 @@ CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn, const
     memset(pchChecksum, 0, CHECKSUM_SIZE);
 }
 
-std::string CMessageHeader::GetCommand() const
+std::string CMessageHeader::GetCommand() 
 {
     return std::string(pchCommand, pchCommand + strnlen(pchCommand, COMMAND_SIZE));
 }
 
-bool CMessageHeader::IsValid(const MessageStartChars& pchMessageStartIn) const
+bool CMessageHeader::IsValid( MessageStartChars& pchMessageStartIn) 
 {
     // Check start string
     if (memcmp(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE) != 0)
         return false;
 
     // Check the command string for errors
-    for (const char* p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++)
+    for ( char* p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++)
     {
         if (*p1 == 0)
         {
@@ -151,14 +151,14 @@ CInv::CInv()
     hash.SetNull();
 }
 
-CInv::CInv(int typeIn, const uint256& hashIn) : type(typeIn), hash(hashIn) {}
+CInv::CInv(int typeIn,  uint256& hashIn) : type(typeIn), hash(hashIn) {}
 
-bool operator<(const CInv& a, const CInv& b)
+bool operator<( CInv& a,  CInv& b)
 {
     return (a.type < b.type || (a.type == b.type && a.hash < b.hash));
 }
 
-std::string CInv::GetCommand() const
+std::string CInv::GetCommand() 
 {
     std::string cmd;
     if (type & MSG_WITNESS_FLAG)
@@ -175,16 +175,16 @@ std::string CInv::GetCommand() const
     }
 }
 
-std::string CInv::ToString() const
+std::string CInv::ToString() 
 {
     try {
         return strprintf("%s %s", GetCommand(), hash.ToString());
-    } catch(const std::out_of_range &) {
+    } catch( std::out_of_range &) {
         return strprintf("0x%08x %s", type, hash.ToString());
     }
 }
 
-const std::vector<std::string> &getAllNetMessageTypes()
+ std::vector<std::string> &getAllNetMessageTypes()
 {
     return allNetMessageTypesVec;
 }

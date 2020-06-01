@@ -16,9 +16,9 @@ class Histogram {
 
   void Clear();
   void Add(double value);
-  void Merge(const Histogram& other);
+  void Merge( Histogram& other);
 
-  std::string ToString() const;
+  std::string ToString() ;
 
  private:
   double min_;
@@ -28,13 +28,13 @@ class Histogram {
   double sum_squares_;
 
   enum { kNumBuckets = 154 };
-  static const double kBucketLimit[kNumBuckets];
+  static  double kBucketLimit[kNumBuckets];
   double buckets_[kNumBuckets];
 
-  double Median() const;
-  double Percentile(double p) const;
-  double Average() const;
-  double StandardDeviation() const;
+  double Median() ;
+  double Percentile(double p) ;
+  double Average() ;
+  double StandardDeviation() ;
 };
 
 }  // namespace leveldb

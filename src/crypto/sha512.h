@@ -17,10 +17,10 @@ private:
     uint64_t bytes;
 
 public:
-    static const size_t OUTPUT_SIZE = 64;
+    static  size_t OUTPUT_SIZE = 64;
 
     CSHA512();
-    CSHA512& Write(const unsigned char* data, size_t len);
+    CSHA512& Write( unsigned char* data, size_t len);
     void Finalize(unsigned char hash[OUTPUT_SIZE]);
     CSHA512& Reset();
 };

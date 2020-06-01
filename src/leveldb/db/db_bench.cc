@@ -41,7 +41,7 @@
 //      stats       -- Print DB stats
 //      sstables    -- Print sstable info
 //      heapprofile -- Dump a heap profile (if supported by this port)
-static const char* FLAGS_benchmarks =
+static  char* FLAGS_benchmarks =
     "fillseq,"
     "fillsync,"
     "fillrandom,"
@@ -112,7 +112,7 @@ static bool FLAGS_use_existing_db = false;
 static bool FLAGS_reuse_logs = false;
 
 // Use the db with the following name.
-static const char* FLAGS_db = NULL;
+static  char* FLAGS_db = NULL;
 
 namespace leveldb {
 
@@ -200,7 +200,7 @@ class Stats {
     message_.clear();
   }
 
-  void Merge(const Stats& other) {
+  void Merge( Stats& other) {
     hist_.Merge(other.hist_);
     done_ += other.done_;
     bytes_ += other.bytes_;
@@ -251,7 +251,7 @@ class Stats {
     bytes_ += n;
   }
 
-  void Report(const Slice& name) {
+  void Report( Slice& name) {
     // Pretend at least one op was done in case we are running a benchmark
     // that does not call FinishedSingleOp().
     if (done_ < 1) done_ = 1;
@@ -317,7 +317,7 @@ struct ThreadState {
 class Benchmark {
  private:
   Cache* cache_;
-  const FilterPolicy* filter_policy_;
+   FilterPolicy* filter_policy_;
   DB* db_;
   int num_;
   int value_size_;
@@ -327,7 +327,7 @@ class Benchmark {
   int heap_counter_;
 
   void PrintHeader() {
-    const int kKeySize = 16;
+     int kKeySize = 16;
     PrintEnvironment();
     fprintf(stdout, "Keys:       %d bytes each\n", kKeySize);
     fprintf(stdout, "Values:     %d bytes each (%d bytes after compression)\n",
@@ -356,7 +356,7 @@ class Benchmark {
 #endif
 
     // See if snappy is working by attempting to compress a compressible string
-    const char text[] = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
+     char text[] = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
     std::string compressed;
     if (!port::Snappy_Compress(text, sizeof(text), &compressed)) {
       fprintf(stdout, "WARNING: Snappy compression is not enabled\n");
@@ -380,7 +380,7 @@ class Benchmark {
       std::string cpu_type;
       std::string cache_size;
       while (fgets(line, sizeof(line), cpuinfo) != NULL) {
-        const char* sep = strchr(line, ':');
+         char* sep = strchr(line, ':');
         if (sep == NULL) {
           continue;
         }
@@ -434,9 +434,9 @@ class Benchmark {
     PrintHeader();
     Open();
 
-    const char* benchmarks = FLAGS_benchmarks;
+     char* benchmarks = FLAGS_benchmarks;
     while (benchmarks != NULL) {
-      const char* sep = strchr(benchmarks, ',');
+       char* sep = strchr(benchmarks, ',');
       Slice name;
       if (sep == NULL) {
         name = benchmarks;
@@ -626,8 +626,8 @@ class Benchmark {
 
   void Crc32c(ThreadState* thread) {
     // Checksum about 500MB of data total
-    const int size = 4096;
-    const char* label = "(4K per op)";
+     int size = 4096;
+     char* label = "(4K per op)";
     std::string data(size, 'x');
     int64_t bytes = 0;
     uint32_t crc = 0;
@@ -755,7 +755,7 @@ class Benchmark {
     for (int i = 0; i < num_; i += entries_per_batch_) {
       batch.Clear();
       for (int j = 0; j < entries_per_batch_; j++) {
-        const int k = seq ? i+j : (thread->rand.Next() % FLAGS_num);
+         int k = seq ? i+j : (thread->rand.Next() % FLAGS_num);
         char key[100];
         snprintf(key, sizeof(key), "%016d", k);
         batch.Put(key, gen.Generate(value_size_));
@@ -803,7 +803,7 @@ class Benchmark {
     int found = 0;
     for (int i = 0; i < reads_; i++) {
       char key[100];
-      const int k = thread->rand.Next() % FLAGS_num;
+       int k = thread->rand.Next() % FLAGS_num;
       snprintf(key, sizeof(key), "%016d", k);
       if (db_->Get(options, key, &value).ok()) {
         found++;
@@ -820,7 +820,7 @@ class Benchmark {
     std::string value;
     for (int i = 0; i < reads_; i++) {
       char key[100];
-      const int k = thread->rand.Next() % FLAGS_num;
+       int k = thread->rand.Next() % FLAGS_num;
       snprintf(key, sizeof(key), "%016d.", k);
       db_->Get(options, key, &value);
       thread->stats.FinishedSingleOp();
@@ -830,10 +830,10 @@ class Benchmark {
   void ReadHot(ThreadState* thread) {
     ReadOptions options;
     std::string value;
-    const int range = (FLAGS_num + 99) / 100;
+     int range = (FLAGS_num + 99) / 100;
     for (int i = 0; i < reads_; i++) {
       char key[100];
-      const int k = thread->rand.Next() % range;
+       int k = thread->rand.Next() % range;
       snprintf(key, sizeof(key), "%016d", k);
       db_->Get(options, key, &value);
       thread->stats.FinishedSingleOp();
@@ -846,7 +846,7 @@ class Benchmark {
     for (int i = 0; i < reads_; i++) {
       Iterator* iter = db_->NewIterator(options);
       char key[100];
-      const int k = thread->rand.Next() % FLAGS_num;
+       int k = thread->rand.Next() % FLAGS_num;
       snprintf(key, sizeof(key), "%016d", k);
       iter->Seek(key);
       if (iter->Valid() && iter->key() == key) found++;
@@ -865,7 +865,7 @@ class Benchmark {
     for (int i = 0; i < num_; i += entries_per_batch_) {
       batch.Clear();
       for (int j = 0; j < entries_per_batch_; j++) {
-        const int k = seq ? i+j : (thread->rand.Next() % FLAGS_num);
+         int k = seq ? i+j : (thread->rand.Next() % FLAGS_num);
         char key[100];
         snprintf(key, sizeof(key), "%016d", k);
         batch.Delete(key);
@@ -902,7 +902,7 @@ class Benchmark {
           }
         }
 
-        const int k = thread->rand.Next() % FLAGS_num;
+         int k = thread->rand.Next() % FLAGS_num;
         char key[100];
         snprintf(key, sizeof(key), "%016d", k);
         Status s = db_->Put(write_options_, key, gen.Generate(value_size_));
@@ -921,7 +921,7 @@ class Benchmark {
     db_->CompactRange(NULL, NULL);
   }
 
-  void PrintStats(const char* key) {
+  void PrintStats( char* key) {
     std::string stats;
     if (!db_->GetProperty(key, &stats)) {
       stats = "(failed)";
@@ -929,7 +929,7 @@ class Benchmark {
     fprintf(stdout, "\n%s\n", stats.c_str());
   }
 
-  static void WriteToFile(void* arg, const char* buf, int n) {
+  static void WriteToFile(void* arg,  char* buf, int n) {
     reinterpret_cast<WritableFile*>(arg)->Append(Slice(buf, n));
   }
 

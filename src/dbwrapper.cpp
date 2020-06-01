@@ -18,7 +18,7 @@ class CBitcoinLevelDBLogger : public leveldb::Logger {
 public:
     // This code is adapted from posix_logger.h, which is why it is using vsprintf.
     // Please do not do this in normal code
-    void Logv(const char * format, va_list ap) override {
+    void Logv( char * format, va_list ap) override {
             if (!LogAcceptCategory(BCLog::LEVELDB)) {
                 return;
             }
@@ -89,7 +89,7 @@ static leveldb::Options GetOptions(size_t nCacheSize)
     return options;
 }
 
-CDBWrapper::CDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory, bool fWipe, bool obfuscate)
+CDBWrapper::CDBWrapper( fs::path& path, size_t nCacheSize, bool fMemory, bool fWipe, bool obfuscate)
 {
     penv = nullptr;
     readoptions.verify_checksums = true;
@@ -165,15 +165,15 @@ bool CDBWrapper::WriteBatch(CDBBatch& batch, bool fSync)
 //
 // We must use a string constructor which specifies length so that we copy
 // past the null-terminator.
-const std::string CDBWrapper::OBFUSCATE_KEY_KEY("\000obfuscate_key", 14);
+ std::string CDBWrapper::OBFUSCATE_KEY_KEY("\000obfuscate_key", 14);
 
-const unsigned int CDBWrapper::OBFUSCATE_KEY_NUM_BYTES = 8;
+ unsigned int CDBWrapper::OBFUSCATE_KEY_NUM_BYTES = 8;
 
 /**
  * Returns a string (consisting of 8 random bytes) suitable for use as an
  * obfuscating XOR key.
  */
-std::vector<unsigned char> CDBWrapper::CreateObfuscateKey() const
+std::vector<unsigned char> CDBWrapper::CreateObfuscateKey() 
 {
     unsigned char buff[OBFUSCATE_KEY_NUM_BYTES];
     GetRandBytes(buff, OBFUSCATE_KEY_NUM_BYTES);
@@ -189,13 +189,13 @@ bool CDBWrapper::IsEmpty()
 }
 
 CDBIterator::~CDBIterator() { delete piter; }
-bool CDBIterator::Valid() const { return piter->Valid(); }
+bool CDBIterator::Valid()  { return piter->Valid(); }
 void CDBIterator::SeekToFirst() { piter->SeekToFirst(); }
 void CDBIterator::Next() { piter->Next(); }
 
 namespace dbwrapper_private {
 
-void HandleError(const leveldb::Status& status)
+void HandleError( leveldb::Status& status)
 {
     if (status.ok())
         return;
@@ -209,7 +209,7 @@ void HandleError(const leveldb::Status& status)
     throw dbwrapper_error("Unknown database error");
 }
 
-const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w)
+ std::vector<unsigned char>& GetObfuscateKey( CDBWrapper &w)
 {
     return w.obfuscate_key;
 }

@@ -12,12 +12,12 @@
 
 typedef struct {
     int keysize;
-    const char* key;
-    const char* plain;
-    const char* cipher;
+     char* key;
+     char* plain;
+     char* cipher;
 } ctaes_test;
 
-static const ctaes_test ctaes_tests[] = {
+static  ctaes_test ctaes_tests[] = {
     /* AES test vectors from FIPS 197. */
     {128, "000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff", "69c4e0d86a7b0430d8cdb78070b4c55a"},
     {192, "000102030405060708090a0b0c0d0e0f1011121314151617", "00112233445566778899aabbccddeeff", "dda97ca4864cdfe06eaf70a0ec0d7191"},
@@ -38,7 +38,7 @@ static const ctaes_test ctaes_tests[] = {
     {256, "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4", "f69f2445df4f9b17ad2b417be66c3710", "23304b7a39f9f3ff067d8d8f9e24ecc7"}
 };
 
-static void from_hex(unsigned char* data, int len, const char* hex) {
+static void from_hex(unsigned char* data, int len,  char* hex) {
     int p;
     for (p = 0; p < len; p++) {
         int v = 0;
@@ -62,7 +62,7 @@ int main(void) {
     int fail = 0;
     for (i = 0; i < sizeof(ctaes_tests) / sizeof(ctaes_tests[0]); i++) {
         unsigned char key[32], plain[16], cipher[16], ciphered[16], deciphered[16];
-        const ctaes_test* test = &ctaes_tests[i];
+         ctaes_test* test = &ctaes_tests[i];
         assert(test->keysize == 128 || test->keysize == 192 || test->keysize == 256);
         from_hex(plain, 16, test->plain);
         from_hex(cipher, 16, test->cipher);

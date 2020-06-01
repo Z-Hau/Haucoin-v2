@@ -159,7 +159,7 @@ TEST(MemEnvTest, Misc) {
 }
 
 TEST(MemEnvTest, LargeWrite) {
-  const size_t kWriteSize = 300 * 1024;
+   size_t kWriteSize = 300 * 1024;
   char* scratch = new char[kWriteSize * 2];
 
   std::string write_data;
@@ -197,8 +197,8 @@ TEST(MemEnvTest, DBTest) {
   options.env = env_;
   DB* db;
 
-  const Slice keys[] = {Slice("aaa"), Slice("bbb"), Slice("ccc")};
-  const Slice vals[] = {Slice("foo"), Slice("bar"), Slice("baz")};
+   Slice keys[] = {Slice("aaa"), Slice("bbb"), Slice("ccc")};
+   Slice vals[] = {Slice("foo"), Slice("bar"), Slice("baz")};
 
   ASSERT_OK(DB::Open(options, "/dir/db", &db));
   for (size_t i = 0; i < 3; ++i) {

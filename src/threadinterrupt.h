@@ -18,7 +18,7 @@
 class CThreadInterrupt
 {
 public:
-    explicit operator bool() const;
+    explicit operator bool() ;
     void operator()();
     void reset();
     bool sleep_for(std::chrono::milliseconds rel_time);

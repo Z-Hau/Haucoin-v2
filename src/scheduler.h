@@ -69,10 +69,10 @@ public:
     // Returns number of tasks waiting to be serviced,
     // and first and last task times
     size_t getQueueInfo(boost::chrono::system_clock::time_point &first,
-                        boost::chrono::system_clock::time_point &last) const;
+                        boost::chrono::system_clock::time_point &last) ;
 
     // Returns true if there are threads actively running in serviceQueue()
-    bool AreThreadsServicingQueue() const;
+    bool AreThreadsServicingQueue() ;
 
 private:
     std::multimap<boost::chrono::system_clock::time_point, Function> taskQueue;
@@ -81,7 +81,7 @@ private:
     int nThreadsServicingQueue;
     bool stopRequested;
     bool stopWhenEmpty;
-    bool shouldStop() const { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
+    bool shouldStop()  { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
 };
 
 /**

@@ -16,9 +16,9 @@ typedef std::vector<unsigned char> valtype;
 bool fAcceptDatacarrier = DEFAULT_ACCEPT_DATACARRIER;
 unsigned nMaxDatacarrierBytes = MAX_OP_RETURN_RELAY;
 
-CScriptID::CScriptID(const CScript& in) : uint160(Hash160(in.begin(), in.end())) {}
+CScriptID::CScriptID( CScript& in) : uint160(Hash160(in.begin(), in.end())) {}
 
-const char* GetTxnOutputType(txnouttype t)
+ char* GetTxnOutputType(txnouttype t)
 {
     switch (t)
     {
@@ -35,7 +35,7 @@ const char* GetTxnOutputType(txnouttype t)
     return nullptr;
 }
 
-bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet)
+bool Solver( CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet)
 {
     // Templates
     static std::multimap<txnouttype, CScript> mTemplates;
@@ -96,10 +96,10 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
     }
 
     // Scan templates
-    const CScript& script1 = scriptPubKey;
-    for (const std::pair<txnouttype, CScript>& tplate : mTemplates)
+     CScript& script1 = scriptPubKey;
+    for ( std::pair<txnouttype, CScript>& tplate : mTemplates)
     {
-        const CScript& script2 = tplate.second;
+         CScript& script2 = tplate.second;
         vSolutionsRet.clear();
 
         opcodetype opcode1, opcode2;
@@ -180,7 +180,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
     return false;
 }
 
-bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
+bool ExtractDestination( CScript& scriptPubKey, CTxDestination& addressRet)
 {
     std::vector<valtype> vSolutions;
     txnouttype whichType;
@@ -227,7 +227,7 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
     return false;
 }
 
-bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet)
+bool ExtractDestinations( CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet)
 {
     addressRet.clear();
     typeRet = TX_NONSTANDARD;
@@ -276,38 +276,38 @@ private:
 public:
     explicit CScriptVisitor(CScript *scriptin) { script = scriptin; }
 
-    bool operator()(const CNoDestination &dest) const {
+    bool operator()( CNoDestination &dest)  {
         script->clear();
         return false;
     }
 
-    bool operator()(const CKeyID &keyID) const {
+    bool operator()( CKeyID &keyID)  {
         script->clear();
         *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
         return true;
     }
 
-    bool operator()(const CScriptID &scriptID) const {
+    bool operator()( CScriptID &scriptID)  {
         script->clear();
         *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
         return true;
     }
 
-    bool operator()(const WitnessV0KeyHash& id) const
+    bool operator()( WitnessV0KeyHash& id) 
     {
         script->clear();
         *script << OP_0 << ToByteVector(id);
         return true;
     }
 
-    bool operator()(const WitnessV0ScriptHash& id) const
+    bool operator()( WitnessV0ScriptHash& id) 
     {
         script->clear();
         *script << OP_0 << ToByteVector(id);
         return true;
     }
 
-    bool operator()(const WitnessUnknown& id) const
+    bool operator()( WitnessUnknown& id) 
     {
         script->clear();
         *script << CScript::EncodeOP_N(id.version) << std::vector<unsigned char>(id.program, id.program + id.length);
@@ -316,7 +316,7 @@ public:
 };
 } // namespace
 
-CScript GetScriptForDestination(const CTxDestination& dest)
+CScript GetScriptForDestination( CTxDestination& dest)
 {
     CScript script;
 
@@ -324,23 +324,23 @@ CScript GetScriptForDestination(const CTxDestination& dest)
     return script;
 }
 
-CScript GetScriptForRawPubKey(const CPubKey& pubKey)
+CScript GetScriptForRawPubKey( CPubKey& pubKey)
 {
     return CScript() << std::vector<unsigned char>(pubKey.begin(), pubKey.end()) << OP_CHECKSIG;
 }
 
-CScript GetScriptForMultisig(int nRequired, const std::vector<CPubKey>& keys)
+CScript GetScriptForMultisig(int nRequired,  std::vector<CPubKey>& keys)
 {
     CScript script;
 
     script << CScript::EncodeOP_N(nRequired);
-    for (const CPubKey& key : keys)
+    for ( CPubKey& key : keys)
         script << ToByteVector(key);
     script << CScript::EncodeOP_N(keys.size()) << OP_CHECKMULTISIG;
     return script;
 }
 
-CScript GetScriptForWitness(const CScript& redeemscript)
+CScript GetScriptForWitness( CScript& redeemscript)
 {
     CScript ret;
 
@@ -358,6 +358,6 @@ CScript GetScriptForWitness(const CScript& redeemscript)
     return GetScriptForDestination(WitnessV0ScriptHash(hash));
 }
 
-bool IsValidDestination(const CTxDestination& dest) {
+bool IsValidDestination( CTxDestination& dest) {
     return dest.which() != 0;
 }

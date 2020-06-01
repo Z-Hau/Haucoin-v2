@@ -16,7 +16,7 @@ class MacNotificationHandler : public QObject
 public:
     /** shows a macOS 10.8+ UserNotification in the UserNotificationCenter
      */
-    void showNotification(const QString &title, const QString &text);
+    void showNotification( QString &title,  QString &text);
 
     /** check if OS can handle UserNotifications */
     bool hasUserNotificationCenterSupport(void);

@@ -13,8 +13,8 @@
 namespace leveldb {
 
 // Update Makefile if you change these
-static const int kMajorVersion = 1;
-static const int kMinorVersion = 20;
+static  int kMajorVersion = 1;
+static  int kMinorVersion = 20;
 
 struct Options;
 struct ReadOptions;
@@ -35,7 +35,7 @@ struct Range {
   Slice limit;          // Not included in the range
 
   Range() { }
-  Range(const Slice& s, const Slice& l) : start(s), limit(l) { }
+  Range( Slice& s,  Slice& l) : start(s), limit(l) { }
 };
 
 // A DB is a persistent ordered map from keys to values.
@@ -48,8 +48,8 @@ class DB {
   // OK on success.
   // Stores NULL in *dbptr and returns a non-OK status on error.
   // Caller should delete *dbptr when it is no longer needed.
-  static Status Open(const Options& options,
-                     const std::string& name,
+  static Status Open( Options& options,
+                      std::string& name,
                      DB** dbptr);
 
   DB() { }
@@ -58,20 +58,20 @@ class DB {
   // Set the database entry for "key" to "value".  Returns OK on success,
   // and a non-OK status on error.
   // Note: consider setting options.sync = true.
-  virtual Status Put(const WriteOptions& options,
-                     const Slice& key,
-                     const Slice& value) = 0;
+  virtual Status Put( WriteOptions& options,
+                      Slice& key,
+                      Slice& value) = 0;
 
   // Remove the database entry (if any) for "key".  Returns OK on
   // success, and a non-OK status on error.  It is not an error if "key"
   // did not exist in the database.
   // Note: consider setting options.sync = true.
-  virtual Status Delete(const WriteOptions& options, const Slice& key) = 0;
+  virtual Status Delete( WriteOptions& options,  Slice& key) = 0;
 
   // Apply the specified updates to the database.
   // Returns OK on success, non-OK on failure.
   // Note: consider setting options.sync = true.
-  virtual Status Write(const WriteOptions& options, WriteBatch* updates) = 0;
+  virtual Status Write( WriteOptions& options, WriteBatch* updates) = 0;
 
   // If the database contains an entry for "key" store the
   // corresponding value in *value and return OK.
@@ -80,8 +80,8 @@ class DB {
   // a status for which Status::IsNotFound() returns true.
   //
   // May return some other Status on an error.
-  virtual Status Get(const ReadOptions& options,
-                     const Slice& key, std::string* value) = 0;
+  virtual Status Get( ReadOptions& options,
+                      Slice& key, std::string* value) = 0;
 
   // Return a heap-allocated iterator over the contents of the database.
   // The result of NewIterator() is initially invalid (caller must
@@ -89,17 +89,17 @@ class DB {
   //
   // Caller should delete the iterator when it is no longer needed.
   // The returned iterator should be deleted before this db is deleted.
-  virtual Iterator* NewIterator(const ReadOptions& options) = 0;
+  virtual Iterator* NewIterator( ReadOptions& options) = 0;
 
   // Return a handle to the current DB state.  Iterators created with
   // this handle will all observe a stable snapshot of the current DB
   // state.  The caller must call ReleaseSnapshot(result) when the
   // snapshot is no longer needed.
-  virtual const Snapshot* GetSnapshot() = 0;
+  virtual  Snapshot* GetSnapshot() = 0;
 
   // Release a previously acquired snapshot.  The caller must not
   // use "snapshot" after this call.
-  virtual void ReleaseSnapshot(const Snapshot* snapshot) = 0;
+  virtual void ReleaseSnapshot( Snapshot* snapshot) = 0;
 
   // DB implementations can export properties about their state
   // via this method.  If "property" is a valid property understood by this
@@ -117,7 +117,7 @@ class DB {
   //     of the sstables that make up the db contents.
   //  "leveldb.approximate-memory-usage" - returns the approximate number of
   //     bytes of memory in use by the DB.
-  virtual bool GetProperty(const Slice& property, std::string* value) = 0;
+  virtual bool GetProperty( Slice& property, std::string* value) = 0;
 
   // For each i in [0,n-1], store in "sizes[i]", the approximate
   // file system space used by keys in "[range[i].start .. range[i].limit)".
@@ -127,7 +127,7 @@ class DB {
   // sizes will be one-tenth the size of the corresponding user data size.
   //
   // The results may not include the sizes of recently written data.
-  virtual void GetApproximateSizes(const Range* range, int n,
+  virtual void GetApproximateSizes( Range* range, int n,
                                    uint64_t* sizes) = 0;
 
   // Compact the underlying storage for the key range [*begin,*end].
@@ -140,23 +140,23 @@ class DB {
   // end==NULL is treated as a key after all keys in the database.
   // Therefore the following call will compact the entire database:
   //    db->CompactRange(NULL, NULL);
-  virtual void CompactRange(const Slice* begin, const Slice* end) = 0;
+  virtual void CompactRange( Slice* begin,  Slice* end) = 0;
 
  private:
   // No copying allowed
-  DB(const DB&);
-  void operator=(const DB&);
+  DB( DB&);
+  void operator=( DB&);
 };
 
 // Destroy the contents of the specified database.
 // Be very careful using this method.
-Status DestroyDB(const std::string& name, const Options& options);
+Status DestroyDB( std::string& name,  Options& options);
 
 // If a DB cannot be opened, you may attempt to call this method to
 // resurrect as much of the contents of the database as possible.
 // Some data may be lost, so be careful when calling this function
 // on a database that contains important information.
-Status RepairDB(const std::string& dbname, const Options& options);
+Status RepairDB( std::string& dbname,  Options& options);
 
 }  // namespace leveldb
 

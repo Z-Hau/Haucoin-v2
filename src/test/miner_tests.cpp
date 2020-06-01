@@ -29,17 +29,17 @@ BOOST_FIXTURE_TEST_SUITE(miner_tests, TestingSetup)
 // BOOST_CHECK_EXCEPTION predicates to check the specific validation error
 class HasReason {
 public:
-    HasReason(const std::string& reason) : m_reason(reason) {}
-    bool operator() (const std::runtime_error& e) const {
+    HasReason( std::string& reason) : m_reason(reason) {}
+    bool operator() ( std::runtime_error& e)  {
         return std::string(e.what()).find(m_reason) != std::string::npos;
     };
 private:
-    const std::string m_reason;
+     std::string m_reason;
 };
 
 static CFeeRate blockMinFeeRate = CFeeRate(DEFAULT_BLOCK_MIN_TX_FEE);
 
-static BlockAssembler AssemblerForTest(const CChainParams& params) {
+static BlockAssembler AssemblerForTest( CChainParams& params) {
     BlockAssembler::Options options;
 
     options.nBlockMaxWeight = MAX_BLOCK_WEIGHT;
@@ -90,7 +90,7 @@ CBlockIndex CreateBlockIndex(int nHeight)
     return index;
 }
 
-bool TestSequenceLocks(const CTransaction &tx, int flags)
+bool TestSequenceLocks( CTransaction &tx, int flags)
 {
     LOCK(mempool.cs);
     return CheckSequenceLocks(tx, flags);
@@ -99,7 +99,7 @@ bool TestSequenceLocks(const CTransaction &tx, int flags)
 // Test suite for ancestor feerate transaction selection.
 // Implemented as an additional function, rather than a separate test case,
 // to allow reusing the blockchain created in CreateNewBlock_validity.
-void TestPackageSelection(const CChainParams& chainparams, CScript scriptPubKey, std::vector<CTransactionRef>& txFirst)
+void TestPackageSelection( CChainParams& chainparams, CScript scriptPubKey, std::vector<CTransactionRef>& txFirst)
 {
     // Test the ancestor feerate transaction selection.
     TestMemPoolEntryHelper entry;
@@ -205,8 +205,8 @@ void TestPackageSelection(const CChainParams& chainparams, CScript scriptPubKey,
 BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
 {
     // Note that by default, these tests run with size accounting enabled.
-    const auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
-    const CChainParams& chainparams = *chainParams;
+     auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
+     CChainParams& chainparams = *chainParams;
     CScript scriptPubKey = CScript() << ParseHex("040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9") << OP_CHECKSIG;
     std::unique_ptr<CBlockTemplate> pblocktemplate;
     CMutableTransaction tx,tx2;
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
             pblock->nNonce = blockinfo[i].nonce;
         }
-        std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
+        std::shared_ptr< CBlock> shared_pblock = std::make_shared< CBlock>(*pblock);
         BOOST_CHECK(ProcessNewBlock(chainparams, shared_pblock, true, nullptr));
         pblock->hashPrevBlock = pblock->GetHash();
     }
@@ -257,10 +257,10 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     // Just to make sure we can still make simple blocks
     BOOST_CHECK(pblocktemplate = AssemblerForTest(chainparams).CreateNewBlock(scriptPubKey));
 
-    const CAmount BLOCKSUBSIDY = 50*COIN;
-    const CAmount LOWFEE = CENT;
-    const CAmount HIGHFEE = COIN;
-    const CAmount HIGHERFEE = 4*COIN;
+     CAmount BLOCKSUBSIDY = 50*COIN;
+     CAmount LOWFEE = CENT;
+     CAmount HIGHFEE = COIN;
+     CAmount HIGHERFEE = 4*COIN;
 
     // block sigops > limit: 1000 CHECKMULTISIG + 1
     tx.vin.resize(1);

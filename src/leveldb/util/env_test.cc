@@ -9,9 +9,9 @@
 
 namespace leveldb {
 
-static const int kDelayMicros = 100000;
-static const int kReadOnlyFileLimit = 4;
-static const int kMMapLimit = 4;
+static  int kDelayMicros = 100000;
+static  int kReadOnlyFileLimit = 4;
+static  int kMMapLimit = 4;
 
 class EnvTest {
  private:

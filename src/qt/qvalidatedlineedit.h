@@ -17,7 +17,7 @@ class QValidatedLineEdit : public QLineEdit
 public:
     explicit QValidatedLineEdit(QWidget *parent);
     void clear();
-    void setCheckValidator(const QValidator *v);
+    void setCheckValidator( QValidator *v);
     bool isValid();
 
 protected:
@@ -26,7 +26,7 @@ protected:
 
 private:
     bool valid;
-    const QValidator *checkValidator;
+     QValidator *checkValidator;
 
 public Q_SLOTS:
     void setValid(bool valid);

@@ -119,7 +119,7 @@ void ReceiveRequestDialog::setModel(OptionsModel *_model)
     update();
 }
 
-void ReceiveRequestDialog::setInfo(const SendCoinsRecipient &_info)
+void ReceiveRequestDialog::setInfo( SendCoinsRecipient &_info)
 {
     this->info = _info;
     update();

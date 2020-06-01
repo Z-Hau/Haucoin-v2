@@ -14,7 +14,7 @@
 #include <array>
 
 // FIXME: Dedup with BuildCreditingTransaction in test/script_tests.cpp.
-static CMutableTransaction BuildCreditingTransaction(const CScript& scriptPubKey)
+static CMutableTransaction BuildCreditingTransaction( CScript& scriptPubKey)
 {
     CMutableTransaction txCredit;
     txCredit.nVersion = 1;
@@ -31,7 +31,7 @@ static CMutableTransaction BuildCreditingTransaction(const CScript& scriptPubKey
 }
 
 // FIXME: Dedup with BuildSpendingTransaction in test/script_tests.cpp.
-static CMutableTransaction BuildSpendingTransaction(const CScript& scriptSig, const CMutableTransaction& txCredit)
+static CMutableTransaction BuildSpendingTransaction( CScript& scriptSig,  CMutableTransaction& txCredit)
 {
     CMutableTransaction txSpend;
     txSpend.nVersion = 1;
@@ -52,12 +52,12 @@ static CMutableTransaction BuildSpendingTransaction(const CScript& scriptSig, co
 // modified to measure performance of other types of scripts.
 static void VerifyScriptBench(benchmark::State& state)
 {
-    const int flags = SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH;
-    const int witnessversion = 0;
+     int flags = SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH;
+     int witnessversion = 0;
 
     // Keypair.
     CKey key;
-    static const std::array<unsigned char, 32> vchKey = {
+    static  std::array<unsigned char, 32> vchKey = {
         {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
         }
@@ -99,7 +99,7 @@ static void VerifyScriptBench(benchmark::State& state)
             txCredit.vout[0].scriptPubKey.data(),
             txCredit.vout[0].scriptPubKey.size(),
             txCredit.vout[0].nValue,
-            (const unsigned char*)stream.data(), stream.size(), 0, flags, nullptr);
+            ( unsigned char*)stream.data(), stream.size(), 0, flags, nullptr);
         assert(csuccess == 1);
 #endif
     }
