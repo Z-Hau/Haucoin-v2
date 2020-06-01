@@ -8,7 +8,7 @@
 
 namespace leveldb {
 
-static std::string IKey( std::string& user_key,
+static std::string IKey(const std::string& user_key,
                         uint64_t seq,
                         ValueType vt) {
   std::string encoded;
@@ -16,19 +16,19 @@ static std::string IKey( std::string& user_key,
   return encoded;
 }
 
-static std::string Shorten( std::string& s,  std::string& l) {
+static std::string Shorten(const std::string& s, const std::string& l) {
   std::string result = s;
   InternalKeyComparator(BytewiseComparator()).FindShortestSeparator(&result, l);
   return result;
 }
 
-static std::string ShortSuccessor( std::string& s) {
+static std::string ShortSuccessor(const std::string& s) {
   std::string result = s;
   InternalKeyComparator(BytewiseComparator()).FindShortSuccessor(&result);
   return result;
 }
 
-static void TestKey( std::string& key,
+static void TestKey(const std::string& key,
                     uint64_t seq,
                     ValueType vt) {
   std::string encoded = IKey(key, seq, vt);
@@ -47,8 +47,8 @@ static void TestKey( std::string& key,
 class FormatTest { };
 
 TEST(FormatTest, InternalKey_EncodeDecode) {
-   char* keys[] = { "", "k", "hello", "longggggggggggggggggggggg" };
-   uint64_t seq[] = {
+  const char* keys[] = { "", "k", "hello", "longggggggggggggggggggggg" };
+  const uint64_t seq[] = {
     1, 2, 3,
     (1ull << 8) - 1, 1ull << 8, (1ull << 8) + 1,
     (1ull << 16) - 1, 1ull << 16, (1ull << 16) + 1,

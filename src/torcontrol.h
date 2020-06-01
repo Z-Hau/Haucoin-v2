@@ -10,8 +10,8 @@
 
 #include <scheduler.h>
 
-extern  std::string DEFAULT_TOR_CONTROL;
-static  bool DEFAULT_LISTEN_ONION = true;
+extern const std::string DEFAULT_TOR_CONTROL;
+static const bool DEFAULT_LISTEN_ONION = true;
 
 void StartTorControl(boost::thread_group& threadGroup, CScheduler& scheduler);
 void InterruptTorControl();

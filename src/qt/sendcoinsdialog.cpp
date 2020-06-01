@@ -28,7 +28,7 @@
 #include <QSettings>
 #include <QTextDocument>
 
-static  std::array<int, 9> confTargets = { {2, 4, 6, 12, 24, 48, 144, 504, 1008} };
+static const std::array<int, 9> confTargets = { {2, 4, 6, 12, 24, 48, 144, 504, 1008} };
 int getConfTargetForIndex(int index) {
     if (index+1 > static_cast<int>(confTargets.size())) {
         return confTargets.back();
@@ -47,7 +47,7 @@ int getIndexForConfTarget(int target) {
     return confTargets.size() - 1;
 }
 
-SendCoinsDialog::SendCoinsDialog( PlatformStyle *_platformStyle, QWidget *parent) :
+SendCoinsDialog::SendCoinsDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SendCoinsDialog),
     clientModel(0),
@@ -78,7 +78,7 @@ SendCoinsDialog::SendCoinsDialog( PlatformStyle *_platformStyle, QWidget *parent
     // Coin Control
     connect(ui->pushButtonCoinControl, SIGNAL(clicked()), this, SLOT(coinControlButtonClicked()));
     connect(ui->checkBoxCoinControlChange, SIGNAL(stateChanged(int)), this, SLOT(coinControlChangeChecked(int)));
-    connect(ui->lineEditCoinControlChange, SIGNAL(textEdited( QString &)), this, SLOT(coinControlChangeEdited( QString &)));
+    connect(ui->lineEditCoinControlChange, SIGNAL(textEdited(const QString &)), this, SLOT(coinControlChangeEdited(const QString &)));
 
     // Coin Control: clipboard actions
     QAction *clipboardQuantityAction = new QAction(tr("Copy quantity"), this);
@@ -162,7 +162,7 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         coinControlUpdateLabels();
 
         // fee section
-        for ( int n : confTargets) {
+        for (const int n : confTargets) {
             ui->confTargetSelector->addItem(tr("%1 (%2 blocks)").arg(GUIUtil::formatNiceTimeOffset(n*Params().GetConsensus().nPowTargetSpacing)).arg(n));
         }
         connect(ui->confTargetSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmartFeeLabel()));
@@ -275,7 +275,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     // Format confirmation message
     QStringList formatted;
-    for ( SendCoinsRecipient &rcp : currentTransaction.getRecipients())
+    for (const SendCoinsRecipient &rcp : currentTransaction.getRecipients())
     {
         // generate bold amount string
         QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
@@ -459,7 +459,7 @@ QWidget *SendCoinsDialog::setupTabChain(QWidget *prev)
     return ui->addButton;
 }
 
-void SendCoinsDialog::setAddress( QString &address)
+void SendCoinsDialog::setAddress(const QString &address)
 {
     SendCoinsEntry *entry = 0;
     // Replace the first entry if it is still unused
@@ -479,7 +479,7 @@ void SendCoinsDialog::setAddress( QString &address)
     entry->setAddress(address);
 }
 
-void SendCoinsDialog::pasteEntry( SendCoinsRecipient &rv)
+void SendCoinsDialog::pasteEntry(const SendCoinsRecipient &rv)
 {
     if(!fNewRecipientAllowed)
         return;
@@ -503,7 +503,7 @@ void SendCoinsDialog::pasteEntry( SendCoinsRecipient &rv)
     updateTabsAndLabels();
 }
 
-bool SendCoinsDialog::handlePaymentRequest( SendCoinsRecipient &rv)
+bool SendCoinsDialog::handlePaymentRequest(const SendCoinsRecipient &rv)
 {
     // Just paste the entry, all pre-checks
     // are done in paymentserver.cpp.
@@ -511,8 +511,8 @@ bool SendCoinsDialog::handlePaymentRequest( SendCoinsRecipient &rv)
     return true;
 }
 
-void SendCoinsDialog::setBalance( CAmount& balance,  CAmount& unconfirmedBalance,  CAmount& immatureBalance,
-                                  CAmount& watchBalance,  CAmount& watchUnconfirmedBalance,  CAmount& watchImmatureBalance)
+void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance,
+                                 const CAmount& watchBalance, const CAmount& watchUnconfirmedBalance, const CAmount& watchImmatureBalance)
 {
     Q_UNUSED(unconfirmedBalance);
     Q_UNUSED(immatureBalance);
@@ -534,7 +534,7 @@ void SendCoinsDialog::updateDisplayUnit()
     updateSmartFeeLabel();
 }
 
-void SendCoinsDialog::processSendCoinsReturn( WalletModel::SendCoinsReturn &sendCoinsReturn,  QString &msgArg)
+void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn &sendCoinsReturn, const QString &msgArg)
 {
     QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
     // Default to a warning message, override if error message is needed
@@ -790,7 +790,7 @@ void SendCoinsDialog::coinControlChangeChecked(int state)
 }
 
 // Coin Control: custom change address changed
-void SendCoinsDialog::coinControlChangeEdited( QString& text)
+void SendCoinsDialog::coinControlChangeEdited(const QString& text)
 {
     if (model && model->getAddressTableModel())
     {
@@ -798,7 +798,7 @@ void SendCoinsDialog::coinControlChangeEdited( QString& text)
         CoinControlDialog::coinControl()->destChange = CNoDestination();
         ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
 
-         CTxDestination dest = DecodeDestination(text.toStdString());
+        const CTxDestination dest = DecodeDestination(text.toStdString());
 
         if (text.isEmpty()) // Nothing entered
         {
@@ -885,7 +885,7 @@ void SendCoinsDialog::coinControlUpdateLabels()
     }
 }
 
-SendConfirmationDialog::SendConfirmationDialog( QString &title,  QString &text, int _secDelay,
+SendConfirmationDialog::SendConfirmationDialog(const QString &title, const QString &text, int _secDelay,
     QWidget *parent) :
     QMessageBox(QMessageBox::Question, title, text, QMessageBox::Yes | QMessageBox::Cancel, parent), secDelay(_secDelay)
 {

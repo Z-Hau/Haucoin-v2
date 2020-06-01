@@ -18,7 +18,7 @@
 #include <QDir>
 #include <QtGlobal>
 
-static UniValue rpcNestedTest_rpc( JSONRPCRequest& request)
+static UniValue rpcNestedTest_rpc(const JSONRPCRequest& request)
 {
     if (request.fHelp) {
         return "help message";
@@ -26,7 +26,7 @@ static UniValue rpcNestedTest_rpc( JSONRPCRequest& request)
     return request.params.write(0, 0);
 }
 
-static  CRPCCommand vRPCCommands[] =
+static const CRPCCommand vRPCCommands[] =
 {
     { "test", "rpcNestedTest", &rpcNestedTest_rpc, {} },
 };

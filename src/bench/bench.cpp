@@ -17,7 +17,7 @@ void benchmark::ConsolePrinter::header()
     std::cout << "# Benchmark, evals, iterations, total, min, max, median" << std::endl;
 }
 
-void benchmark::ConsolePrinter::result( State& state)
+void benchmark::ConsolePrinter::result(const State& state)
 {
     auto results = state.m_elapsed_results;
     std::sort(results.begin(), results.end());
@@ -58,14 +58,14 @@ void benchmark::PlotlyPrinter::header()
               << std::endl;
 }
 
-void benchmark::PlotlyPrinter::result( State& state)
+void benchmark::PlotlyPrinter::result(const State& state)
 {
     std::cout << "{ " << std::endl
               << "  name: '" << state.m_name << "', " << std::endl
               << "  y: [";
 
-     char* prefix = "";
-    for ( auto& e : state.m_elapsed_results) {
+    const char* prefix = "";
+    for (const auto& e : state.m_elapsed_results) {
         std::cout << prefix << std::setprecision(6) << e;
         prefix = ", ";
     }
@@ -94,7 +94,7 @@ benchmark::BenchRunner::BenchRunner(std::string name, benchmark::BenchFunction f
     benchmarks().insert(std::make_pair(name, Bench{func, num_iters_for_one_second}));
 }
 
-void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double scaling,  std::string& filter, bool is_list_only)
+void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double scaling, const std::string& filter, bool is_list_only)
 {
     perf_init();
     if (!std::ratio_less_equal<benchmark::clock::period, std::micro>::value) {
@@ -109,7 +109,7 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
 
     printer.header();
 
-    for ( auto& p : benchmarks()) {
+    for (const auto& p : benchmarks()) {
         if (!std::regex_match(p.first, baseMatch, reFilter)) {
             continue;
         }
@@ -130,7 +130,7 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
     perf_fini();
 }
 
-bool benchmark::State::UpdateTimer( benchmark::time_point current_time)
+bool benchmark::State::UpdateTimer(const benchmark::time_point current_time)
 {
     if (m_start_time != time_point()) {
         std::chrono::duration<double> diff = current_time - m_start_time;

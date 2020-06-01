@@ -76,7 +76,7 @@ public:
         nRandomPos = -1;
     }
 
-    CAddrInfo( CAddress &addrIn,  CNetAddr &addrSource) : CAddress(addrIn), source(addrSource)
+    CAddrInfo(const CAddress &addrIn, const CNetAddr &addrSource) : CAddress(addrIn), source(addrSource)
     {
         Init();
     }
@@ -87,25 +87,25 @@ public:
     }
 
     //! Calculate in which "tried" bucket this entry belongs
-    int GetTriedBucket( uint256 &nKey) ;
+    int GetTriedBucket(const uint256 &nKey) const;
 
     //! Calculate in which "new" bucket this entry belongs, given a certain source
-    int GetNewBucket( uint256 &nKey,  CNetAddr& src) ;
+    int GetNewBucket(const uint256 &nKey, const CNetAddr& src) const;
 
     //! Calculate in which "new" bucket this entry belongs, using its default source
-    int GetNewBucket( uint256 &nKey) 
+    int GetNewBucket(const uint256 &nKey) const
     {
         return GetNewBucket(nKey, source);
     }
 
     //! Calculate in which position of a bucket to store this entry.
-    int GetBucketPosition( uint256 &nKey, bool fNew, int nBucket) ;
+    int GetBucketPosition(const uint256 &nKey, bool fNew, int nBucket) const;
 
     //! Determine whether the statistics about this entry are bad enough so that it can just be deleted
-    bool IsTerrible(int64_t nNow = GetAdjustedTime()) ;
+    bool IsTerrible(int64_t nNow = GetAdjustedTime()) const;
 
     //! Calculate the relative chance this entry should be given when selecting nodes to connect to
-    double GetChance(int64_t nNow = GetAdjustedTime()) ;
+    double GetChance(int64_t nNow = GetAdjustedTime()) const;
 
 };
 
@@ -220,11 +220,11 @@ protected:
     FastRandomContext insecure_rand;
 
     //! Find an entry.
-    CAddrInfo* Find( CNetAddr& addr, int *pnId = nullptr);
+    CAddrInfo* Find(const CNetAddr& addr, int *pnId = nullptr);
 
     //! find an entry, creating it if necessary.
     //! nTime and nServices of the found node are updated, if necessary.
-    CAddrInfo* Create( CAddress &addr,  CNetAddr &addrSource, int *pnId = nullptr);
+    CAddrInfo* Create(const CAddress &addr, const CNetAddr &addrSource, int *pnId = nullptr);
 
     //! Swap two elements in vRandom.
     void SwapRandom(unsigned int nRandomPos1, unsigned int nRandomPos2);
@@ -239,13 +239,13 @@ protected:
     void ClearNew(int nUBucket, int nUBucketPos);
 
     //! Mark an entry "good", possibly moving it from "new" to "tried".
-    void Good_( CService &addr, int64_t nTime);
+    void Good_(const CService &addr, int64_t nTime);
 
     //! Add an entry to the "new" table.
-    bool Add_( CAddress &addr,  CNetAddr& source, int64_t nTimePenalty);
+    bool Add_(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty);
 
     //! Mark an entry as attempted to connect.
-    void Attempt_( CService &addr, bool fCountFailure, int64_t nTime);
+    void Attempt_(const CService &addr, bool fCountFailure, int64_t nTime);
 
     //! Select an address to connect to, if newOnly is set to true, only the new table is selected from.
     CAddrInfo Select_(bool newOnly);
@@ -262,10 +262,10 @@ protected:
     void GetAddr_(std::vector<CAddress> &vAddr);
 
     //! Mark an entry as currently-connected-to.
-    void Connected_( CService &addr, int64_t nTime);
+    void Connected_(const CService &addr, int64_t nTime);
 
     //! Update an entry's service bits.
-    void SetServices_( CService &addr, ServiceFlags nServices);
+    void SetServices_(const CService &addr, ServiceFlags nServices);
 
 public:
     /**
@@ -298,7 +298,7 @@ public:
      * very little in common.
      */
     template<typename Stream>
-    void Serialize(Stream &s) 
+    void Serialize(Stream &s) const
     {
         LOCK(cs);
 
@@ -313,9 +313,9 @@ public:
         s << nUBuckets;
         std::map<int, int> mapUnkIds;
         int nIds = 0;
-        for ( auto& entry : mapInfo) {
+        for (const auto& entry : mapInfo) {
             mapUnkIds[entry.first] = nIds;
-             CAddrInfo &info = entry.second;
+            const CAddrInfo &info = entry.second;
             if (info.nRefCount) {
                 assert(nIds != nNew); // this means nNew was wrong, oh ow
                 s << info;
@@ -323,8 +323,8 @@ public:
             }
         }
         nIds = 0;
-        for ( auto& entry : mapInfo) {
-             CAddrInfo &info = entry.second;
+        for (const auto& entry : mapInfo) {
+            const CAddrInfo &info = entry.second;
             if (info.fInTried) {
                 assert(nIds != nTried); // this means nTried was wrong, oh ow
                 s << info;
@@ -488,7 +488,7 @@ public:
     }
 
     //! Return the number of (unique) addresses in all tables.
-    size_t size() 
+    size_t size() const
     {
         LOCK(cs); // TODO: Cache this in an atomic to avoid this overhead
         return vRandom.size();
@@ -508,7 +508,7 @@ public:
     }
 
     //! Add a single address.
-    bool Add( CAddress &addr,  CNetAddr& source, int64_t nTimePenalty = 0)
+    bool Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         LOCK(cs);
         bool fRet = false;
@@ -522,7 +522,7 @@ public:
     }
 
     //! Add multiple addresses.
-    bool Add( std::vector<CAddress> &vAddr,  CNetAddr& source, int64_t nTimePenalty = 0)
+    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         LOCK(cs);
         int nAdd = 0;
@@ -537,7 +537,7 @@ public:
     }
 
     //! Mark an entry as accessible.
-    void Good( CService &addr, int64_t nTime = GetAdjustedTime())
+    void Good(const CService &addr, int64_t nTime = GetAdjustedTime())
     {
         LOCK(cs);
         Check();
@@ -546,7 +546,7 @@ public:
     }
 
     //! Mark an entry as connection attempted to.
-    void Attempt( CService &addr, bool fCountFailure, int64_t nTime = GetAdjustedTime())
+    void Attempt(const CService &addr, bool fCountFailure, int64_t nTime = GetAdjustedTime())
     {
         LOCK(cs);
         Check();
@@ -583,7 +583,7 @@ public:
     }
 
     //! Mark an entry as currently-connected-to.
-    void Connected( CService &addr, int64_t nTime = GetAdjustedTime())
+    void Connected(const CService &addr, int64_t nTime = GetAdjustedTime())
     {
         LOCK(cs);
         Check();
@@ -591,7 +591,7 @@ public:
         Check();
     }
 
-    void SetServices( CService &addr, ServiceFlags nServices)
+    void SetServices(const CService &addr, ServiceFlags nServices)
     {
         LOCK(cs);
         Check();

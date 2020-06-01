@@ -39,13 +39,13 @@
 #endif
 
 /** Maximum size of http request (request line + headers) */
-static  size_t MAX_HEADERS_SIZE = 8192;
+static const size_t MAX_HEADERS_SIZE = 8192;
 
 /** HTTP request work item */
 class HTTPWorkItem final : public HTTPClosure
 {
 public:
-    HTTPWorkItem(std::unique_ptr<HTTPRequest> _req,  std::string &_path,  HTTPRequestHandler& _func):
+    HTTPWorkItem(std::unique_ptr<HTTPRequest> _req, const std::string &_path, const HTTPRequestHandler& _func):
         req(std::move(_req)), path(_path), func(_func)
     {
     }
@@ -150,11 +150,11 @@ std::vector<HTTPPathHandler> pathHandlers;
 std::vector<evhttp_bound_socket *> boundSockets;
 
 /** Check if a network address is allowed to access the HTTP server */
-static bool ClientAllowed( CNetAddr& netaddr)
+static bool ClientAllowed(const CNetAddr& netaddr)
 {
     if (!netaddr.IsValid())
         return false;
-    for( CSubNet& subnet : rpc_allow_subnets)
+    for(const CSubNet& subnet : rpc_allow_subnets)
         if (subnet.Match(netaddr))
             return true;
     return false;
@@ -170,7 +170,7 @@ static bool InitHTTPAllowList()
     LookupHost("::1", localv6, false);
     rpc_allow_subnets.push_back(CSubNet(localv4, 8));      // always allow IPv4 local subnet
     rpc_allow_subnets.push_back(CSubNet(localv6));         // always allow IPv6 localhost
-    for ( std::string& strAllow : gArgs.GetArgs("-rpcallowip")) {
+    for (const std::string& strAllow : gArgs.GetArgs("-rpcallowip")) {
         CSubNet subnet;
         LookupSubNet(strAllow.c_str(), subnet);
         if (!subnet.IsValid()) {
@@ -182,7 +182,7 @@ static bool InitHTTPAllowList()
         rpc_allow_subnets.push_back(subnet);
     }
     std::string strAllowed;
-    for ( CSubNet& subnet : rpc_allow_subnets)
+    for (const CSubNet& subnet : rpc_allow_subnets)
         strAllowed += subnet.ToString() + " ";
     LogPrint(BCLog::HTTP, "Allowing HTTP connections from: %s\n", strAllowed);
     return true;
@@ -303,7 +303,7 @@ static bool HTTPBindAddresses(struct evhttp* http)
             LogPrintf("WARNING: option -rpcbind was ignored because -rpcallowip was not specified, refusing to allow everyone to connect\n");
         }
     } else if (gArgs.IsArgSet("-rpcbind")) { // Specific bind address
-        for ( std::string& strRPCBind : gArgs.GetArgs("-rpcbind")) {
+        for (const std::string& strRPCBind : gArgs.GetArgs("-rpcbind")) {
             int port = defaultPort;
             std::string host;
             SplitHostPort(strRPCBind, port, host);
@@ -335,7 +335,7 @@ static void HTTPWorkQueueRun(WorkQueue<HTTPClosure>* queue)
 }
 
 /** libevent event log callback */
-static void libevent_log_cb(int severity,  char *msg)
+static void libevent_log_cb(int severity, const char *msg)
 {
 #ifndef EVENT_LOG_WARN
 // EVENT_LOG_WARN was added in 2.0.19; but before then _EVENT_LOG_WARN existed.
@@ -506,7 +506,7 @@ static void httpevent_callback_fn(evutil_socket_t, short, void* data)
         delete self;
 }
 
-HTTPEvent::HTTPEvent(struct event_base* base, bool _deleteWhenTriggered,  std::function<void(void)>& _handler):
+HTTPEvent::HTTPEvent(struct event_base* base, bool _deleteWhenTriggered, const std::function<void(void)>& _handler):
     deleteWhenTriggered(_deleteWhenTriggered), handler(_handler)
 {
     ev = event_new(base, -1, 0, httpevent_callback_fn, this);
@@ -537,11 +537,11 @@ HTTPRequest::~HTTPRequest()
     // evhttpd cleans up the request, as long as a reply was sent.
 }
 
-std::pair<bool, std::string> HTTPRequest::GetHeader( std::string& hdr)
+std::pair<bool, std::string> HTTPRequest::GetHeader(const std::string& hdr)
 {
-     struct evkeyvalq* headers = evhttp_request_get_input_headers(req);
+    const struct evkeyvalq* headers = evhttp_request_get_input_headers(req);
     assert(headers);
-     char* val = evhttp_find_header(headers, hdr.c_str());
+    const char* val = evhttp_find_header(headers, hdr.c_str());
     if (val)
         return std::make_pair(true, val);
     else
@@ -560,7 +560,7 @@ std::string HTTPRequest::ReadBody()
      * better to not copy into an intermediate string but use a stream
      * abstraction to consume the evbuffer on the fly in the parsing algorithm.
      */
-     char* data = ( char*)evbuffer_pullup(buf, size);
+    const char* data = (const char*)evbuffer_pullup(buf, size);
     if (!data) // returns nullptr in case of empty buffer
         return "";
     std::string rv(data, size);
@@ -568,7 +568,7 @@ std::string HTTPRequest::ReadBody()
     return rv;
 }
 
-void HTTPRequest::WriteHeader( std::string& hdr,  std::string& value)
+void HTTPRequest::WriteHeader(const std::string& hdr, const std::string& value)
 {
     struct evkeyvalq* headers = evhttp_request_get_output_headers(req);
     assert(headers);
@@ -580,7 +580,7 @@ void HTTPRequest::WriteHeader( std::string& hdr,  std::string& value)
  * Replies must be sent in the main loop in the main http thread,
  * this cannot be done from worker threads.
  */
-void HTTPRequest::WriteReply(int nStatus,  std::string& strReply)
+void HTTPRequest::WriteReply(int nStatus, const std::string& strReply)
 {
     assert(!replySent && req);
     // Send event to main http thread to send reply message
@@ -613,7 +613,7 @@ CService HTTPRequest::GetPeer()
     CService peer;
     if (con) {
         // evhttp retains ownership over returned address string
-         char* address = "";
+        const char* address = "";
         uint16_t port = 0;
         evhttp_connection_get_peer(con, (char**)&address, &port);
         peer = LookupNumeric(address, port);
@@ -647,13 +647,13 @@ HTTPRequest::RequestMethod HTTPRequest::GetRequestMethod()
     }
 }
 
-void RegisterHTTPHandler( std::string &prefix, bool exactMatch,  HTTPRequestHandler &handler)
+void RegisterHTTPHandler(const std::string &prefix, bool exactMatch, const HTTPRequestHandler &handler)
 {
     LogPrint(BCLog::HTTP, "Registering HTTP handler for %s (exactmatch %d)\n", prefix, exactMatch);
     pathHandlers.push_back(HTTPPathHandler(prefix, exactMatch, handler));
 }
 
-void UnregisterHTTPHandler( std::string &prefix, bool exactMatch)
+void UnregisterHTTPHandler(const std::string &prefix, bool exactMatch)
 {
     std::vector<HTTPPathHandler>::iterator i = pathHandlers.begin();
     std::vector<HTTPPathHandler>::iterator iend = pathHandlers.end();
@@ -667,7 +667,7 @@ void UnregisterHTTPHandler( std::string &prefix, bool exactMatch)
     }
 }
 
-std::string urlDecode( std::string &urlEncoded) {
+std::string urlDecode(const std::string &urlEncoded) {
     std::string res;
     if (!urlEncoded.empty()) {
         char *decoded = evhttp_uridecode(urlEncoded.c_str(), false, nullptr);

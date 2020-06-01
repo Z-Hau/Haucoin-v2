@@ -8,7 +8,7 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
- char* GetOpName(opcodetype opcode)
+const char* GetOpName(opcodetype opcode)
 {
     switch (opcode)
     {
@@ -151,7 +151,7 @@
     }
 }
 
-unsigned int CScript::GetSigOpCount(bool fAccurate) 
+unsigned int CScript::GetSigOpCount(bool fAccurate) const
 {
     unsigned int n = 0;
     const_iterator pc = begin();
@@ -175,7 +175,7 @@ unsigned int CScript::GetSigOpCount(bool fAccurate)
     return n;
 }
 
-unsigned int CScript::GetSigOpCount( CScript& scriptSig) 
+unsigned int CScript::GetSigOpCount(const CScript& scriptSig) const
 {
     if (!IsPayToScriptHash())
         return GetSigOpCount(true);
@@ -199,7 +199,7 @@ unsigned int CScript::GetSigOpCount( CScript& scriptSig)
     return subscript.GetSigOpCount(true);
 }
 
-bool CScript::IsPayToScriptHash() 
+bool CScript::IsPayToScriptHash() const
 {
     // Extra-fast test for pay-to-script-hash CScripts:
     return (this->size() == 23 &&
@@ -208,7 +208,7 @@ bool CScript::IsPayToScriptHash()
             (*this)[22] == OP_EQUAL);
 }
 
-bool CScript::IsPayToWitnessScriptHash() 
+bool CScript::IsPayToWitnessScriptHash() const
 {
     // Extra-fast test for pay-to-witness-script-hash CScripts:
     return (this->size() == 34 &&
@@ -218,7 +218,7 @@ bool CScript::IsPayToWitnessScriptHash()
 
 // A witness program is any valid CScript that consists of a 1-byte push opcode
 // followed by a data push between 2 and 40 bytes.
-bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program) 
+bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program) const
 {
     if (this->size() < 4 || this->size() > 42) {
         return false;
@@ -234,7 +234,7 @@ bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program
     return false;
 }
 
-bool CScript::IsPushOnly(const_iterator pc) 
+bool CScript::IsPushOnly(const_iterator pc) const
 {
     while (pc < end())
     {
@@ -251,12 +251,12 @@ bool CScript::IsPushOnly(const_iterator pc)
     return true;
 }
 
-bool CScript::IsPushOnly() 
+bool CScript::IsPushOnly() const
 {
     return this->IsPushOnly(begin());
 }
 
-std::string CScriptWitness::ToString() 
+std::string CScriptWitness::ToString() const
 {
     std::string ret = "CScriptWitness(";
     for (unsigned int i = 0; i < stack.size(); i++) {
@@ -268,7 +268,7 @@ std::string CScriptWitness::ToString()
     return ret + ")";
 }
 
-bool CScript::HasValidOps() 
+bool CScript::HasValidOps() const
 {
     CScript::const_iterator it = begin();
     while (it < end()) {

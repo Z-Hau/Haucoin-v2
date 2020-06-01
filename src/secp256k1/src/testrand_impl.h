@@ -19,7 +19,7 @@ static int secp256k1_test_rng_precomputed_used = 8;
 static uint64_t secp256k1_test_rng_integer;
 static int secp256k1_test_rng_integer_bits_left = 0;
 
-SECP256K1_INLINE static void secp256k1_rand_seed( unsigned char *seed16) {
+SECP256K1_INLINE static void secp256k1_rand_seed(const unsigned char *seed16) {
     secp256k1_rfc6979_hmac_sha256_initialize(&secp256k1_test_rng, seed16, 16);
 }
 
@@ -56,7 +56,7 @@ static uint32_t secp256k1_rand_int(uint32_t range) {
      * range is to 2**B. The array below (indexed by B) contains a 0 when the
      * first mechanism is to be used, and the number A otherwise.
      */
-    static  int addbits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1, 0};
+    static const int addbits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1, 0};
     uint32_t trange, mult;
     int bits = 0;
     if (range <= 1) {

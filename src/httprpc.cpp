@@ -22,7 +22,7 @@
 #include <boost/algorithm/string.hpp> // boost::trim
 
 /** WWW-Authenticate to present with 401 Unauthorized response */
-static  char* WWW_AUTH_HEADER_DATA = "Basic realm=\"jsonrpc\"";
+static const char* WWW_AUTH_HEADER_DATA = "Basic realm=\"jsonrpc\"";
 
 /** Simple one-shot callback timer to be used by the RPC mechanism to e.g.
  * re-lock the wallet.
@@ -48,7 +48,7 @@ public:
     explicit HTTPRPCTimerInterface(struct event_base* _base) : base(_base)
     {
     }
-     char* Name() override
+    const char* Name() override
     {
         return "HTTP";
     }
@@ -66,7 +66,7 @@ static std::string strRPCUserColonPass;
 /* Stored RPC timer interface (for unregistration) */
 static std::unique_ptr<HTTPRPCTimerInterface> httpRPCTimerInterface;
 
-static void JSONErrorReply(HTTPRequest* req,  UniValue& objError,  UniValue& id)
+static void JSONErrorReply(HTTPRequest* req, const UniValue& objError, const UniValue& id)
 {
     // Send error reply from json-rpc error object
     int nStatus = HTTP_INTERNAL_SERVER_ERROR;
@@ -93,7 +93,7 @@ static bool multiUserAuthorized(std::string strUserPass)
     std::string strUser = strUserPass.substr(0, strUserPass.find(':'));
     std::string strPass = strUserPass.substr(strUserPass.find(':') + 1);
 
-    for ( std::string& strRPCAuth : gArgs.GetArgs("-rpcauth")) {
+    for (const std::string& strRPCAuth : gArgs.GetArgs("-rpcauth")) {
         //Search for multi-user login/pass "rpcauth" from config
         std::vector<std::string> vFields;
         boost::split(vFields, strRPCAuth, boost::is_any_of(":$"));
@@ -110,10 +110,10 @@ static bool multiUserAuthorized(std::string strUserPass)
         std::string strSalt = vFields[1];
         std::string strHash = vFields[2];
 
-        static  unsigned int KEY_SIZE = 32;
+        static const unsigned int KEY_SIZE = 32;
         unsigned char out[KEY_SIZE];
 
-        CHMAC_SHA256(reinterpret_cast< unsigned char*>(strSalt.c_str()), strSalt.size()).Write(reinterpret_cast< unsigned char*>(strPass.c_str()), strPass.size()).Finalize(out);
+        CHMAC_SHA256(reinterpret_cast<const unsigned char*>(strSalt.c_str()), strSalt.size()).Write(reinterpret_cast<const unsigned char*>(strPass.c_str()), strPass.size()).Finalize(out);
         std::vector<unsigned char> hexvec(out, out+KEY_SIZE);
         std::string strHashFromPass = HexStr(hexvec);
 
@@ -124,7 +124,7 @@ static bool multiUserAuthorized(std::string strUserPass)
     return false;
 }
 
-static bool RPCAuthorized( std::string& strAuth, std::string& strAuthUsernameOut)
+static bool RPCAuthorized(const std::string& strAuth, std::string& strAuthUsernameOut)
 {
     if (strRPCUserColonPass.empty()) // Belt-and-suspenders measure if InitRPCAuthentication was not called
         return false;
@@ -144,7 +144,7 @@ static bool RPCAuthorized( std::string& strAuth, std::string& strAuthUsernameOut
     return multiUserAuthorized(strUserPass);
 }
 
-static bool HTTPReq_JSONRPC(HTTPRequest* req,  std::string &)
+static bool HTTPReq_JSONRPC(HTTPRequest* req, const std::string &)
 {
     // JSONRPC handles only POST
     if (req->GetRequestMethod() != HTTPRequest::POST) {
@@ -200,10 +200,10 @@ static bool HTTPReq_JSONRPC(HTTPRequest* req,  std::string &)
 
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strReply);
-    } catch ( UniValue& objError) {
+    } catch (const UniValue& objError) {
         JSONErrorReply(req, objError, jreq.id);
         return false;
-    } catch ( std::exception& e) {
+    } catch (const std::exception& e) {
         JSONErrorReply(req, JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
         return false;
     }

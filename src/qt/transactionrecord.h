@@ -81,7 +81,7 @@ public:
     };
 
     /** Number of confirmation recommended for accepting a transaction */
-    static  int RecommendedNumConfirmations = 6;
+    static const int RecommendedNumConfirmations = 6;
 
     TransactionRecord():
             hash(), time(0), type(Other), address(""), debit(0), credit(0), idx(0)
@@ -95,8 +95,8 @@ public:
     }
 
     TransactionRecord(uint256 _hash, qint64 _time,
-                Type _type,  std::string &_address,
-                 CAmount& _debit,  CAmount& _credit):
+                Type _type, const std::string &_address,
+                const CAmount& _debit, const CAmount& _credit):
             hash(_hash), time(_time), type(_type), address(_address), debit(_debit), credit(_credit),
             idx(0)
     {
@@ -104,8 +104,8 @@ public:
 
     /** Decompose CWallet transaction to model transaction records.
      */
-    static bool showTransaction( CWalletTx &wtx);
-    static QList<TransactionRecord> decomposeTransaction( CWallet *wallet,  CWalletTx &wtx);
+    static bool showTransaction(const CWalletTx &wtx);
+    static QList<TransactionRecord> decomposeTransaction(const CWallet *wallet, const CWalletTx &wtx);
 
     /** @name Immutable transaction attributes
       @{*/
@@ -127,18 +127,18 @@ public:
     bool involvesWatchAddress;
 
     /** Return the unique identifier for this transaction (part) */
-    QString getTxID() ;
+    QString getTxID() const;
 
     /** Return the output index of the subtransaction  */
-    int getOutputIndex() ;
+    int getOutputIndex() const;
 
     /** Update status from core wallet tx.
      */
-    void updateStatus( CWalletTx &wtx);
+    void updateStatus(const CWalletTx &wtx);
 
     /** Return whether a status update is needed.
      */
-    bool statusUpdateNeeded() ;
+    bool statusUpdateNeeded() const;
 };
 
 #endif // BITCOIN_QT_TRANSACTIONRECORD_H

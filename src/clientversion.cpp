@@ -12,7 +12,7 @@
  * for both bitcoind and bitcoin-qt, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
- std::string CLIENT_NAME("Satoshi");
+const std::string CLIENT_NAME("Satoshi");
 
 /**
  * Client version number
@@ -66,7 +66,7 @@
 #endif
 #endif
 
- std::string CLIENT_BUILD(BUILD_DESC CLIENT_VERSION_SUFFIX);
+const std::string CLIENT_BUILD(BUILD_DESC CLIENT_VERSION_SUFFIX);
 
 static std::string FormatVersion(int nVersion)
 {
@@ -84,7 +84,7 @@ std::string FormatFullVersion()
 /** 
  * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki) 
  */
-std::string FormatSubVersion( std::string& name, int nClientVersion,  std::vector<std::string>& comments)
+std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
 {
     std::ostringstream ss;
     ss << "/";

@@ -39,7 +39,7 @@ public:
         MINIMUM_COLUMN_WIDTH = 130
     };
 
-    explicit ReceiveCoinsDialog( PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget *parent = 0);
     ~ReceiveCoinsDialog();
 
     void setModel(WalletModel *model);
@@ -57,7 +57,7 @@ private:
     GUIUtil::TableViewLastColumnResizingFixer *columnResizingFixer;
     WalletModel *model;
     QMenu *contextMenu;
-     PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
     QModelIndex selectedRow();
     void copyColumnToClipboard(int column);
@@ -67,10 +67,10 @@ private Q_SLOTS:
     void on_receiveButton_clicked();
     void on_showRequestButton_clicked();
     void on_removeRequestButton_clicked();
-    void on_recentRequestsView_doubleClicked( QModelIndex &index);
-    void recentRequestsView_selectionChanged( QItemSelection &selected,  QItemSelection &deselected);
+    void on_recentRequestsView_doubleClicked(const QModelIndex &index);
+    void recentRequestsView_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void updateDisplayUnit();
-    void showMenu( QPoint &point);
+    void showMenu(const QPoint &point);
     void copyURI();
     void copyLabel();
     void copyMessage();

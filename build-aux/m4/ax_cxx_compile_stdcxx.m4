@@ -233,13 +233,13 @@ namespace cxx11
     template < typename T1, typename T2 >
     struct is_same
     {
-      static  bool value = false;
+      static const bool value = false;
     };
 
     template < typename T >
     struct is_same<T, T>
     {
-      static  bool value = true;
+      static const bool value = true;
     };
 
     template < typename T1, typename T2 >
@@ -250,7 +250,7 @@ namespace cxx11
     }
 
     int
-    test( int c, volatile int v)
+    test(const int c, volatile int v)
     {
       static_assert(is_same<int, decltype(0)>::value == true, "");
       static_assert(is_same<int, decltype(c)>::value == false, "");
@@ -285,14 +285,14 @@ namespace cxx11
 
     template < typename CharT >
     unsigned long constexpr
-    strlen_c_r( CharT * s,  unsigned long acc) noexcept
+    strlen_c_r(const CharT *const s, const unsigned long acc) noexcept
     {
       return *s ? strlen_c_r(s + 1, acc + 1) : acc;
     }
 
     template < typename CharT >
     unsigned long constexpr
-    strlen_c( CharT * s) noexcept
+    strlen_c(const CharT *const s) noexcept
     {
       return strlen_c_r(s, 0UL);
     }
@@ -314,14 +314,14 @@ namespace cxx11
     };
 
     answer<1> f(int&)       { return answer<1>(); }
-    answer<2> f( int&) { return answer<2>(); }
+    answer<2> f(const int&) { return answer<2>(); }
     answer<3> f(int&&)      { return answer<3>(); }
 
     void
     test()
     {
       int i = 0;
-       int c = 0;
+      const int c = 0;
       static_assert(decltype(f(i))::value == 1, "");
       static_assert(decltype(f(c))::value == 2, "");
       static_assert(decltype(f(0))::value == 3, "");
@@ -334,8 +334,8 @@ namespace cxx11
 
     struct test
     {
-      static  int zero {};
-      static  int one {1};
+      static const int zero {};
+      static const int one {1};
     };
 
     static_assert(test::zero == 0, "");
@@ -363,7 +363,7 @@ namespace cxx11
       auto c = [=](){ return a + b; }();
       auto d = [&](){ return c; }();
       auto e = [a, &b](int x) mutable {
-         auto identity = [](int y){ return y; };
+        const auto identity = [](int y){ return y; };
         for (auto i = 0; i < a; ++i)
           a += b--;
         return x + identity(a + b);
@@ -374,12 +374,12 @@ namespace cxx11
     int
     test3()
     {
-       auto nullary = [](){ return 0; };
-       auto unary = [](int x){ return x; };
+      const auto nullary = [](){ return 0; };
+      const auto unary = [](int x){ return x; };
       using nullary_t = decltype(nullary);
       using unary_t = decltype(unary);
-       auto higher1st = [](nullary_t f){ return f(); };
-       auto higher2nd = [unary](nullary_t f1){
+      const auto higher1st = [](nullary_t f){ return f(); };
+      const auto higher2nd = [unary](nullary_t f1){
         return [unary, f1](unary_t f2){ return f2(unary(f1())); };
       };
       return higher1st(nullary) + higher2nd(nullary)(unary);
@@ -470,11 +470,11 @@ namespace cxx14
     int
     test()
     {
-       auto lambda = [](auto&&... args){
-         auto istiny = [](auto x){
+      const auto lambda = [](auto&&... args){
+        const auto istiny = [](auto x){
           return (sizeof(x) == 1UL) ? 1 : 0;
         };
-         int aretiny[] = { istiny(args)... };
+        const int aretiny[] = { istiny(args)... };
         return aretiny[0];
       };
       return lambda(1, 1L, 1.0f, '1');
@@ -495,7 +495,7 @@ namespace cxx14
 
     template < typename CharT >
     constexpr unsigned long
-    strlen_c( CharT * s) noexcept
+    strlen_c(const CharT *const s) noexcept
     {
       auto length = 0UL;
       for (auto p = s; *p; ++p)
@@ -517,8 +517,8 @@ namespace cxx14
     test()
     {
       auto x = 0;
-       auto lambda1 = [a = x](int b){ return a + b; };
-       auto lambda2 = [a = lambda1(x)](){ return a; };
+      const auto lambda1 = [a = x](int b){ return a + b; };
+      const auto lambda2 = [a = lambda1(x)](){ return a; };
       return lambda2();
     }
 

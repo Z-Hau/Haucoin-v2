@@ -7,7 +7,7 @@
 #include <policy/policy.h>
 #include <wallet/wallet.h>
 
-WalletModelTransaction::WalletModelTransaction( QList<SendCoinsRecipient> &_recipients) :
+WalletModelTransaction::WalletModelTransaction(const QList<SendCoinsRecipient> &_recipients) :
     recipients(_recipients),
     walletTransaction(0),
     fee(0)
@@ -20,12 +20,12 @@ WalletModelTransaction::~WalletModelTransaction()
     delete walletTransaction;
 }
 
-QList<SendCoinsRecipient> WalletModelTransaction::getRecipients() 
+QList<SendCoinsRecipient> WalletModelTransaction::getRecipients() const
 {
     return recipients;
 }
 
-CWalletTx *WalletModelTransaction::getTransaction() 
+CWalletTx *WalletModelTransaction::getTransaction() const
 {
     return walletTransaction;
 }
@@ -35,12 +35,12 @@ unsigned int WalletModelTransaction::getTransactionSize()
     return (!walletTransaction ? 0 : ::GetVirtualTransactionSize(*walletTransaction->tx));
 }
 
-CAmount WalletModelTransaction::getTransactionFee() 
+CAmount WalletModelTransaction::getTransactionFee() const
 {
     return fee;
 }
 
-void WalletModelTransaction::setTransactionFee( CAmount& newFee)
+void WalletModelTransaction::setTransactionFee(const CAmount& newFee)
 {
     fee = newFee;
 }
@@ -55,10 +55,10 @@ void WalletModelTransaction::reassignAmounts(int nChangePosRet)
         if (rcp.paymentRequest.IsInitialized())
         {
             CAmount subtotal = 0;
-             payments::PaymentDetails& details = rcp.paymentRequest.getDetails();
+            const payments::PaymentDetails& details = rcp.paymentRequest.getDetails();
             for (int j = 0; j < details.outputs_size(); j++)
             {
-                 payments::Output& out = details.outputs(j);
+                const payments::Output& out = details.outputs(j);
                 if (out.amount() <= 0) continue;
                 if (i == nChangePosRet)
                     i++;
@@ -77,10 +77,10 @@ void WalletModelTransaction::reassignAmounts(int nChangePosRet)
     }
 }
 
-CAmount WalletModelTransaction::getTotalTransactionAmount() 
+CAmount WalletModelTransaction::getTotalTransactionAmount() const
 {
     CAmount totalTransactionAmount = 0;
-    for ( SendCoinsRecipient &rcp : recipients)
+    for (const SendCoinsRecipient &rcp : recipients)
     {
         totalTransactionAmount += rcp.amount;
     }

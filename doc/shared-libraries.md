@@ -18,9 +18,9 @@ The interface is defined in the C header `bitcoinconsensus.h` located in  `src/s
 `bitcoinconsensus_verify_script` returns an `int` with the status of the verification. It will be `1` if the input script correctly spends the previous output `scriptPubKey`.
 
 ##### Parameters
-- ` unsigned char *scriptPubKey` - The previous output script that encumbers spending.
+- `const unsigned char *scriptPubKey` - The previous output script that encumbers spending.
 - `unsigned int scriptPubKeyLen` - The number of bytes for the `scriptPubKey`.
-- ` unsigned char *txTo` - The transaction with the input that is spending the previous output.
+- `const unsigned char *txTo` - The transaction with the input that is spending the previous output.
 - `unsigned int txToLen` - The number of bytes for the `txTo`.
 - `unsigned int nIn` - The index of the input in `txTo` that spends the `scriptPubKey`.
 - `unsigned int flags` - The script validation flags *(see below)*.

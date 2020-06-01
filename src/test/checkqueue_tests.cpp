@@ -24,7 +24,7 @@
 // otherwise.
 BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
 
-static  unsigned int QUEUE_BATCH_SIZE = 128;
+static const unsigned int QUEUE_BATCH_SIZE = 128;
 
 struct FakeCheck {
     bool operator()()
@@ -82,7 +82,7 @@ struct MemoryCheck {
         return true;
     }
     MemoryCheck(){};
-    MemoryCheck( MemoryCheck& x)
+    MemoryCheck(const MemoryCheck& x)
     {
         // We have to do this to make sure that destructor calls are paired
         //

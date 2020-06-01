@@ -29,10 +29,10 @@
 
 #ifdef USE_DBUS
 // https://wiki.ubuntu.com/NotificationDevelopmentGuidelines recommends at least 128
- int FREEDESKTOP_NOTIFICATION_ICON_SIZE = 128;
+const int FREEDESKTOP_NOTIFICATION_ICON_SIZE = 128;
 #endif
 
-Notificator::Notificator( QString &_programName, QSystemTrayIcon *_trayIcon, QWidget *_parent) :
+Notificator::Notificator(const QString &_programName, QSystemTrayIcon *_trayIcon, QWidget *_parent) :
     QObject(_parent),
     parent(_parent),
     programName(_programName),
@@ -76,12 +76,12 @@ class FreedesktopImage
 {
 public:
     FreedesktopImage() {}
-    explicit FreedesktopImage( QImage &img);
+    explicit FreedesktopImage(const QImage &img);
 
     static int metaType();
 
     // Image to variant that can be marshalled over DBus
-    static QVariant toVariant( QImage &img);
+    static QVariant toVariant(const QImage &img);
 
 private:
     int width, height, stride;
@@ -90,18 +90,18 @@ private:
     int bitsPerSample;
     QByteArray image;
 
-    friend QDBusArgument &operator<<(QDBusArgument &a,  FreedesktopImage &i);
-    friend  QDBusArgument &operator>>( QDBusArgument &a, FreedesktopImage &i);
+    friend QDBusArgument &operator<<(QDBusArgument &a, const FreedesktopImage &i);
+    friend const QDBusArgument &operator>>(const QDBusArgument &a, FreedesktopImage &i);
 };
 
 Q_DECLARE_METATYPE(FreedesktopImage);
 
 // Image configuration settings
- int CHANNELS = 4;
- int BYTES_PER_PIXEL = 4;
- int BITS_PER_SAMPLE = 8;
+const int CHANNELS = 4;
+const int BYTES_PER_PIXEL = 4;
+const int BITS_PER_SAMPLE = 8;
 
-FreedesktopImage::FreedesktopImage( QImage &img):
+FreedesktopImage::FreedesktopImage(const QImage &img):
     width(img.width()),
     height(img.height()),
     stride(img.width() * BYTES_PER_PIXEL),
@@ -111,7 +111,7 @@ FreedesktopImage::FreedesktopImage( QImage &img):
 {
     // Convert 00xAARRGGBB to RGBA bytewise (endian-independent) format
     QImage tmp = img.convertToFormat(QImage::Format_ARGB32);
-     uint32_t *data = reinterpret_cast< uint32_t*>(tmp.bits());
+    const uint32_t *data = reinterpret_cast<const uint32_t*>(tmp.bits());
 
     unsigned int num_pixels = width * height;
     image.resize(num_pixels * BYTES_PER_PIXEL);
@@ -125,7 +125,7 @@ FreedesktopImage::FreedesktopImage( QImage &img):
     }
 }
 
-QDBusArgument &operator<<(QDBusArgument &a,  FreedesktopImage &i)
+QDBusArgument &operator<<(QDBusArgument &a, const FreedesktopImage &i)
 {
     a.beginStructure();
     a << i.width << i.height << i.stride << i.hasAlpha << i.bitsPerSample << i.channels << i.image;
@@ -133,7 +133,7 @@ QDBusArgument &operator<<(QDBusArgument &a,  FreedesktopImage &i)
     return a;
 }
 
- QDBusArgument &operator>>( QDBusArgument &a, FreedesktopImage &i)
+const QDBusArgument &operator>>(const QDBusArgument &a, FreedesktopImage &i)
 {
     a.beginStructure();
     a >> i.width >> i.height >> i.stride >> i.hasAlpha >> i.bitsPerSample >> i.channels >> i.image;
@@ -146,13 +146,13 @@ int FreedesktopImage::metaType()
     return qDBusRegisterMetaType<FreedesktopImage>();
 }
 
-QVariant FreedesktopImage::toVariant( QImage &img)
+QVariant FreedesktopImage::toVariant(const QImage &img)
 {
     FreedesktopImage fimg(img);
     return QVariant(FreedesktopImage::metaType(), &fimg);
 }
 
-void Notificator::notifyDBus(Class cls,  QString &title,  QString &text,  QIcon &icon, int millisTimeout)
+void Notificator::notifyDBus(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout)
 {
     Q_UNUSED(cls);
     // Arguments for DBus call:
@@ -209,7 +209,7 @@ void Notificator::notifyDBus(Class cls,  QString &title,  QString &text,  QIcon 
 }
 #endif
 
-void Notificator::notifySystray(Class cls,  QString &title,  QString &text,  QIcon &icon, int millisTimeout)
+void Notificator::notifySystray(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout)
 {
     Q_UNUSED(icon);
     QSystemTrayIcon::MessageIcon sicon = QSystemTrayIcon::NoIcon;
@@ -224,14 +224,14 @@ void Notificator::notifySystray(Class cls,  QString &title,  QString &text,  QIc
 
 // Based on Qt's tray icon implementation
 #ifdef Q_OS_MAC
-void Notificator::notifyMacUserNotificationCenter(Class cls,  QString &title,  QString &text,  QIcon &icon) {
+void Notificator::notifyMacUserNotificationCenter(Class cls, const QString &title, const QString &text, const QIcon &icon) {
     // icon is not supported by the user notification center yet. OSX will use the app icon.
     MacNotificationHandler::instance()->showNotification(title, text);
 }
 
 #endif
 
-void Notificator::notify(Class cls,  QString &title,  QString &text,  QIcon &icon, int millisTimeout)
+void Notificator::notify(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout)
 {
     switch(mode)
     {

@@ -53,7 +53,7 @@ class QUrl;
 QT_END_NAMESPACE
 
 // BIP70 max payment request size in bytes (DoS protection)
-static  qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 50000;
+static const qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 50000;
 
 class PaymentServer : public QObject
 {
@@ -89,23 +89,23 @@ public:
     void setOptionsModel(OptionsModel *optionsModel);
 
     // Verify that the payment request network matches the client network
-    static bool verifyNetwork( payments::PaymentDetails& requestDetails);
+    static bool verifyNetwork(const payments::PaymentDetails& requestDetails);
     // Verify if the payment request is expired
-    static bool verifyExpired( payments::PaymentDetails& requestDetails);
+    static bool verifyExpired(const payments::PaymentDetails& requestDetails);
     // Verify the payment request size is valid as per BIP70
     static bool verifySize(qint64 requestSize);
     // Verify the payment request amount is valid
-    static bool verifyAmount( CAmount& requestAmount);
+    static bool verifyAmount(const CAmount& requestAmount);
 
 Q_SIGNALS:
     // Fired when a valid payment request is received
     void receivedPaymentRequest(SendCoinsRecipient);
 
     // Fired when a valid PaymentACK is received
-    void receivedPaymentACK( QString &paymentACKMsg);
+    void receivedPaymentACK(const QString &paymentACKMsg);
 
     // Fired when a message should be reported to the user
-    void message( QString &title,  QString &message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
 
 public Q_SLOTS:
     // Signal this when the main window's UI is ready
@@ -113,16 +113,16 @@ public Q_SLOTS:
     void uiReady();
 
     // Submit Payment message to a merchant, get back PaymentACK:
-    void fetchPaymentACK(CWallet* wallet,  SendCoinsRecipient& recipient, QByteArray transaction);
+    void fetchPaymentACK(CWallet* wallet, const SendCoinsRecipient& recipient, QByteArray transaction);
 
     // Handle an incoming URI, URI with local file scheme or file
-    void handleURIOrFile( QString& s);
+    void handleURIOrFile(const QString& s);
 
 private Q_SLOTS:
     void handleURIConnection();
     void netRequestFinished(QNetworkReply*);
-    void reportSslErrors(QNetworkReply*,  QList<QSslError> &);
-    void handlePaymentACK( QString& paymentACKMsg);
+    void reportSslErrors(QNetworkReply*, const QList<QSslError> &);
+    void handlePaymentACK(const QString& paymentACKMsg);
 
 protected:
     // Constructor registers this on the parent QApplication to
@@ -130,9 +130,9 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    static bool readPaymentRequestFromFile( QString& filename, PaymentRequestPlus& request);
-    bool processPaymentRequest( PaymentRequestPlus& request, SendCoinsRecipient& recipient);
-    void fetchRequest( QUrl& url);
+    static bool readPaymentRequestFromFile(const QString& filename, PaymentRequestPlus& request);
+    bool processPaymentRequest(const PaymentRequestPlus& request, SendCoinsRecipient& recipient);
+    void fetchRequest(const QUrl& url);
 
     // Setup networking
     void initNetManager();

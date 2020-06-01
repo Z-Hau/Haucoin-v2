@@ -89,7 +89,7 @@ int BitcoinUnits::decimals(int unit)
     }
 }
 
-QString BitcoinUnits::format(int unit,  CAmount& nIn, bool fPlus, SeparatorStyle separators)
+QString BitcoinUnits::format(int unit, const CAmount& nIn, bool fPlus, SeparatorStyle separators)
 {
     // Note: not using straight sprintf here because we do NOT want
     // localized number formatting.
@@ -128,12 +128,12 @@ QString BitcoinUnits::format(int unit,  CAmount& nIn, bool fPlus, SeparatorStyle
 // Please take care to use formatHtmlWithUnit instead, when
 // appropriate.
 
-QString BitcoinUnits::formatWithUnit(int unit,  CAmount& amount, bool plussign, SeparatorStyle separators)
+QString BitcoinUnits::formatWithUnit(int unit, const CAmount& amount, bool plussign, SeparatorStyle separators)
 {
     return format(unit, amount, plussign, separators) + QString(" ") + shortName(unit);
 }
 
-QString BitcoinUnits::formatHtmlWithUnit(int unit,  CAmount& amount, bool plussign, SeparatorStyle separators)
+QString BitcoinUnits::formatHtmlWithUnit(int unit, const CAmount& amount, bool plussign, SeparatorStyle separators)
 {
     QString str(formatWithUnit(unit, amount, plussign, separators));
     str.replace(QChar(THIN_SP_CP), QString(THIN_SP_HTML));
@@ -141,7 +141,7 @@ QString BitcoinUnits::formatHtmlWithUnit(int unit,  CAmount& amount, bool plussi
 }
 
 
-bool BitcoinUnits::parse(int unit,  QString &value, CAmount *val_out)
+bool BitcoinUnits::parse(int unit, const QString &value, CAmount *val_out)
 {
     if(!valid(unit) || value.isEmpty())
         return false; // Refuse to parse invalid unit or empty string
@@ -190,13 +190,13 @@ QString BitcoinUnits::getAmountColumnTitle(int unit)
     return amountTitle;
 }
 
-int BitcoinUnits::rowCount( QModelIndex &parent) 
+int BitcoinUnits::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return unitlist.size();
 }
 
-QVariant BitcoinUnits::data( QModelIndex &index, int role) 
+QVariant BitcoinUnits::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
     if(row >= 0 && row < unitlist.size())

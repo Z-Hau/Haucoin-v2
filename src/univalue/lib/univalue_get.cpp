@@ -16,7 +16,7 @@
 
 namespace
 {
-static bool ParsePrechecks( std::string& str)
+static bool ParsePrechecks(const std::string& str)
 {
     if (str.empty()) // No empty string allowed
         return false;
@@ -27,7 +27,7 @@ static bool ParsePrechecks( std::string& str)
     return true;
 }
 
-bool ParseInt32( std::string& str, int32_t *out)
+bool ParseInt32(const std::string& str, int32_t *out)
 {
     if (!ParsePrechecks(str))
         return false;
@@ -43,7 +43,7 @@ bool ParseInt32( std::string& str, int32_t *out)
         n <= std::numeric_limits<int32_t>::max();
 }
 
-bool ParseInt64( std::string& str, int64_t *out)
+bool ParseInt64(const std::string& str, int64_t *out)
 {
     if (!ParsePrechecks(str))
         return false;
@@ -58,7 +58,7 @@ bool ParseInt64( std::string& str, int64_t *out)
         n <= std::numeric_limits<int64_t>::max();
 }
 
-bool ParseDouble( std::string& str, double *out)
+bool ParseDouble(const std::string& str, double *out)
 {
     if (!ParsePrechecks(str))
         return false;
@@ -73,35 +73,35 @@ bool ParseDouble( std::string& str, double *out)
 }
 }
 
- std::vector<std::string>& UniValue::getKeys() 
+const std::vector<std::string>& UniValue::getKeys() const
 {
     if (typ != VOBJ)
         throw std::runtime_error("JSON value is not an object as expected");
     return keys;
 }
 
- std::vector<UniValue>& UniValue::getValues() 
+const std::vector<UniValue>& UniValue::getValues() const
 {
     if (typ != VOBJ && typ != VARR)
         throw std::runtime_error("JSON value is not an object or array as expected");
     return values;
 }
 
-bool UniValue::get_bool() 
+bool UniValue::get_bool() const
 {
     if (typ != VBOOL)
         throw std::runtime_error("JSON value is not a boolean as expected");
     return getBool();
 }
 
- std::string& UniValue::get_str() 
+const std::string& UniValue::get_str() const
 {
     if (typ != VSTR)
         throw std::runtime_error("JSON value is not a string as expected");
     return getValStr();
 }
 
-int UniValue::get_int() 
+int UniValue::get_int() const
 {
     if (typ != VNUM)
         throw std::runtime_error("JSON value is not an integer as expected");
@@ -111,7 +111,7 @@ int UniValue::get_int()
     return retval;
 }
 
-int64_t UniValue::get_int64() 
+int64_t UniValue::get_int64() const
 {
     if (typ != VNUM)
         throw std::runtime_error("JSON value is not an integer as expected");
@@ -121,7 +121,7 @@ int64_t UniValue::get_int64()
     return retval;
 }
 
-double UniValue::get_real() 
+double UniValue::get_real() const
 {
     if (typ != VNUM)
         throw std::runtime_error("JSON value is not a number as expected");
@@ -131,14 +131,14 @@ double UniValue::get_real()
     return retval;
 }
 
- UniValue& UniValue::get_obj() 
+const UniValue& UniValue::get_obj() const
 {
     if (typ != VOBJ)
         throw std::runtime_error("JSON value is not an object as expected");
     return *this;
 }
 
- UniValue& UniValue::get_array() 
+const UniValue& UniValue::get_array() const
 {
     if (typ != VARR)
         throw std::runtime_error("JSON value is not an array as expected");

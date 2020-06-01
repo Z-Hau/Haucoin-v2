@@ -31,7 +31,7 @@ class NodeLessThan
 public:
     NodeLessThan(int nColumn, Qt::SortOrder fOrder) :
         column(nColumn), order(fOrder) {}
-    bool operator()( CNodeCombinedStats &left,  CNodeCombinedStats &right) ;
+    bool operator()(const CNodeCombinedStats &left, const CNodeCombinedStats &right) const;
 
 private:
     int column;
@@ -49,7 +49,7 @@ class PeerTableModel : public QAbstractTableModel
 public:
     explicit PeerTableModel(ClientModel *parent = 0);
     ~PeerTableModel();
-     CNodeCombinedStats *getNodeStats(int idx);
+    const CNodeCombinedStats *getNodeStats(int idx);
     int getRowByNodeId(NodeId nodeid);
     void startAutoRefresh();
     void stopAutoRefresh();
@@ -65,12 +65,12 @@ public:
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount( QModelIndex &parent) ;
-    int columnCount( QModelIndex &parent) ;
-    QVariant data( QModelIndex &index, int role) ;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) ;
-    QModelIndex index(int row, int column,  QModelIndex &parent) ;
-    Qt::ItemFlags flags( QModelIndex &index) ;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
     void sort(int column, Qt::SortOrder order);
     /*@}*/
 

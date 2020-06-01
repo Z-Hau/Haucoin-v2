@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string>
 
-void SetMiscWarning( std::string& strWarning);
+void SetMiscWarning(const std::string& strWarning);
 void SetfLargeWorkForkFound(bool flag);
 bool GetfLargeWorkForkFound();
 void SetfLargeWorkInvalidChainFound(bool flag);
@@ -20,8 +20,8 @@ void SetfLargeWorkInvalidChainFound(bool flag);
  * - "gui": get all warnings, translated (where possible) for GUI
  * This function only returns the highest priority warning of the set selected by strFor.
  */
-std::string GetWarnings( std::string& strFor);
+std::string GetWarnings(const std::string& strFor);
 
-static  bool DEFAULT_TESTSAFEMODE = false;
+static const bool DEFAULT_TESTSAFEMODE = false;
 
 #endif //  BITCOIN_WARNINGS_H

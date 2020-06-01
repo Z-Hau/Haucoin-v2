@@ -152,7 +152,7 @@ static void RandAddSeedPerfmon()
     std::vector<unsigned char> vData(250000, 0);
     long ret = 0;
     unsigned long nSize = 0;
-     size_t nMaxSize = 10000000; // Bail out at more than 10MB of performance data
+    const size_t nMaxSize = 10000000; // Bail out at more than 10MB of performance data
     while (true) {
         nSize = vData.size();
         ret = RegQueryValueExA(HKEY_PERFORMANCE_DATA, "Global", nullptr, nullptr, vData.data(), &nSize);
@@ -253,7 +253,7 @@ void GetOSRand(unsigned char *ent32)
     /* FreeBSD and similar. It is possible for the call to return less
      * bytes than requested, so need to read in a loop.
      */
-    static  int name[2] = {CTL_KERN, KERN_ARND};
+    static const int name[2] = {CTL_KERN, KERN_ARND};
     int have = 0;
     do {
         size_t len = NUM_OS_RANDOM_BYTES - have;
@@ -300,13 +300,13 @@ static uint64_t rng_counter = 0;
 
 static void AddDataToRng(void* data, size_t len) {
     CSHA512 hasher;
-    hasher.Write(( unsigned char*)&len, sizeof(len));
-    hasher.Write(( unsigned char*)data, len);
+    hasher.Write((const unsigned char*)&len, sizeof(len));
+    hasher.Write((const unsigned char*)data, len);
     unsigned char buf[64];
     {
         std::unique_lock<std::mutex> lock(cs_rng_state);
         hasher.Write(rng_state, sizeof(rng_state));
-        hasher.Write(( unsigned char*)&rng_counter, sizeof(rng_counter));
+        hasher.Write((const unsigned char*)&rng_counter, sizeof(rng_counter));
         ++rng_counter;
         hasher.Finalize(buf);
         memcpy(rng_state, buf + 32, 32);
@@ -338,7 +338,7 @@ void GetStrongRandBytes(unsigned char* out, int num)
     {
         std::unique_lock<std::mutex> lock(cs_rng_state);
         hasher.Write(rng_state, sizeof(rng_state));
-        hasher.Write(( unsigned char*)&rng_counter, sizeof(rng_counter));
+        hasher.Write((const unsigned char*)&rng_counter, sizeof(rng_counter));
         ++rng_counter;
         hasher.Finalize(buf);
         memcpy(rng_state, buf + 32, 32);
@@ -403,7 +403,7 @@ std::vector<unsigned char> FastRandomContext::randbytes(size_t len)
     return ret;
 }
 
-FastRandomContext::FastRandomContext( uint256& seed) : requires_seed(false), bytebuf_size(0), bitbuf_size(0)
+FastRandomContext::FastRandomContext(const uint256& seed) : requires_seed(false), bytebuf_size(0), bitbuf_size(0)
 {
     rng.SetKey(seed.begin(), 32);
 }
@@ -416,7 +416,7 @@ bool Random_SanityCheck()
      * OSRandom() overwrites all 32 bytes of the output given a maximum
      * number of tries.
      */
-    static  ssize_t MAX_TRIES = 1024;
+    static const ssize_t MAX_TRIES = 1024;
     uint8_t data[NUM_OS_RANDOM_BYTES];
     bool overwritten[NUM_OS_RANDOM_BYTES] = {}; /* Tracks which bytes have been overwritten at least once */
     int num_overwritten;
@@ -446,8 +446,8 @@ bool Random_SanityCheck()
     if (stop == start) return false;
 
     // We called GetPerformanceCounter. Use it as entropy.
-    RAND_add(( unsigned char*)&start, sizeof(start), 1);
-    RAND_add(( unsigned char*)&stop, sizeof(stop), 1);
+    RAND_add((const unsigned char*)&start, sizeof(start), 1);
+    RAND_add((const unsigned char*)&stop, sizeof(stop), 1);
 
     return true;
 }

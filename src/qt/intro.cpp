@@ -20,11 +20,11 @@
 
 #include <cmath>
 
-static  uint64_t GB_BYTES = 1000000000LL;
+static const uint64_t GB_BYTES = 1000000000LL;
 /* Minimum free space (in GB) needed for data directory */
-static  uint64_t BLOCK_CHAIN_SIZE = 200;
+static const uint64_t BLOCK_CHAIN_SIZE = 200;
 /* Minimum free space (in GB) needed for data directory when pruned; Does not include prune target */
-static  uint64_t CHAIN_STATE_SIZE = 3;
+static const uint64_t CHAIN_STATE_SIZE = 3;
 /* Total required space (in GB) depending on user choice (prune, not prune) */
 static uint64_t requiredSpace;
 
@@ -54,7 +54,7 @@ public Q_SLOTS:
     void check();
 
 Q_SIGNALS:
-    void reply(int status,  QString &message, quint64 available);
+    void reply(int status, const QString &message, quint64 available);
 
 private:
     Intro *intro;
@@ -103,7 +103,7 @@ void FreespaceChecker::check()
                 replyMessage = tr("Path already exists, and is not a directory.");
             }
         }
-    } catch ( fs::filesystem_error&)
+    } catch (const fs::filesystem_error&)
     {
         /* Parent directory does not exist or is not accessible */
         replyStatus = ST_ERROR;
@@ -166,7 +166,7 @@ QString Intro::getDataDirectory()
     return ui->dataDirectory->text();
 }
 
-void Intro::setDataDirectory( QString &dataDir)
+void Intro::setDataDirectory(const QString &dataDir)
 {
     ui->dataDirectory->setText(dataDir);
     if(dataDir == getDefaultDataDirectory())
@@ -219,7 +219,7 @@ bool Intro::pickDataDirectory()
                     TryCreateDirectories(GUIUtil::qstringToBoostPath(dataDir) / "wallets");
                 }
                 break;
-            } catch ( fs::filesystem_error&) {
+            } catch (const fs::filesystem_error&) {
                 QMessageBox::critical(0, tr(PACKAGE_NAME),
                     tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
                 /* fall through, back to choosing screen */
@@ -238,7 +238,7 @@ bool Intro::pickDataDirectory()
     return true;
 }
 
-void Intro::setStatus(int status,  QString &message, quint64 bytesAvailable)
+void Intro::setStatus(int status, const QString &message, quint64 bytesAvailable)
 {
     switch(status)
     {
@@ -270,7 +270,7 @@ void Intro::setStatus(int status,  QString &message, quint64 bytesAvailable)
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(status != FreespaceChecker::ST_ERROR);
 }
 
-void Intro::on_dataDirectory_textChanged( QString &dataDirStr)
+void Intro::on_dataDirectory_textChanged(const QString &dataDirStr)
 {
     /* Disable OK button until check result comes in */
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
@@ -310,7 +310,7 @@ void Intro::startThread()
     thread->start();
 }
 
-void Intro::checkPath( QString &dataDir)
+void Intro::checkPath(const QString &dataDir)
 {
     mutex.lock();
     pathToCheck = dataDir;

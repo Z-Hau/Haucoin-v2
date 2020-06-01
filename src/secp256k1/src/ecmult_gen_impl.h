@@ -18,7 +18,7 @@ static void secp256k1_ecmult_gen_context_init(secp256k1_ecmult_gen_context *ctx)
     ctx->prec = NULL;
 }
 
-static void secp256k1_ecmult_gen_context_build(secp256k1_ecmult_gen_context *ctx,  secp256k1_callback* cb) {
+static void secp256k1_ecmult_gen_context_build(secp256k1_ecmult_gen_context *ctx, const secp256k1_callback* cb) {
 #ifndef USE_ECMULT_STATIC_PRECOMPUTATION
     secp256k1_ge prec[1024];
     secp256k1_gej gj;
@@ -37,7 +37,7 @@ static void secp256k1_ecmult_gen_context_build(secp256k1_ecmult_gen_context *ctx
 
     /* Construct a group element with no known corresponding scalar (nothing up my sleeve). */
     {
-        static  unsigned char nums_b32[33] = "The scalar for this x is unknown";
+        static const unsigned char nums_b32[33] = "The scalar for this x is unknown";
         secp256k1_fe nums_x;
         secp256k1_ge nums_ge;
         int r;
@@ -91,12 +91,12 @@ static void secp256k1_ecmult_gen_context_build(secp256k1_ecmult_gen_context *ctx
     secp256k1_ecmult_gen_blind(ctx, NULL);
 }
 
-static int secp256k1_ecmult_gen_context_is_built( secp256k1_ecmult_gen_context* ctx) {
+static int secp256k1_ecmult_gen_context_is_built(const secp256k1_ecmult_gen_context* ctx) {
     return ctx->prec != NULL;
 }
 
 static void secp256k1_ecmult_gen_context_clone(secp256k1_ecmult_gen_context *dst,
-                                                secp256k1_ecmult_gen_context *src,  secp256k1_callback* cb) {
+                                               const secp256k1_ecmult_gen_context *src, const secp256k1_callback* cb) {
     if (src->prec == NULL) {
         dst->prec = NULL;
     } else {
@@ -121,7 +121,7 @@ static void secp256k1_ecmult_gen_context_clear(secp256k1_ecmult_gen_context *ctx
     ctx->prec = NULL;
 }
 
-static void secp256k1_ecmult_gen( secp256k1_ecmult_gen_context *ctx, secp256k1_gej *r,  secp256k1_scalar *gn) {
+static void secp256k1_ecmult_gen(const secp256k1_ecmult_gen_context *ctx, secp256k1_gej *r, const secp256k1_scalar *gn) {
     secp256k1_ge add;
     secp256k1_ge_storage adds;
     secp256k1_scalar gnb;
@@ -156,7 +156,7 @@ static void secp256k1_ecmult_gen( secp256k1_ecmult_gen_context *ctx, secp256k1_g
 }
 
 /* Setup blinding values for secp256k1_ecmult_gen. */
-static void secp256k1_ecmult_gen_blind(secp256k1_ecmult_gen_context *ctx,  unsigned char *seed32) {
+static void secp256k1_ecmult_gen_blind(secp256k1_ecmult_gen_context *ctx, const unsigned char *seed32) {
     secp256k1_scalar b;
     secp256k1_gej gb;
     secp256k1_fe s;

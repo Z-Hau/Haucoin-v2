@@ -10,7 +10,7 @@
 #include <streams.h>
 #include <util.h>
 
-void zmqError( char *str)
+void zmqError(const char *str)
 {
     LogPrint(BCLog::ZMQ, "zmq: Error: %s, errno=%s\n", str, zmq_strerror(errno));
 }
@@ -40,7 +40,7 @@ CZMQNotificationInterface* CZMQNotificationInterface::Create()
     factories["pubrawblock"] = CZMQAbstractNotifier::Create<CZMQPublishRawBlockNotifier>;
     factories["pubrawtx"] = CZMQAbstractNotifier::Create<CZMQPublishRawTransactionNotifier>;
 
-    for ( auto& entry : factories)
+    for (const auto& entry : factories)
     {
         std::string arg("-zmq" + entry.first);
         if (gArgs.IsArgSet(arg))
@@ -124,7 +124,7 @@ void CZMQNotificationInterface::Shutdown()
     }
 }
 
-void CZMQNotificationInterface::UpdatedBlockTip( CBlockIndex *pindexNew,  CBlockIndex *pindexFork, bool fInitialDownload)
+void CZMQNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload)
 {
     if (fInitialDownload || pindexNew == pindexFork) // In IBD or blocks were disconnected without any new ones
         return;
@@ -144,11 +144,11 @@ void CZMQNotificationInterface::UpdatedBlockTip( CBlockIndex *pindexNew,  CBlock
     }
 }
 
-void CZMQNotificationInterface::TransactionAddedToMempool( CTransactionRef& ptx)
+void CZMQNotificationInterface::TransactionAddedToMempool(const CTransactionRef& ptx)
 {
     // Used by BlockConnected and BlockDisconnected as well, because they're
     // all the same external callback.
-     CTransaction& tx = *ptx;
+    const CTransaction& tx = *ptx;
 
     for (std::list<CZMQAbstractNotifier*>::iterator i = notifiers.begin(); i!=notifiers.end(); )
     {
@@ -165,17 +165,17 @@ void CZMQNotificationInterface::TransactionAddedToMempool( CTransactionRef& ptx)
     }
 }
 
-void CZMQNotificationInterface::BlockConnected( std::shared_ptr< CBlock>& pblock,  CBlockIndex* pindexConnected,  std::vector<CTransactionRef>& vtxConflicted)
+void CZMQNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindexConnected, const std::vector<CTransactionRef>& vtxConflicted)
 {
-    for ( CTransactionRef& ptx : pblock->vtx) {
+    for (const CTransactionRef& ptx : pblock->vtx) {
         // Do a normal notify for each transaction added in the block
         TransactionAddedToMempool(ptx);
     }
 }
 
-void CZMQNotificationInterface::BlockDisconnected( std::shared_ptr< CBlock>& pblock)
+void CZMQNotificationInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock)
 {
-    for ( CTransactionRef& ptx : pblock->vtx) {
+    for (const CTransactionRef& ptx : pblock->vtx) {
         // Do a normal notify for each transaction removed in block disconnection
         TransactionAddedToMempool(ptx);
     }

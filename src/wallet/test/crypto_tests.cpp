@@ -15,9 +15,9 @@ BOOST_FIXTURE_TEST_SUITE(wallet_crypto, BasicTestingSetup)
 class TestCrypter
 {
 public:
-static void TestPassphraseSingle( std::vector<unsigned char>& vchSalt,  SecureString& passphrase, uint32_t rounds,
-                  std::vector<unsigned char>& correctKey = std::vector<unsigned char>(),
-                  std::vector<unsigned char>& correctIV=std::vector<unsigned char>())
+static void TestPassphraseSingle(const std::vector<unsigned char>& vchSalt, const SecureString& passphrase, uint32_t rounds,
+                 const std::vector<unsigned char>& correctKey = std::vector<unsigned char>(),
+                 const std::vector<unsigned char>& correctIV=std::vector<unsigned char>())
 {
     CCrypter crypt;
     crypt.SetKeyFromPassphrase(passphrase, vchSalt, rounds, 0);
@@ -30,17 +30,17 @@ static void TestPassphraseSingle( std::vector<unsigned char>& vchSalt,  SecureSt
             HexStr(crypt.vchIV.begin(), crypt.vchIV.end()) + std::string(" != ") + HexStr(correctIV.begin(), correctIV.end()));
 }
 
-static void TestPassphrase( std::vector<unsigned char>& vchSalt,  SecureString& passphrase, uint32_t rounds,
-                  std::vector<unsigned char>& correctKey = std::vector<unsigned char>(),
-                  std::vector<unsigned char>& correctIV=std::vector<unsigned char>())
+static void TestPassphrase(const std::vector<unsigned char>& vchSalt, const SecureString& passphrase, uint32_t rounds,
+                 const std::vector<unsigned char>& correctKey = std::vector<unsigned char>(),
+                 const std::vector<unsigned char>& correctIV=std::vector<unsigned char>())
 {
     TestPassphraseSingle(vchSalt, passphrase, rounds, correctKey, correctIV);
     for(SecureString::const_iterator i(passphrase.begin()); i != passphrase.end(); ++i)
         TestPassphraseSingle(vchSalt, SecureString(i, passphrase.end()), rounds);
 }
 
-static void TestDecrypt( CCrypter& crypt,  std::vector<unsigned char>& vchCiphertext, \
-                         std::vector<unsigned char>& vchPlaintext = std::vector<unsigned char>())
+static void TestDecrypt(const CCrypter& crypt, const std::vector<unsigned char>& vchCiphertext, \
+                        const std::vector<unsigned char>& vchPlaintext = std::vector<unsigned char>())
 {
     CKeyingMaterial vchDecrypted;
     crypt.Decrypt(vchCiphertext, vchDecrypted);
@@ -48,8 +48,8 @@ static void TestDecrypt( CCrypter& crypt,  std::vector<unsigned char>& vchCipher
         BOOST_CHECK(CKeyingMaterial(vchPlaintext.begin(), vchPlaintext.end()) == vchDecrypted);
 }
 
-static void TestEncryptSingle( CCrypter& crypt,  CKeyingMaterial& vchPlaintext,
-                        std::vector<unsigned char>& vchCiphertextCorrect = std::vector<unsigned char>())
+static void TestEncryptSingle(const CCrypter& crypt, const CKeyingMaterial& vchPlaintext,
+                       const std::vector<unsigned char>& vchCiphertextCorrect = std::vector<unsigned char>())
 {
     std::vector<unsigned char> vchCiphertext;
     crypt.Encrypt(vchPlaintext, vchCiphertext);
@@ -57,12 +57,12 @@ static void TestEncryptSingle( CCrypter& crypt,  CKeyingMaterial& vchPlaintext,
     if (!vchCiphertextCorrect.empty())
         BOOST_CHECK(vchCiphertext == vchCiphertextCorrect);
 
-     std::vector<unsigned char> vchPlaintext2(vchPlaintext.begin(), vchPlaintext.end());
+    const std::vector<unsigned char> vchPlaintext2(vchPlaintext.begin(), vchPlaintext.end());
     TestDecrypt(crypt, vchCiphertext, vchPlaintext2);
 }
 
-static void TestEncrypt( CCrypter& crypt,  std::vector<unsigned char>& vchPlaintextIn, \
-                        std::vector<unsigned char>& vchCiphertextCorrect = std::vector<unsigned char>())
+static void TestEncrypt(const CCrypter& crypt, const std::vector<unsigned char>& vchPlaintextIn, \
+                       const std::vector<unsigned char>& vchCiphertextCorrect = std::vector<unsigned char>())
 {
     TestEncryptSingle(crypt, CKeyingMaterial(vchPlaintextIn.begin(), vchPlaintextIn.end()), vchCiphertextCorrect);
     for(std::vector<unsigned char>::const_iterator i(vchPlaintextIn.begin()); i != vchPlaintextIn.end(); ++i)

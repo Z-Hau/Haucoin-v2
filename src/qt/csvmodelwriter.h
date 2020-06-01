@@ -20,10 +20,10 @@ class CSVModelWriter : public QObject
     Q_OBJECT
 
 public:
-    explicit CSVModelWriter( QString &filename, QObject *parent = 0);
+    explicit CSVModelWriter(const QString &filename, QObject *parent = 0);
 
-    void setModel( QAbstractItemModel *model);
-    void addColumn( QString &title, int column, int role=Qt::EditRole);
+    void setModel(const QAbstractItemModel *model);
+    void addColumn(const QString &title, int column, int role=Qt::EditRole);
 
     /** Perform export of the model to CSV.
         @returns true on success, false otherwise
@@ -32,7 +32,7 @@ public:
 
 private:
     QString filename;
-     QAbstractItemModel *model;
+    const QAbstractItemModel *model;
 
     struct Column
     {

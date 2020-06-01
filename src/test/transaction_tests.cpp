@@ -33,7 +33,7 @@
 typedef std::vector<unsigned char> valtype;
 
 // In script_tests.cpp
-extern UniValue read_json( std::string& jsondata);
+extern UniValue read_json(const std::string& jsondata);
 
 static std::map<std::string, unsigned int> mapFlagNames = {
     {std::string("NONE"), (unsigned int)SCRIPT_VERIFY_NONE},
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(tx_valid)
             UniValue inputs = test[0].get_array();
             bool fValid = true;
 	    for (unsigned int inpIdx = 0; inpIdx < inputs.size(); inpIdx++) {
-	         UniValue& input = inputs[inpIdx];
+	        const UniValue& input = inputs[inpIdx];
                 if (!input.isArray())
                 {
                     fValid = false;
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(tx_valid)
                     amount = mapprevOutValues[tx.vin[i].prevout];
                 }
                 unsigned int verify_flags = ParseScriptFlags(test[2].get_str());
-                 CScriptWitness *witness = &tx.vin[i].scriptWitness;
+                const CScriptWitness *witness = &tx.vin[i].scriptWitness;
                 BOOST_CHECK_MESSAGE(VerifyScript(tx.vin[i].scriptSig, mapprevOutScriptPubKeys[tx.vin[i].prevout],
                                                  witness, verify_flags, TransactionSignatureChecker(&tx, i, amount, txdata), &err),
                                     strTest);
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(tx_invalid)
             UniValue inputs = test[0].get_array();
             bool fValid = true;
 	    for (unsigned int inpIdx = 0; inpIdx < inputs.size(); inpIdx++) {
-	         UniValue& input = inputs[inpIdx];
+	        const UniValue& input = inputs[inpIdx];
                 if (!input.isArray())
                 {
                     fValid = false;
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(tx_invalid)
                 if (mapprevOutValues.count(tx.vin[i].prevout)) {
                     amount = mapprevOutValues[tx.vin[i].prevout];
                 }
-                 CScriptWitness *witness = &tx.vin[i].scriptWitness;
+                const CScriptWitness *witness = &tx.vin[i].scriptWitness;
                 fValid = VerifyScript(tx.vin[i].scriptSig, mapprevOutScriptPubKeys[tx.vin[i].prevout],
                                       witness, verify_flags, TransactionSignatureChecker(&tx, i, amount, txdata), &err);
             }
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(test_Get)
     BOOST_CHECK_EQUAL(coins.GetValueIn(t1), (50+21+22)*CENT);
 }
 
-void CreateCreditAndSpend( CKeyStore& keystore,  CScript& outscript, CTransactionRef& output, CMutableTransaction& input, bool success = true)
+void CreateCreditAndSpend(const CKeyStore& keystore, const CScript& outscript, CTransactionRef& output, CMutableTransaction& input, bool success = true)
 {
     CMutableTransaction outputm;
     outputm.nVersion = 1;
@@ -382,7 +382,7 @@ void CreateCreditAndSpend( CKeyStore& keystore,  CScript& outscript, CTransactio
     assert(input.vin[0].scriptWitness.stack == inputm.vin[0].scriptWitness.stack);
 }
 
-void CheckWithFlag( CTransactionRef& output,  CMutableTransaction& input, int flags, bool success)
+void CheckWithFlag(const CTransactionRef& output, const CMutableTransaction& input, int flags, bool success)
 {
     ScriptError error;
     CTransaction inputi(input);
@@ -390,10 +390,10 @@ void CheckWithFlag( CTransactionRef& output,  CMutableTransaction& input, int fl
     assert(ret == success);
 }
 
-static CScript PushAll( std::vector<valtype>& values)
+static CScript PushAll(const std::vector<valtype>& values)
 {
     CScript result;
-    for ( valtype& v : values) {
+    for (const valtype& v : values) {
         if (v.size() == 0) {
             result << OP_0;
         } else if (v.size() == 1 && v[0] >= 1 && v[0] <= 16) {
@@ -405,7 +405,7 @@ static CScript PushAll( std::vector<valtype>& values)
     return result;
 }
 
-void ReplaceRedeemScript(CScript& script,  CScript& redeemScript)
+void ReplaceRedeemScript(CScript& script, const CScript& redeemScript)
 {
     std::vector<valtype> stack;
     EvalScript(stack, script, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), SIGVERSION_BASE);

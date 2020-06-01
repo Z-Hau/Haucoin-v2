@@ -38,7 +38,7 @@ void VersionEdit::Clear() {
   new_files_.clear();
 }
 
-void VersionEdit::EncodeTo(std::string* dst)  {
+void VersionEdit::EncodeTo(std::string* dst) const {
   if (has_comparator_) {
     PutVarint32(dst, kComparator);
     PutLengthPrefixedSlice(dst, comparator_);
@@ -75,7 +75,7 @@ void VersionEdit::EncodeTo(std::string* dst)  {
   }
 
   for (size_t i = 0; i < new_files_.size(); i++) {
-     FileMetaData& f = new_files_[i].second;
+    const FileMetaData& f = new_files_[i].second;
     PutVarint32(dst, kNewFile);
     PutVarint32(dst, new_files_[i].first);  // level
     PutVarint64(dst, f.number);
@@ -106,10 +106,10 @@ static bool GetLevel(Slice* input, int* level) {
   }
 }
 
-Status VersionEdit::DecodeFrom( Slice& src) {
+Status VersionEdit::DecodeFrom(const Slice& src) {
   Clear();
   Slice input = src;
-   char* msg = NULL;
+  const char* msg = NULL;
   uint32_t tag;
 
   // Temporary storage for parsing
@@ -209,7 +209,7 @@ Status VersionEdit::DecodeFrom( Slice& src) {
   return result;
 }
 
-std::string VersionEdit::DebugString()  {
+std::string VersionEdit::DebugString() const {
   std::string r;
   r.append("VersionEdit {");
   if (has_comparator_) {
@@ -247,7 +247,7 @@ std::string VersionEdit::DebugString()  {
     AppendNumberTo(&r, iter->second);
   }
   for (size_t i = 0; i < new_files_.size(); i++) {
-     FileMetaData& f = new_files_[i].second;
+    const FileMetaData& f = new_files_[i].second;
     r.append("\n  AddFile: ");
     AppendNumberTo(&r, new_files_[i].first);
     r.append(" ");

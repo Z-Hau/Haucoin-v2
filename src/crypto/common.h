@@ -14,21 +14,21 @@
 
 #include <compat/endian.h>
 
-uint16_t static inline ReadLE16( unsigned char* ptr)
+uint16_t static inline ReadLE16(const unsigned char* ptr)
 {
     uint16_t x;
     memcpy((char*)&x, ptr, 2);
     return le16toh(x);
 }
 
-uint32_t static inline ReadLE32( unsigned char* ptr)
+uint32_t static inline ReadLE32(const unsigned char* ptr)
 {
     uint32_t x;
     memcpy((char*)&x, ptr, 4);
     return le32toh(x);
 }
 
-uint64_t static inline ReadLE64( unsigned char* ptr)
+uint64_t static inline ReadLE64(const unsigned char* ptr)
 {
     uint64_t x;
     memcpy((char*)&x, ptr, 8);
@@ -53,14 +53,14 @@ void static inline WriteLE64(unsigned char* ptr, uint64_t x)
     memcpy(ptr, (char*)&v, 8);
 }
 
-uint32_t static inline ReadBE32( unsigned char* ptr)
+uint32_t static inline ReadBE32(const unsigned char* ptr)
 {
     uint32_t x;
     memcpy((char*)&x, ptr, 4);
     return be32toh(x);
 }
 
-uint64_t static inline ReadBE64( unsigned char* ptr)
+uint64_t static inline ReadBE64(const unsigned char* ptr)
 {
     uint64_t x;
     memcpy((char*)&x, ptr, 8);

@@ -18,7 +18,7 @@
  * Maximum amount of time that a block timestamp is allowed to exceed the
  * current network-adjusted time before the block will be accepted.
  */
-static  int64_t MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
+static const int64_t MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
 
 /**
  * Timestamp window used as a grace period by code that compares external
@@ -26,7 +26,7 @@ static  int64_t MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
  * to block timestamps. This should be set at least as high as
  * MAX_FUTURE_BLOCK_TIME.
  */
-static  int64_t TIMESTAMP_WINDOW = MAX_FUTURE_BLOCK_TIME;
+static const int64_t TIMESTAMP_WINDOW = MAX_FUTURE_BLOCK_TIME;
 
 class CBlockFileInfo
 {
@@ -66,7 +66,7 @@ public:
          SetNull();
      }
 
-     std::string ToString() ;
+     std::string ToString() const;
 
      /** update statistics (does not update nSize) */
      void AddBlock(unsigned int nHeightIn, uint64_t nTimeIn) {
@@ -104,18 +104,18 @@ struct CDiskBlockPos
         nPos = nPosIn;
     }
 
-    friend bool operator==( CDiskBlockPos &a,  CDiskBlockPos &b) {
+    friend bool operator==(const CDiskBlockPos &a, const CDiskBlockPos &b) {
         return (a.nFile == b.nFile && a.nPos == b.nPos);
     }
 
-    friend bool operator!=( CDiskBlockPos &a,  CDiskBlockPos &b) {
+    friend bool operator!=(const CDiskBlockPos &a, const CDiskBlockPos &b) {
         return !(a == b);
     }
 
     void SetNull() { nFile = -1; nPos = 0; }
-    bool IsNull()  { return (nFile == -1); }
+    bool IsNull() const { return (nFile == -1); }
 
-    std::string ToString() 
+    std::string ToString() const
     {
         return strprintf("CBlockDiskPos(nFile=%i, nPos=%i)", nFile, nPos);
     }
@@ -171,7 +171,7 @@ class CBlockIndex
 {
 public:
     //! pointer to the hash of the block, if any. Memory is owned by this CBlockIndex
-     uint256* phashBlock;
+    const uint256* phashBlock;
 
     //! pointer to the index of the predecessor of this block
     CBlockIndex* pprev;
@@ -247,7 +247,7 @@ public:
         SetNull();
     }
 
-    explicit CBlockIndex( CBlockHeader& block)
+    explicit CBlockIndex(const CBlockHeader& block)
     {
         SetNull();
 
@@ -258,7 +258,7 @@ public:
         nNonce         = block.nNonce;
     }
 
-    CDiskBlockPos GetBlockPos()  {
+    CDiskBlockPos GetBlockPos() const {
         CDiskBlockPos ret;
         if (nStatus & BLOCK_HAVE_DATA) {
             ret.nFile = nFile;
@@ -267,7 +267,7 @@ public:
         return ret;
     }
 
-    CDiskBlockPos GetUndoPos()  {
+    CDiskBlockPos GetUndoPos() const {
         CDiskBlockPos ret;
         if (nStatus & BLOCK_HAVE_UNDO) {
             ret.nFile = nFile;
@@ -276,7 +276,7 @@ public:
         return ret;
     }
 
-    CBlockHeader GetBlockHeader() 
+    CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
         block.nVersion       = nVersion;
@@ -289,30 +289,30 @@ public:
         return block;
     }
 
-    uint256 GetBlockHash() 
+    uint256 GetBlockHash() const
     {
         return *phashBlock;
     }
 
-    int64_t GetBlockTime() 
+    int64_t GetBlockTime() const
     {
         return (int64_t)nTime;
     }
 
-    int64_t GetBlockTimeMax() 
+    int64_t GetBlockTimeMax() const
     {
         return (int64_t)nTimeMax;
     }
 
     static constexpr int nMedianTimeSpan = 11;
 
-    int64_t GetMedianTimePast() 
+    int64_t GetMedianTimePast() const
     {
         int64_t pmedian[nMedianTimeSpan];
         int64_t* pbegin = &pmedian[nMedianTimeSpan];
         int64_t* pend = &pmedian[nMedianTimeSpan];
 
-         CBlockIndex* pindex = this;
+        const CBlockIndex* pindex = this;
         for (int i = 0; i < nMedianTimeSpan && pindex; i++, pindex = pindex->pprev)
             *(--pbegin) = pindex->GetBlockTime();
 
@@ -320,7 +320,7 @@ public:
         return pbegin[(pend - pbegin)/2];
     }
 
-    std::string ToString() 
+    std::string ToString() const
     {
         return strprintf("CBlockIndex(pprev=%p, nHeight=%d, merkle=%s, hashBlock=%s)",
             pprev, nHeight,
@@ -329,7 +329,7 @@ public:
     }
 
     //! Check whether this block index entry is valid up to the passed validity level.
-    bool IsValid(enum BlockStatus nUpTo = BLOCK_VALID_TRANSACTIONS) 
+    bool IsValid(enum BlockStatus nUpTo = BLOCK_VALID_TRANSACTIONS) const
     {
         assert(!(nUpTo & ~BLOCK_VALID_MASK)); // Only validity flags allowed.
         if (nStatus & BLOCK_FAILED_MASK)
@@ -356,14 +356,14 @@ public:
 
     //! Efficiently find an ancestor of this block.
     CBlockIndex* GetAncestor(int height);
-     CBlockIndex* GetAncestor(int height) ;
+    const CBlockIndex* GetAncestor(int height) const;
 };
 
-arith_uint256 GetBlockProof( CBlockIndex& block);
+arith_uint256 GetBlockProof(const CBlockIndex& block);
 /** Return the time it would take to redo the work difference between from and to, assuming the current hashrate corresponds to the difficulty at tip, in seconds. */
-int64_t GetBlockProofEquivalentTime( CBlockIndex& to,  CBlockIndex& from,  CBlockIndex& tip,  Consensus::Params&);
+int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params&);
 /** Find the forking point between two chain tips. */
- CBlockIndex* LastCommonAncestor( CBlockIndex* pa,  CBlockIndex* pb);
+const CBlockIndex* LastCommonAncestor(const CBlockIndex* pa, const CBlockIndex* pb);
 
 
 /** Used to marshal pointers into hashes for db storage. */
@@ -376,7 +376,7 @@ public:
         hashPrev = uint256();
     }
 
-    explicit CDiskBlockIndex( CBlockIndex* pindex) : CBlockIndex(*pindex) {
+    explicit CDiskBlockIndex(const CBlockIndex* pindex) : CBlockIndex(*pindex) {
         hashPrev = (pprev ? pprev->GetBlockHash() : uint256());
     }
 
@@ -407,7 +407,7 @@ public:
         READWRITE(nNonce);
     }
 
-    uint256 GetBlockHash() 
+    uint256 GetBlockHash() const
     {
         CBlockHeader block;
         block.nVersion        = nVersion;
@@ -420,7 +420,7 @@ public:
     }
 
 
-    std::string ToString() 
+    std::string ToString() const
     {
         std::string str = "CDiskBlockIndex(";
         str += CBlockIndex::ToString();
@@ -438,35 +438,35 @@ private:
 
 public:
     /** Returns the index entry for the genesis block of this chain, or nullptr if none. */
-    CBlockIndex *Genesis()  {
+    CBlockIndex *Genesis() const {
         return vChain.size() > 0 ? vChain[0] : nullptr;
     }
 
     /** Returns the index entry for the tip of this chain, or nullptr if none. */
-    CBlockIndex *Tip()  {
+    CBlockIndex *Tip() const {
         return vChain.size() > 0 ? vChain[vChain.size() - 1] : nullptr;
     }
 
     /** Returns the index entry at a particular height in this chain, or nullptr if no such height exists. */
-    CBlockIndex *operator[](int nHeight)  {
+    CBlockIndex *operator[](int nHeight) const {
         if (nHeight < 0 || nHeight >= (int)vChain.size())
             return nullptr;
         return vChain[nHeight];
     }
 
     /** Compare two chains efficiently. */
-    friend bool operator==( CChain &a,  CChain &b) {
+    friend bool operator==(const CChain &a, const CChain &b) {
         return a.vChain.size() == b.vChain.size() &&
                a.vChain[a.vChain.size() - 1] == b.vChain[b.vChain.size() - 1];
     }
 
     /** Efficiently check whether a block is present in this chain. */
-    bool Contains( CBlockIndex *pindex)  {
+    bool Contains(const CBlockIndex *pindex) const {
         return (*this)[pindex->nHeight] == pindex;
     }
 
     /** Find the successor of a block in this chain, or nullptr if the given index is not found or is the tip. */
-    CBlockIndex *Next( CBlockIndex *pindex)  {
+    CBlockIndex *Next(const CBlockIndex *pindex) const {
         if (Contains(pindex))
             return (*this)[pindex->nHeight + 1];
         else
@@ -474,7 +474,7 @@ public:
     }
 
     /** Return the maximal height in the chain. Is equal to chain.Tip() ? chain.Tip()->nHeight : -1. */
-    int Height()  {
+    int Height() const {
         return vChain.size() - 1;
     }
 
@@ -482,13 +482,13 @@ public:
     void SetTip(CBlockIndex *pindex);
 
     /** Return a CBlockLocator that refers to a block in this chain (by default the tip). */
-    CBlockLocator GetLocator( CBlockIndex *pindex = nullptr) ;
+    CBlockLocator GetLocator(const CBlockIndex *pindex = nullptr) const;
 
     /** Find the last common block between this chain and a block index entry. */
-     CBlockIndex *FindFork( CBlockIndex *pindex) ;
+    const CBlockIndex *FindFork(const CBlockIndex *pindex) const;
 
     /** Find the earliest block with timestamp equal or greater than the given. */
-    CBlockIndex* FindEarliestAtLeast(int64_t nTime) ;
+    CBlockIndex* FindEarliestAtLeast(int64_t nTime) const;
 };
 
 #endif // BITCOIN_CHAIN_H

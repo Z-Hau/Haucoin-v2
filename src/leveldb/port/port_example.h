@@ -18,7 +18,7 @@ namespace port {
 
 // The following boolean constant must be true on a little-endian machine
 // and false otherwise.
-static  bool kLittleEndian = true /* or some other expression */;
+static const bool kLittleEndian = true /* or some other expression */;
 
 // ------------------ Threading -------------------
 
@@ -85,7 +85,7 @@ class AtomicPointer {
   // Read and return the stored pointer with the guarantee that no
   // later memory access (read or write) by this thread can be
   // reordered ahead of this read.
-  void* Acquire_Load() ;
+  void* Acquire_Load() const;
 
   // Set v as the stored pointer with the guarantee that no earlier
   // memory access (read or write) by this thread can be reordered
@@ -93,7 +93,7 @@ class AtomicPointer {
   void Release_Store(void* v);
 
   // Read the stored pointer with no ordering guarantees.
-  void* NoBarrier_Load() ;
+  void* NoBarrier_Load() const;
 
   // Set va as the stored pointer with no ordering guarantees.
   void NoBarrier_Store(void* v);
@@ -103,13 +103,13 @@ class AtomicPointer {
 
 // Store the snappy compression of "input[0,input_length-1]" in *output.
 // Returns false if snappy is not supported by this port.
-extern bool Snappy_Compress( char* input, size_t input_length,
+extern bool Snappy_Compress(const char* input, size_t input_length,
                             std::string* output);
 
 // If input[0,input_length-1] looks like a valid snappy compressed
 // buffer, store the size of the uncompressed data in *result and
 // return true.  Else return false.
-extern bool Snappy_GetUncompressedLength( char* input, size_t length,
+extern bool Snappy_GetUncompressedLength(const char* input, size_t length,
                                          size_t* result);
 
 // Attempt to snappy uncompress input[0,input_length-1] into *output.
@@ -119,7 +119,7 @@ extern bool Snappy_GetUncompressedLength( char* input, size_t length,
 // REQUIRES: at least the first "n" bytes of output[] must be writable
 // where "n" is the result of a successful call to
 // Snappy_GetUncompressedLength.
-extern bool Snappy_Uncompress( char* input_data, size_t input_length,
+extern bool Snappy_Uncompress(const char* input_data, size_t input_length,
                               char* output);
 
 // ------------------ Miscellaneous -------------------
@@ -127,7 +127,7 @@ extern bool Snappy_Uncompress( char* input_data, size_t input_length,
 // If heap profiling is not supported, returns false.
 // Else repeatedly calls (*func)(arg, data, n) and then returns true.
 // The concatenation of all "data[0,n-1]" fragments is the heap profile.
-extern bool GetHeapProfile(void (*func)(void*,  char*, int), void* arg);
+extern bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg);
 
 // Determine whether a working accelerated crc32 implementation exists
 // Returns true if AcceleratedCRC32C is safe to call
@@ -137,7 +137,7 @@ bool HasAcceleratedCRC32C();
 //
 // Returns zero if the CRC cannot be extended using acceleration, else returns
 // the newly extended CRC value (which may also be zero).
-uint32_t AcceleratedCRC32C(uint32_t crc,  char* buf, size_t size);
+uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size);
 
 }  // namespace port
 }  // namespace leveldb

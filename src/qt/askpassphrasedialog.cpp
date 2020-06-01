@@ -238,7 +238,7 @@ bool AskPassphraseDialog::event(QEvent *event)
 void AskPassphraseDialog::toggleShowPassword(bool show)
 {
     ui->toggleShowPasswordButton->setDown(show);
-     auto mode = show ? QLineEdit::Normal : QLineEdit::Password;
+    const auto mode = show ? QLineEdit::Normal : QLineEdit::Password;
     ui->passEdit1->setEchoMode(mode);
     ui->passEdit2->setEchoMode(mode);
     ui->passEdit3->setEchoMode(mode);
@@ -256,7 +256,7 @@ bool AskPassphraseDialog::eventFilter(QObject *object, QEvent *event)
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         QString str = ke->text();
         if (str.length() != 0) {
-             QChar *psz = str.unicode();
+            const QChar *psz = str.unicode();
             bool fShift = (ke->modifiers() & Qt::ShiftModifier) != 0;
             if ((fShift && *psz >= 'a' && *psz <= 'z') || (!fShift && *psz >= 'A' && *psz <= 'Z')) {
                 fCapsLock = true;

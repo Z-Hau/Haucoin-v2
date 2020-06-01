@@ -15,10 +15,10 @@
 #include <QList>
 #include <QTimer>
 
-bool NodeLessThan::operator()( CNodeCombinedStats &left,  CNodeCombinedStats &right) 
+bool NodeLessThan::operator()(const CNodeCombinedStats &left, const CNodeCombinedStats &right) const
 {
-     CNodeStats *pLeft = &(left.nodeStats);
-     CNodeStats *pRight = &(right.nodeStats);
+    const CNodeStats *pLeft = &(left.nodeStats);
+    const CNodeStats *pRight = &(right.nodeStats);
 
     if (order == Qt::DescendingOrder)
         std::swap(pLeft, pRight);
@@ -66,7 +66,7 @@ public:
 #if QT_VERSION >= 0x040700
             cachedNodeStats.reserve(vstats.size());
 #endif
-            for ( CNodeStats& nodestats : vstats)
+            for (const CNodeStats& nodestats : vstats)
             {
                 CNodeCombinedStats stats;
                 stats.nodeStateStats.nMisbehavior = 0;
@@ -95,11 +95,11 @@ public:
         // build index map
         mapNodeRows.clear();
         int row = 0;
-        for ( CNodeCombinedStats& stats : cachedNodeStats)
+        for (const CNodeCombinedStats& stats : cachedNodeStats)
             mapNodeRows.insert(std::pair<NodeId, int>(stats.nodeStats.nodeid, row++));
     }
 
-    int size() 
+    int size() const
     {
         return cachedNodeStats.size();
     }
@@ -147,19 +147,19 @@ void PeerTableModel::stopAutoRefresh()
     timer->stop();
 }
 
-int PeerTableModel::rowCount( QModelIndex &parent) 
+int PeerTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return priv->size();
 }
 
-int PeerTableModel::columnCount( QModelIndex &parent) 
+int PeerTableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return columns.length();
 }
 
-QVariant PeerTableModel::data( QModelIndex &index, int role) 
+QVariant PeerTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
         return QVariant();
@@ -196,7 +196,7 @@ QVariant PeerTableModel::data( QModelIndex &index, int role)
     return QVariant();
 }
 
-QVariant PeerTableModel::headerData(int section, Qt::Orientation orientation, int role) 
+QVariant PeerTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(orientation == Qt::Horizontal)
     {
@@ -208,7 +208,7 @@ QVariant PeerTableModel::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
-Qt::ItemFlags PeerTableModel::flags( QModelIndex &index) 
+Qt::ItemFlags PeerTableModel::flags(const QModelIndex &index) const
 {
     if(!index.isValid())
         return 0;
@@ -217,7 +217,7 @@ Qt::ItemFlags PeerTableModel::flags( QModelIndex &index)
     return retval;
 }
 
-QModelIndex PeerTableModel::index(int row, int column,  QModelIndex &parent) 
+QModelIndex PeerTableModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     CNodeCombinedStats *data = priv->index(row);
@@ -227,7 +227,7 @@ QModelIndex PeerTableModel::index(int row, int column,  QModelIndex &parent)
     return QModelIndex();
 }
 
- CNodeCombinedStats *PeerTableModel::getNodeStats(int idx)
+const CNodeCombinedStats *PeerTableModel::getNodeStats(int idx)
 {
     return priv->index(idx);
 }

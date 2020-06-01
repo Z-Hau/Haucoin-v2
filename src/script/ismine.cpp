@@ -13,10 +13,10 @@
 
 typedef std::vector<unsigned char> valtype;
 
-unsigned int HaveKeys( std::vector<valtype>& pubkeys,  CKeyStore& keystore)
+unsigned int HaveKeys(const std::vector<valtype>& pubkeys, const CKeyStore& keystore)
 {
     unsigned int nResult = 0;
-    for ( valtype& pubkey : pubkeys)
+    for (const valtype& pubkey : pubkeys)
     {
         CKeyID keyID = CPubKey(pubkey).GetID();
         if (keystore.HaveKey(keyID))
@@ -25,25 +25,25 @@ unsigned int HaveKeys( std::vector<valtype>& pubkeys,  CKeyStore& keystore)
     return nResult;
 }
 
-isminetype IsMine( CKeyStore& keystore,  CScript& scriptPubKey, SigVersion sigversion)
+isminetype IsMine(const CKeyStore& keystore, const CScript& scriptPubKey, SigVersion sigversion)
 {
     bool isInvalid = false;
     return IsMine(keystore, scriptPubKey, isInvalid, sigversion);
 }
 
-isminetype IsMine( CKeyStore& keystore,  CTxDestination& dest, SigVersion sigversion)
+isminetype IsMine(const CKeyStore& keystore, const CTxDestination& dest, SigVersion sigversion)
 {
     bool isInvalid = false;
     return IsMine(keystore, dest, isInvalid, sigversion);
 }
 
-isminetype IsMine( CKeyStore &keystore,  CTxDestination& dest, bool& isInvalid, SigVersion sigversion)
+isminetype IsMine(const CKeyStore &keystore, const CTxDestination& dest, bool& isInvalid, SigVersion sigversion)
 {
     CScript script = GetScriptForDestination(dest);
     return IsMine(keystore, script, isInvalid, sigversion);
 }
 
-isminetype IsMine( CKeyStore &keystore,  CScript& scriptPubKey, bool& isInvalid, SigVersion sigversion)
+isminetype IsMine(const CKeyStore &keystore, const CScript& scriptPubKey, bool& isInvalid, SigVersion sigversion)
 {
     isInvalid = false;
 

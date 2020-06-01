@@ -29,13 +29,13 @@ struct Table::Rep {
   RandomAccessFile* file;
   uint64_t cache_id;
   FilterBlockReader* filter;
-   char* filter_data;
+  const char* filter_data;
 
   BlockHandle metaindex_handle;  // Handle to metaindex_block: saved from footer
   Block* index_block;
 };
 
-Status Table::Open( Options& options,
+Status Table::Open(const Options& options,
                    RandomAccessFile* file,
                    uint64_t size,
                    Table** table) {
@@ -88,7 +88,7 @@ Status Table::Open( Options& options,
   return s;
 }
 
-void Table::ReadMeta( Footer& footer) {
+void Table::ReadMeta(const Footer& footer) {
   if (rep_->options.filter_policy == NULL) {
     return;  // Do not need any metadata
   }
@@ -117,7 +117,7 @@ void Table::ReadMeta( Footer& footer) {
   delete meta;
 }
 
-void Table::ReadFilter( Slice& filter_handle_value) {
+void Table::ReadFilter(const Slice& filter_handle_value) {
   Slice v = filter_handle_value;
   BlockHandle filter_handle;
   if (!filter_handle.DecodeFrom(&v).ok()) {
@@ -148,7 +148,7 @@ static void DeleteBlock(void* arg, void* ignored) {
   delete reinterpret_cast<Block*>(arg);
 }
 
-static void DeleteCachedBlock( Slice& key, void* value) {
+static void DeleteCachedBlock(const Slice& key, void* value) {
   Block* block = reinterpret_cast<Block*>(value);
   delete block;
 }
@@ -162,8 +162,8 @@ static void ReleaseBlock(void* arg, void* h) {
 // Convert an index iterator value (i.e., an encoded BlockHandle)
 // into an iterator over the contents of the corresponding block.
 Iterator* Table::BlockReader(void* arg,
-                              ReadOptions& options,
-                              Slice& index_value) {
+                             const ReadOptions& options,
+                             const Slice& index_value) {
   Table* table = reinterpret_cast<Table*>(arg);
   Cache* block_cache = table->rep_->options.block_cache;
   Block* block = NULL;
@@ -217,15 +217,15 @@ Iterator* Table::BlockReader(void* arg,
   return iter;
 }
 
-Iterator* Table::NewIterator( ReadOptions& options)  {
+Iterator* Table::NewIterator(const ReadOptions& options) const {
   return NewTwoLevelIterator(
       rep_->index_block->NewIterator(rep_->options.comparator),
       &Table::BlockReader, const_cast<Table*>(this), options);
 }
 
-Status Table::InternalGet( ReadOptions& options,  Slice& k,
+Status Table::InternalGet(const ReadOptions& options, const Slice& k,
                           void* arg,
-                          void (*saver)(void*,  Slice&,  Slice&)) {
+                          void (*saver)(void*, const Slice&, const Slice&)) {
   Status s;
   Iterator* iiter = rep_->index_block->NewIterator(rep_->options.comparator);
   iiter->Seek(k);
@@ -255,7 +255,7 @@ Status Table::InternalGet( ReadOptions& options,  Slice& k,
 }
 
 
-uint64_t Table::ApproximateOffsetOf( Slice& key)  {
+uint64_t Table::ApproximateOffsetOf(const Slice& key) const {
   Iterator* index_iter =
       rep_->index_block->NewIterator(rep_->options.comparator);
   index_iter->Seek(key);

@@ -20,7 +20,7 @@ TEST(FileNameTest, Parse) {
 
   // Successful parses
   static struct {
-     char* fname;
+    const char* fname;
     uint64_t number;
     FileType type;
   } cases[] = {
@@ -44,7 +44,7 @@ TEST(FileNameTest, Parse) {
   }
 
   // Errors
-  static  char* errors[] = {
+  static const char* errors[] = {
     "",
     "foo",
     "foo-dx-100.log",

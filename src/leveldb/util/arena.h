@@ -26,7 +26,7 @@ class Arena {
 
   // Returns an estimate of the total memory usage of data allocated
   // by the arena.
-  size_t MemoryUsage()  {
+  size_t MemoryUsage() const {
     return reinterpret_cast<uintptr_t>(memory_usage_.NoBarrier_Load());
   }
 
@@ -45,8 +45,8 @@ class Arena {
   port::AtomicPointer memory_usage_;
 
   // No copying allowed
-  Arena( Arena&);
-  void operator=( Arena&);
+  Arena(const Arena&);
+  void operator=(const Arena&);
 };
 
 inline char* Arena::Allocate(size_t bytes) {

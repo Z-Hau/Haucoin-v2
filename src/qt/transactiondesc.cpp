@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <string>
 
-QString TransactionDesc::FormatTxStatus( CWalletTx& wtx)
+QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 {
     AssertLockHeld(cs_main);
     if (!CheckFinalTx(*wtx.tx))
@@ -122,7 +122,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
         // Coinbase
         //
         CAmount nUnmatured = 0;
-        for ( CTxOut& txout : wtx.tx->vout)
+        for (const CTxOut& txout : wtx.tx->vout)
             nUnmatured += wallet->GetCredit(txout, ISMINE_ALL);
         strHTML += "<b>" + tr("Credit") + ":</b> ";
         if (wtx.IsInMainChain())
@@ -141,14 +141,14 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
     else
     {
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        for ( CTxIn& txin : wtx.tx->vin)
+        for (const CTxIn& txin : wtx.tx->vin)
         {
             isminetype mine = wallet->IsMine(txin);
             if(fAllFromMe > mine) fAllFromMe = mine;
         }
 
         isminetype fAllToMe = ISMINE_SPENDABLE;
-        for ( CTxOut& txout : wtx.tx->vout)
+        for (const CTxOut& txout : wtx.tx->vout)
         {
             isminetype mine = wallet->IsMine(txout);
             if(fAllToMe > mine) fAllToMe = mine;
@@ -162,7 +162,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
             //
             // Debit
             //
-            for ( CTxOut& txout : wtx.tx->vout)
+            for (const CTxOut& txout : wtx.tx->vout)
             {
                 // Ignore change
                 isminetype toSelf = wallet->IsMine(txout);
@@ -210,10 +210,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
             //
             // Mixed debit transaction
             //
-            for ( CTxIn& txin : wtx.tx->vin)
+            for (const CTxIn& txin : wtx.tx->vin)
                 if (wallet->IsMine(txin))
                     strHTML += "<b>" + tr("Debit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -wallet->GetDebit(txin, ISMINE_ALL)) + "<br>";
-            for ( CTxOut& txout : wtx.tx->vout)
+            for (const CTxOut& txout : wtx.tx->vout)
                 if (wallet->IsMine(txout))
                     strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, wallet->GetCredit(txout, ISMINE_ALL)) + "<br>";
         }
@@ -234,14 +234,14 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
     strHTML += "<b>" + tr("Output index") + ":</b> " + QString::number(rec->getOutputIndex()) + "<br>";
 
     // Message from normal bitcoin:URI (bitcoin:123...?message=example)
-    for ( std::pair<std::string, std::string>& r : wtx.vOrderForm)
+    for (const std::pair<std::string, std::string>& r : wtx.vOrderForm)
         if (r.first == "Message")
             strHTML += "<br><b>" + tr("Message") + ":</b><br>" + GUIUtil::HtmlEscape(r.second, true) + "<br>";
 
     //
     // PaymentRequest info:
     //
-    for ( std::pair<std::string, std::string>& r : wtx.vOrderForm)
+    for (const std::pair<std::string, std::string>& r : wtx.vOrderForm)
     {
         if (r.first == "PaymentRequest")
         {
@@ -265,10 +265,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
     if (logCategories != BCLog::NONE)
     {
         strHTML += "<hr><br>" + tr("Debug information") + "<br><br>";
-        for ( CTxIn& txin : wtx.tx->vin)
+        for (const CTxIn& txin : wtx.tx->vin)
             if(wallet->IsMine(txin))
                 strHTML += "<b>" + tr("Debit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -wallet->GetDebit(txin, ISMINE_ALL)) + "<br>";
-        for ( CTxOut& txout : wtx.tx->vout)
+        for (const CTxOut& txout : wtx.tx->vout)
             if(wallet->IsMine(txout))
                 strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, wallet->GetCredit(txout, ISMINE_ALL)) + "<br>";
 
@@ -278,7 +278,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
         strHTML += "<br><b>" + tr("Inputs") + ":</b>";
         strHTML += "<ul>";
 
-        for ( CTxIn& txin : wtx.tx->vin)
+        for (const CTxIn& txin : wtx.tx->vin)
         {
             COutPoint prevout = txin.prevout;
 
@@ -287,7 +287,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx, TransactionReco
             {
                 {
                     strHTML += "<li>";
-                     CTxOut &vout = prev.out;
+                    const CTxOut &vout = prev.out;
                     CTxDestination address;
                     if (ExtractDestination(vout.scriptPubKey, address))
                     {

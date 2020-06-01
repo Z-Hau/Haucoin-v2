@@ -15,7 +15,7 @@
 
 /* Return positive answer if transaction should be shown in list.
  */
-bool TransactionRecord::showTransaction( CWalletTx &wtx)
+bool TransactionRecord::showTransaction(const CWalletTx &wtx)
 {
     // There are currently no cases where we hide transactions, but
     // we may want to use this in the future for things like RBF.
@@ -25,7 +25,7 @@ bool TransactionRecord::showTransaction( CWalletTx &wtx)
 /*
  * Decompose CWallet transaction to model transaction records.
  */
-QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *wallet,  CWalletTx &wtx)
+QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *wallet, const CWalletTx &wtx)
 {
     QList<TransactionRecord> parts;
     int64_t nTime = wtx.GetTxTime();
@@ -42,7 +42,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *walle
         //
         for(unsigned int i = 0; i < wtx.tx->vout.size(); i++)
         {
-             CTxOut& txout = wtx.tx->vout[i];
+            const CTxOut& txout = wtx.tx->vout[i];
             isminetype mine = wallet->IsMine(txout);
             if(mine)
             {
@@ -77,7 +77,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *walle
     {
         bool involvesWatchAddress = false;
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        for ( CTxIn& txin : wtx.tx->vin)
+        for (const CTxIn& txin : wtx.tx->vin)
         {
             isminetype mine = wallet->IsMine(txin);
             if(mine & ISMINE_WATCH_ONLY) involvesWatchAddress = true;
@@ -85,7 +85,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *walle
         }
 
         isminetype fAllToMe = ISMINE_SPENDABLE;
-        for ( CTxOut& txout : wtx.tx->vout)
+        for (const CTxOut& txout : wtx.tx->vout)
         {
             isminetype mine = wallet->IsMine(txout);
             if(mine & ISMINE_WATCH_ONLY) involvesWatchAddress = true;
@@ -110,7 +110,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *walle
 
             for (unsigned int nOut = 0; nOut < wtx.tx->vout.size(); nOut++)
             {
-                 CTxOut& txout = wtx.tx->vout[nOut];
+                const CTxOut& txout = wtx.tx->vout[nOut];
                 TransactionRecord sub(hash, nTime);
                 sub.idx = nOut;
                 sub.involvesWatchAddress = involvesWatchAddress;
@@ -161,7 +161,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction( CWallet *walle
     return parts;
 }
 
-void TransactionRecord::updateStatus( CWalletTx &wtx)
+void TransactionRecord::updateStatus(const CWalletTx &wtx)
 {
     AssertLockHeld(cs_main);
     // Determine transaction status
@@ -240,18 +240,18 @@ void TransactionRecord::updateStatus( CWalletTx &wtx)
     status.needsUpdate = false;
 }
 
-bool TransactionRecord::statusUpdateNeeded() 
+bool TransactionRecord::statusUpdateNeeded() const
 {
     AssertLockHeld(cs_main);
     return status.cur_num_blocks != chainActive.Height() || status.needsUpdate;
 }
 
-QString TransactionRecord::getTxID() 
+QString TransactionRecord::getTxID() const
 {
     return QString::fromStdString(hash.ToString());
 }
 
-int TransactionRecord::getOutputIndex() 
+int TransactionRecord::getOutputIndex() const
 {
     return idx;
 }

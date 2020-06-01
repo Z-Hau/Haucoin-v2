@@ -32,7 +32,7 @@ class VersionEdit {
 
   void Clear();
 
-  void SetComparatorName( Slice& name) {
+  void SetComparatorName(const Slice& name) {
     has_comparator_ = true;
     comparator_ = name.ToString();
   }
@@ -52,7 +52,7 @@ class VersionEdit {
     has_last_sequence_ = true;
     last_sequence_ = seq;
   }
-  void SetCompactPointer(int level,  InternalKey& key) {
+  void SetCompactPointer(int level, const InternalKey& key) {
     compact_pointers_.push_back(std::make_pair(level, key));
   }
 
@@ -61,8 +61,8 @@ class VersionEdit {
   // REQUIRES: "smallest" and "largest" are smallest and largest keys in file
   void AddFile(int level, uint64_t file,
                uint64_t file_size,
-                InternalKey& smallest,
-                InternalKey& largest) {
+               const InternalKey& smallest,
+               const InternalKey& largest) {
     FileMetaData f;
     f.number = file;
     f.file_size = file_size;
@@ -76,10 +76,10 @@ class VersionEdit {
     deleted_files_.insert(std::make_pair(level, file));
   }
 
-  void EncodeTo(std::string* dst) ;
-  Status DecodeFrom( Slice& src);
+  void EncodeTo(std::string* dst) const;
+  Status DecodeFrom(const Slice& src);
 
-  std::string DebugString() ;
+  std::string DebugString() const;
 
  private:
   friend class VersionSet;

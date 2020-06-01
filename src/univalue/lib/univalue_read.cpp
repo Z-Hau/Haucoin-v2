@@ -16,7 +16,7 @@ static bool json_isdigit(int ch)
 }
 
 // convert hexadecimal string to unsigned integer
-static  char *hatoui( char *first,  char *last,
+static const char *hatoui(const char *first, const char *last,
                           unsigned int& out)
 {
     unsigned int result = 0;
@@ -43,12 +43,12 @@ static  char *hatoui( char *first,  char *last,
 }
 
 enum jtokentype getJsonToken(string& tokenVal, unsigned int& consumed,
-                             char *raw,  char *end)
+                            const char *raw, const char *end)
 {
     tokenVal.clear();
     consumed = 0;
 
-     char *rawStart = raw;
+    const char *rawStart = raw;
 
     while (raw < end && (json_isspace(*raw)))          // skip whitespace
         raw++;
@@ -116,9 +116,9 @@ enum jtokentype getJsonToken(string& tokenVal, unsigned int& consumed,
         // part 1: int
         string numStr;
 
-         char *first = raw;
+        const char *first = raw;
 
-         char *firstDigit = first;
+        const char *firstDigit = first;
         if (!json_isdigit(*firstDigit))
             firstDigit++;
         if ((*firstDigit == '0') && json_isdigit(firstDigit[1]))
@@ -250,7 +250,7 @@ enum expect_bits {
 #define setExpect(bit) (expectMask |= EXP_##bit)
 #define clearExpect(bit) (expectMask &= ~EXP_##bit)
 
-bool UniValue::read( char *raw, size_t size)
+bool UniValue::read(const char *raw, size_t size)
 {
     clear();
 
@@ -261,7 +261,7 @@ bool UniValue::read( char *raw, size_t size)
     unsigned int consumed;
     enum jtokentype tok = JTOK_NONE;
     enum jtokentype last_tok = JTOK_NONE;
-     char* end = raw + size;
+    const char* end = raw + size;
     do {
         last_tok = tok;
 

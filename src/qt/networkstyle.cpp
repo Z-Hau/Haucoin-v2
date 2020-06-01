@@ -8,21 +8,21 @@
 
 #include <QApplication>
 
-static  struct {
-     char *networkId;
-     char *appName;
-     int iconColorHueShift;
-     int iconColorSaturationReduction;
-     char *titleAddText;
+static const struct {
+    const char *networkId;
+    const char *appName;
+    const int iconColorHueShift;
+    const int iconColorSaturationReduction;
+    const char *titleAddText;
 } network_styles[] = {
     {"main", QAPP_APP_NAME_DEFAULT, 0, 0, ""},
     {"test", QAPP_APP_NAME_TESTNET, 70, 30, QT_TRANSLATE_NOOP("SplashScreen", "[testnet]")},
     {"regtest", QAPP_APP_NAME_TESTNET, 160, 30, "[regtest]"}
 };
-static  unsigned network_styles_count = sizeof(network_styles)/sizeof(*network_styles);
+static const unsigned network_styles_count = sizeof(network_styles)/sizeof(*network_styles);
 
-// titleAddText needs to be  char* for tr()
-NetworkStyle::NetworkStyle( QString &_appName,  int iconColorHueShift,  int iconColorSaturationReduction,  char *_titleAddText):
+// titleAddText needs to be const char* for tr()
+NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift, const int iconColorSaturationReduction, const char *_titleAddText):
     appName(_appName),
     titleAddText(qApp->translate("SplashScreen", _titleAddText))
 {
@@ -79,7 +79,7 @@ NetworkStyle::NetworkStyle( QString &_appName,  int iconColorHueShift,  int icon
     trayAndWindowIcon   = QIcon(pixmap.scaled(QSize(256,256)));
 }
 
- NetworkStyle *NetworkStyle::instantiate( QString &networkId)
+const NetworkStyle *NetworkStyle::instantiate(const QString &networkId)
 {
     for (unsigned x=0; x<network_styles_count; ++x)
     {

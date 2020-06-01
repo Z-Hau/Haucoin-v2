@@ -87,13 +87,13 @@ TestVector test3 =
      "xprv9uPDJpEQgRQfDcW7BkF7eTya6RPxXeJCqCJGHuCJ4GiRVLzkTXBAJMu2qaMWPrS7AANYqdq6vcBcBUdJCVVFceUvJFjaPdGZ2y9WACViL4L",
       0);
 
-void RunTest( TestVector &test) {
+void RunTest(const TestVector &test) {
     std::vector<unsigned char> seed = ParseHex(test.strHexMaster);
     CExtKey key;
     CExtPubKey pubkey;
     key.SetMaster(seed.data(), seed.size());
     pubkey = key.Neuter();
-    for ( TestDerivation &derive : test.vDerive) {
+    for (const TestDerivation &derive : test.vDerive) {
         unsigned char data[74];
         key.Encode(data);
         pubkey.Encode(data);

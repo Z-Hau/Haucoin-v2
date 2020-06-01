@@ -17,7 +17,7 @@
 class scriptnum10_error : public std::runtime_error
 {
 public:
-    explicit scriptnum10_error( std::string& str) : std::runtime_error(str) {}
+    explicit scriptnum10_error(const std::string& str) : std::runtime_error(str) {}
 };
 
 class CScriptNum10
@@ -27,15 +27,15 @@ class CScriptNum10
  */
 public:
 
-    explicit CScriptNum10( int64_t& n)
+    explicit CScriptNum10(const int64_t& n)
     {
         m_value = n;
     }
 
-    static  size_t nDefaultMaxNumSize = 4;
+    static const size_t nDefaultMaxNumSize = 4;
 
-    explicit CScriptNum10( std::vector<unsigned char>& vch, bool fRequireMinimal,
-                         size_t nMaxNumSize = nDefaultMaxNumSize)
+    explicit CScriptNum10(const std::vector<unsigned char>& vch, bool fRequireMinimal,
+                        const size_t nMaxNumSize = nDefaultMaxNumSize)
     {
         if (vch.size() > nMaxNumSize) {
             throw scriptnum10_error("script number overflow");
@@ -61,41 +61,41 @@ public:
         m_value = set_vch(vch);
     }
 
-    inline bool operator==( int64_t& rhs)     { return m_value == rhs; }
-    inline bool operator!=( int64_t& rhs)     { return m_value != rhs; }
-    inline bool operator<=( int64_t& rhs)     { return m_value <= rhs; }
-    inline bool operator< ( int64_t& rhs)     { return m_value <  rhs; }
-    inline bool operator>=( int64_t& rhs)     { return m_value >= rhs; }
-    inline bool operator> ( int64_t& rhs)     { return m_value >  rhs; }
+    inline bool operator==(const int64_t& rhs) const    { return m_value == rhs; }
+    inline bool operator!=(const int64_t& rhs) const    { return m_value != rhs; }
+    inline bool operator<=(const int64_t& rhs) const    { return m_value <= rhs; }
+    inline bool operator< (const int64_t& rhs) const    { return m_value <  rhs; }
+    inline bool operator>=(const int64_t& rhs) const    { return m_value >= rhs; }
+    inline bool operator> (const int64_t& rhs) const    { return m_value >  rhs; }
 
-    inline bool operator==( CScriptNum10& rhs)  { return operator==(rhs.m_value); }
-    inline bool operator!=( CScriptNum10& rhs)  { return operator!=(rhs.m_value); }
-    inline bool operator<=( CScriptNum10& rhs)  { return operator<=(rhs.m_value); }
-    inline bool operator< ( CScriptNum10& rhs)  { return operator< (rhs.m_value); }
-    inline bool operator>=( CScriptNum10& rhs)  { return operator>=(rhs.m_value); }
-    inline bool operator> ( CScriptNum10& rhs)  { return operator> (rhs.m_value); }
+    inline bool operator==(const CScriptNum10& rhs) const { return operator==(rhs.m_value); }
+    inline bool operator!=(const CScriptNum10& rhs) const { return operator!=(rhs.m_value); }
+    inline bool operator<=(const CScriptNum10& rhs) const { return operator<=(rhs.m_value); }
+    inline bool operator< (const CScriptNum10& rhs) const { return operator< (rhs.m_value); }
+    inline bool operator>=(const CScriptNum10& rhs) const { return operator>=(rhs.m_value); }
+    inline bool operator> (const CScriptNum10& rhs) const { return operator> (rhs.m_value); }
 
-    inline CScriptNum10 operator+(    int64_t& rhs)     { return CScriptNum10(m_value + rhs);}
-    inline CScriptNum10 operator-(    int64_t& rhs)     { return CScriptNum10(m_value - rhs);}
-    inline CScriptNum10 operator+(    CScriptNum10& rhs)  { return operator+(rhs.m_value);   }
-    inline CScriptNum10 operator-(    CScriptNum10& rhs)  { return operator-(rhs.m_value);   }
+    inline CScriptNum10 operator+(   const int64_t& rhs)    const { return CScriptNum10(m_value + rhs);}
+    inline CScriptNum10 operator-(   const int64_t& rhs)    const { return CScriptNum10(m_value - rhs);}
+    inline CScriptNum10 operator+(   const CScriptNum10& rhs) const { return operator+(rhs.m_value);   }
+    inline CScriptNum10 operator-(   const CScriptNum10& rhs) const { return operator-(rhs.m_value);   }
 
-    inline CScriptNum10& operator+=(  CScriptNum10& rhs)       { return operator+=(rhs.m_value);  }
-    inline CScriptNum10& operator-=(  CScriptNum10& rhs)       { return operator-=(rhs.m_value);  }
+    inline CScriptNum10& operator+=( const CScriptNum10& rhs)       { return operator+=(rhs.m_value);  }
+    inline CScriptNum10& operator-=( const CScriptNum10& rhs)       { return operator-=(rhs.m_value);  }
 
-    inline CScriptNum10 operator-()                         
+    inline CScriptNum10 operator-()                         const
     {
         assert(m_value != std::numeric_limits<int64_t>::min());
         return CScriptNum10(-m_value);
     }
 
-    inline CScriptNum10& operator=(  int64_t& rhs)
+    inline CScriptNum10& operator=( const int64_t& rhs)
     {
         m_value = rhs;
         return *this;
     }
 
-    inline CScriptNum10& operator+=(  int64_t& rhs)
+    inline CScriptNum10& operator+=( const int64_t& rhs)
     {
         assert(rhs == 0 || (rhs > 0 && m_value <= std::numeric_limits<int64_t>::max() - rhs) ||
                            (rhs < 0 && m_value >= std::numeric_limits<int64_t>::min() - rhs));
@@ -103,7 +103,7 @@ public:
         return *this;
     }
 
-    inline CScriptNum10& operator-=(  int64_t& rhs)
+    inline CScriptNum10& operator-=( const int64_t& rhs)
     {
         assert(rhs == 0 || (rhs > 0 && m_value >= std::numeric_limits<int64_t>::min() + rhs) ||
                            (rhs < 0 && m_value <= std::numeric_limits<int64_t>::max() + rhs));
@@ -111,7 +111,7 @@ public:
         return *this;
     }
 
-    int getint() 
+    int getint() const
     {
         if (m_value > std::numeric_limits<int>::max())
             return std::numeric_limits<int>::max();
@@ -120,18 +120,18 @@ public:
         return m_value;
     }
 
-    std::vector<unsigned char> getvch() 
+    std::vector<unsigned char> getvch() const
     {
         return serialize(m_value);
     }
 
-    static std::vector<unsigned char> serialize( int64_t& value)
+    static std::vector<unsigned char> serialize(const int64_t& value)
     {
         if(value == 0)
             return std::vector<unsigned char>();
 
         std::vector<unsigned char> result;
-         bool neg = value < 0;
+        const bool neg = value < 0;
         uint64_t absvalue = neg ? -value : value;
 
         while(absvalue)
@@ -159,7 +159,7 @@ public:
     }
 
 private:
-    static int64_t set_vch( std::vector<unsigned char>& vch)
+    static int64_t set_vch(const std::vector<unsigned char>& vch)
     {
       if (vch.empty())
           return 0;

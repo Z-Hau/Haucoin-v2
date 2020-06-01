@@ -257,7 +257,7 @@ class TwoPartComparator : public leveldb::Comparator {
   //   if a < b: negative result
   //   if a > b: positive result
   //   else: zero result
-  int Compare( leveldb::Slice& a,  leveldb::Slice& b)  {
+  int Compare(const leveldb::Slice& a, const leveldb::Slice& b) const {
     int a1, a2, b1, b2;
     ParseKey(a, &a1, &a2);
     ParseKey(b, &b1, &b2);
@@ -269,9 +269,9 @@ class TwoPartComparator : public leveldb::Comparator {
   }
 
   // Ignore the following methods for now:
-   char* Name()  { return "TwoPartComparator"; }
-  void FindShortestSeparator(std::string*,  leveldb::Slice&)  {}
-  void FindShortSuccessor(std::string*)  {}
+  const char* Name() const { return "TwoPartComparator"; }
+  void FindShortestSeparator(std::string*, const leveldb::Slice&) const {}
+  void FindShortSuccessor(std::string*) const {}
 };
 ```
 
@@ -430,9 +430,9 @@ class CustomFilterPolicy : public leveldb::FilterPolicy {
   CustomFilterPolicy() : builtin_policy_(NewBloomFilterPolicy(10)) {}
   ~CustomFilterPolicy() { delete builtin_policy_; }
 
-   char* Name()  { return "IgnoreTrailingSpacesFilter"; }
+  const char* Name() const { return "IgnoreTrailingSpacesFilter"; }
 
-  void CreateFilter( Slice* keys, int n, std::string* dst)  {
+  void CreateFilter(const Slice* keys, int n, std::string* dst) const {
     // Use builtin bloom filter code after removing trailing spaces
     std::vector<Slice> trimmed(n);
     for (int i = 0; i < n; i++) {

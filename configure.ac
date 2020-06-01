@@ -712,7 +712,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <unistd.h>
 AC_MSG_CHECKING(for sysctl KERN_ARND)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
   #include <sys/sysctl.h>]],
- [[ static  int name[2] = {CTL_KERN, KERN_ARND};
+ [[ static const int name[2] = {CTL_KERN, KERN_ARND};
     sysctl(name, 2, nullptr, nullptr, nullptr, 0); ]])],
  [ AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SYSCTL_ARND, 1,[Define this symbol if the BSD sysctl(KERN_ARND) is available]) ],
  [ AC_MSG_RESULT(no)]

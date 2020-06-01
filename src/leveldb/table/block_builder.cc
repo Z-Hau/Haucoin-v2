@@ -36,7 +36,7 @@
 
 namespace leveldb {
 
-BlockBuilder::BlockBuilder( Options* options)
+BlockBuilder::BlockBuilder(const Options* options)
     : options_(options),
       restarts_(),
       counter_(0),
@@ -54,7 +54,7 @@ void BlockBuilder::Reset() {
   last_key_.clear();
 }
 
-size_t BlockBuilder::CurrentSizeEstimate()  {
+size_t BlockBuilder::CurrentSizeEstimate() const {
   return (buffer_.size() +                        // Raw data buffer
           restarts_.size() * sizeof(uint32_t) +   // Restart array
           sizeof(uint32_t));                      // Restart array length
@@ -70,7 +70,7 @@ Slice BlockBuilder::Finish() {
   return Slice(buffer_);
 }
 
-void BlockBuilder::Add( Slice& key,  Slice& value) {
+void BlockBuilder::Add(const Slice& key, const Slice& value) {
   Slice last_key_piece(last_key_);
   assert(!finished_);
   assert(counter_ <= options_->block_restart_interval);
@@ -79,7 +79,7 @@ void BlockBuilder::Add( Slice& key,  Slice& value) {
   size_t shared = 0;
   if (counter_ < options_->block_restart_interval) {
     // See how much sharing to do with previous string
-     size_t min_length = std::min(last_key_piece.size(), key.size());
+    const size_t min_length = std::min(last_key_piece.size(), key.size());
     while ((shared < min_length) && (last_key_piece[shared] == key[shared])) {
       shared++;
     }
@@ -88,7 +88,7 @@ void BlockBuilder::Add( Slice& key,  Slice& value) {
     restarts_.push_back(buffer_.size());
     counter_ = 0;
   }
-   size_t non_shared = key.size() - shared;
+  const size_t non_shared = key.size() - shared;
 
   // Add "<shared><non_shared><value_size>" to buffer_
   PutVarint32(&buffer_, shared);

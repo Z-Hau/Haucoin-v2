@@ -51,7 +51,7 @@ class Class
     std::string m_name;
 
 public:
-    bool Function( std::string& s, int n)
+    bool Function(const std::string& s, int n)
     {
         // Comment summarising what this section of code does
         for (int i = 0; i < n; ++i) {
@@ -86,7 +86,7 @@ For example, to describe a function use:
  * @param[in] arg2    Another argument description
  * @pre Precondition for function...
  */
-bool function(int arg1,  char *arg2)
+bool function(int arg1, const char *arg2)
 ```
 A complete list of `@xxx` commands can be found at http://www.stack.nl/~dimitri/doxygen/manual/commands.html.
 As Doxygen recognizes the comments by the delimiters (`/**` and `*/` in this case), you don't
@@ -119,7 +119,7 @@ Also OK:
 ///
 /// ... text ...
 ///
-bool function2(int arg1,  char *arg2)
+bool function2(int arg1, const char *arg2)
 ```
 
 Not OK (used plenty in the current source, but not picked up):

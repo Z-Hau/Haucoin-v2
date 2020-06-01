@@ -56,8 +56,8 @@ class State
 public:
     std::string m_name;
     uint64_t m_num_iters_left;
-     uint64_t m_num_iters;
-     uint64_t m_num_evals;
+    const uint64_t m_num_iters;
+    const uint64_t m_num_evals;
     std::vector<double> m_elapsed_results;
     time_point m_start_time;
 
@@ -94,7 +94,7 @@ class BenchRunner
 public:
     BenchRunner(std::string name, BenchFunction func, uint64_t num_iters_for_one_second);
 
-    static void RunAll(Printer& printer, uint64_t num_evals, double scaling,  std::string& filter, bool is_list_only);
+    static void RunAll(Printer& printer, uint64_t num_evals, double scaling, const std::string& filter, bool is_list_only);
 };
 
 // interface to output benchmark results.
@@ -103,7 +103,7 @@ class Printer
 public:
     virtual ~Printer() {}
     virtual void header() = 0;
-    virtual void result( State& state) = 0;
+    virtual void result(const State& state) = 0;
     virtual void footer() = 0;
 };
 
@@ -112,7 +112,7 @@ class ConsolePrinter : public Printer
 {
 public:
     void header();
-    void result( State& state);
+    void result(const State& state);
     void footer();
 };
 
@@ -122,7 +122,7 @@ class PlotlyPrinter : public Printer
 public:
     PlotlyPrinter(std::string plotly_url, int64_t width, int64_t height);
     void header();
-    void result( State& state);
+    void result(const State& state);
     void footer();
 
 private:

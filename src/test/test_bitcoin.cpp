@@ -37,13 +37,13 @@ FastRandomContext insecure_rand_ctx(insecure_rand_seed);
 extern bool fPrintToConsole;
 extern void noui_connect();
 
-std::ostream& operator<<(std::ostream& os,  uint256& num)
+std::ostream& operator<<(std::ostream& os, const uint256& num)
 {
     os << num.ToString();
     return os;
 }
 
-BasicTestingSetup::BasicTestingSetup( std::string& chainName)
+BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
 {
         SHA256AutoDetect();
         RandomInit();
@@ -63,9 +63,9 @@ BasicTestingSetup::~BasicTestingSetup()
         ECC_Stop();
 }
 
-TestingSetup::TestingSetup( std::string& chainName) : BasicTestingSetup(chainName)
+TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
-     CChainParams& chainparams = Params();
+    const CChainParams& chainparams = Params();
         // Ideally we'd move all the RPC tests to the functional testing framework
         // instead of unit tests, but for now we need these here.
 
@@ -137,15 +137,15 @@ TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
 // scriptPubKey, and try to add it to the current chain.
 //
 CBlock
-TestChain100Setup::CreateAndProcessBlock( std::vector<CMutableTransaction>& txns,  CScript& scriptPubKey)
+TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>& txns, const CScript& scriptPubKey)
 {
-     CChainParams& chainparams = Params();
+    const CChainParams& chainparams = Params();
     std::unique_ptr<CBlockTemplate> pblocktemplate = BlockAssembler(chainparams).CreateNewBlock(scriptPubKey);
     CBlock& block = pblocktemplate->block;
 
     // Replace mempool-selected txns with just coinbase plus passed-in txns:
     block.vtx.resize(1);
-    for ( CMutableTransaction& tx : txns)
+    for (const CMutableTransaction& tx : txns)
         block.vtx.push_back(MakeTransactionRef(tx));
     // IncrementExtraNonce creates a valid coinbase and merkleRoot
     unsigned int extraNonce = 0;
@@ -156,7 +156,7 @@ TestChain100Setup::CreateAndProcessBlock( std::vector<CMutableTransaction>& txns
 
     while (!CheckProofOfWork(block.GetHash(), block.nBits, chainparams.GetConsensus())) ++block.nNonce;
 
-    std::shared_ptr< CBlock> shared_pblock = std::make_shared< CBlock>(block);
+    std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
     ProcessNewBlock(chainparams, shared_pblock, true, nullptr);
 
     CBlock result = block;
@@ -168,12 +168,12 @@ TestChain100Setup::~TestChain100Setup()
 }
 
 
-CTxMemPoolEntry TestMemPoolEntryHelper::FromTx( CMutableTransaction &tx) {
+CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(const CMutableTransaction &tx) {
     CTransaction txn(tx);
     return FromTx(txn);
 }
 
-CTxMemPoolEntry TestMemPoolEntryHelper::FromTx( CTransaction &txn) {
+CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(const CTransaction &txn) {
     return CTxMemPoolEntry(MakeTransactionRef(txn), nFee, nTime, nHeight,
                            spendsCoinbase, sigOpCost, lp);
 }

@@ -13,7 +13,7 @@ std::string strMiscWarning;
 bool fLargeWorkForkFound = false;
 bool fLargeWorkInvalidChainFound = false;
 
-void SetMiscWarning( std::string& strWarning)
+void SetMiscWarning(const std::string& strWarning)
 {
     LOCK(cs_warnings);
     strMiscWarning = strWarning;
@@ -37,12 +37,12 @@ void SetfLargeWorkInvalidChainFound(bool flag)
     fLargeWorkInvalidChainFound = flag;
 }
 
-std::string GetWarnings( std::string& strFor)
+std::string GetWarnings(const std::string& strFor)
 {
     std::string strStatusBar;
     std::string strRPC;
     std::string strGUI;
-     std::string uiAlertSeperator = "<hr />";
+    const std::string uiAlertSeperator = "<hr />";
 
     LOCK(cs_warnings);
 

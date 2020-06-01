@@ -23,7 +23,7 @@
 BOOST_FIXTURE_TEST_SUITE(crypto_tests, BasicTestingSetup)
 
 template<typename Hasher, typename In, typename Out>
-void TestVector( Hasher &h,  In &in,  Out &out) {
+void TestVector(const Hasher &h, const In &in, const Out &out) {
     Out hash;
     BOOST_CHECK(out.size() == h.OUTPUT_SIZE);
     hash.resize(out.size());
@@ -51,22 +51,22 @@ void TestVector( Hasher &h,  In &in,  Out &out) {
     }
 }
 
-void TestSHA1( std::string &in,  std::string &hexout) { TestVector(CSHA1(), in, ParseHex(hexout));}
-void TestSHA256( std::string &in,  std::string &hexout) { TestVector(CSHA256(), in, ParseHex(hexout));}
-void TestSHA512( std::string &in,  std::string &hexout) { TestVector(CSHA512(), in, ParseHex(hexout));}
-void TestRIPEMD160( std::string &in,  std::string &hexout) { TestVector(CRIPEMD160(), in, ParseHex(hexout));}
+void TestSHA1(const std::string &in, const std::string &hexout) { TestVector(CSHA1(), in, ParseHex(hexout));}
+void TestSHA256(const std::string &in, const std::string &hexout) { TestVector(CSHA256(), in, ParseHex(hexout));}
+void TestSHA512(const std::string &in, const std::string &hexout) { TestVector(CSHA512(), in, ParseHex(hexout));}
+void TestRIPEMD160(const std::string &in, const std::string &hexout) { TestVector(CRIPEMD160(), in, ParseHex(hexout));}
 
-void TestHMACSHA256( std::string &hexkey,  std::string &hexin,  std::string &hexout) {
+void TestHMACSHA256(const std::string &hexkey, const std::string &hexin, const std::string &hexout) {
     std::vector<unsigned char> key = ParseHex(hexkey);
     TestVector(CHMAC_SHA256(key.data(), key.size()), ParseHex(hexin), ParseHex(hexout));
 }
 
-void TestHMACSHA512( std::string &hexkey,  std::string &hexin,  std::string &hexout) {
+void TestHMACSHA512(const std::string &hexkey, const std::string &hexin, const std::string &hexout) {
     std::vector<unsigned char> key = ParseHex(hexkey);
     TestVector(CHMAC_SHA512(key.data(), key.size()), ParseHex(hexin), ParseHex(hexout));
 }
 
-void TestAES128( std::string &hexkey,  std::string &hexin,  std::string &hexout)
+void TestAES128(const std::string &hexkey, const std::string &hexin, const std::string &hexout)
 {
     std::vector<unsigned char> key = ParseHex(hexkey);
     std::vector<unsigned char> in = ParseHex(hexin);
@@ -86,7 +86,7 @@ void TestAES128( std::string &hexkey,  std::string &hexin,  std::string &hexout)
     BOOST_CHECK_EQUAL(HexStr(buf2), HexStr(in));
 }
 
-void TestAES256( std::string &hexkey,  std::string &hexin,  std::string &hexout)
+void TestAES256(const std::string &hexkey, const std::string &hexin, const std::string &hexout)
 {
     std::vector<unsigned char> key = ParseHex(hexkey);
     std::vector<unsigned char> in = ParseHex(hexin);
@@ -105,7 +105,7 @@ void TestAES256( std::string &hexkey,  std::string &hexin,  std::string &hexout)
     BOOST_CHECK(buf == in);
 }
 
-void TestAES128CBC( std::string &hexkey,  std::string &hexiv, bool pad,  std::string &hexin,  std::string &hexout)
+void TestAES128CBC(const std::string &hexkey, const std::string &hexiv, bool pad, const std::string &hexin, const std::string &hexout)
 {
     std::vector<unsigned char> key = ParseHex(hexkey);
     std::vector<unsigned char> iv = ParseHex(hexiv);
@@ -146,7 +146,7 @@ void TestAES128CBC( std::string &hexkey,  std::string &hexiv, bool pad,  std::st
     }
 }
 
-void TestAES256CBC( std::string &hexkey,  std::string &hexiv, bool pad,  std::string &hexin,  std::string &hexout)
+void TestAES256CBC(const std::string &hexkey, const std::string &hexiv, bool pad, const std::string &hexin, const std::string &hexout)
 {
     std::vector<unsigned char> key = ParseHex(hexkey);
     std::vector<unsigned char> iv = ParseHex(hexiv);
@@ -187,7 +187,7 @@ void TestAES256CBC( std::string &hexkey,  std::string &hexiv, bool pad,  std::st
     }
 }
 
-void TestChaCha20( std::string &hexkey, uint64_t nonce, uint64_t seek,  std::string& hexout)
+void TestChaCha20(const std::string &hexkey, uint64_t nonce, uint64_t seek, const std::string& hexout)
 {
     std::vector<unsigned char> key = ParseHex(hexkey);
     ChaCha20 rng(key.data(), key.size());
@@ -212,7 +212,7 @@ std::string LongTestString(void) {
     return ret;
 }
 
- std::string test1 = LongTestString();
+const std::string test1 = LongTestString();
 
 BOOST_AUTO_TEST_CASE(ripemd160_testvectors) {
     TestRIPEMD160("", "9c1185a5c5e9fc54612808977ee8f548b2258d31");

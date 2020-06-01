@@ -15,7 +15,7 @@ namespace log {
 
 // Construct a string of the specified length made out of the supplied
 // partial string.
-static std::string BigString( std::string& partial_string, size_t n) {
+static std::string BigString(const std::string& partial_string, size_t n) {
   std::string result;
   while (result.size() < n) {
     result.append(partial_string);
@@ -45,7 +45,7 @@ class LogTest {
     virtual Status Close() { return Status::OK(); }
     virtual Status Flush() { return Status::OK(); }
     virtual Status Sync() { return Status::OK(); }
-    virtual Status Append( Slice& slice) {
+    virtual Status Append(const Slice& slice) {
       contents_.append(slice.data(), slice.size());
       return Status::OK();
     }
@@ -94,7 +94,7 @@ class LogTest {
     std::string message_;
 
     ReportCollector() : dropped_bytes_(0) { }
-    virtual void Corruption(size_t bytes,  Status& status) {
+    virtual void Corruption(size_t bytes, const Status& status) {
       dropped_bytes_ += bytes;
       message_.append(status.ToString());
     }
@@ -129,12 +129,12 @@ class LogTest {
     writer_ = new Writer(&dest_, dest_.contents_.size());
   }
 
-  void Write( std::string& msg) {
+  void Write(const std::string& msg) {
     ASSERT_TRUE(!reading_) << "Write() after starting to read";
     writer_->AddRecord(Slice(msg));
   }
 
-  size_t WrittenBytes()  {
+  size_t WrittenBytes() const {
     return dest_.contents_.size();
   }
 
@@ -175,16 +175,16 @@ class LogTest {
     source_.force_error_ = true;
   }
 
-  size_t DroppedBytes()  {
+  size_t DroppedBytes() const {
     return report_.dropped_bytes_;
   }
 
-  std::string ReportMessage()  {
+  std::string ReportMessage() const {
     return report_.message_;
   }
 
   // Returns OK iff recorded error message contains "msg"
-  std::string MatchError( std::string& msg)  {
+  std::string MatchError(const std::string& msg) const {
     if (report_.message_.find(msg) == std::string::npos) {
       return report_.message_;
     } else {
@@ -306,7 +306,7 @@ TEST(LogTest, Fragmentation) {
 
 TEST(LogTest, MarginalTrailer) {
   // Make a trailer that is exactly the same length as an empty record.
-   int n = kBlockSize - 2*kHeaderSize;
+  const int n = kBlockSize - 2*kHeaderSize;
   Write(BigString("foo", n));
   ASSERT_EQ(kBlockSize - kHeaderSize, WrittenBytes());
   Write("");
@@ -319,7 +319,7 @@ TEST(LogTest, MarginalTrailer) {
 
 TEST(LogTest, MarginalTrailer2) {
   // Make a trailer that is exactly the same length as an empty record.
-   int n = kBlockSize - 2*kHeaderSize;
+  const int n = kBlockSize - 2*kHeaderSize;
   Write(BigString("foo", n));
   ASSERT_EQ(kBlockSize - kHeaderSize, WrittenBytes());
   Write("bar");
@@ -331,7 +331,7 @@ TEST(LogTest, MarginalTrailer2) {
 }
 
 TEST(LogTest, ShortTrailer) {
-   int n = kBlockSize - 2*kHeaderSize + 4;
+  const int n = kBlockSize - 2*kHeaderSize + 4;
   Write(BigString("foo", n));
   ASSERT_EQ(kBlockSize - kHeaderSize + 4, WrittenBytes());
   Write("");
@@ -343,7 +343,7 @@ TEST(LogTest, ShortTrailer) {
 }
 
 TEST(LogTest, AlignedEof) {
-   int n = kBlockSize - 2*kHeaderSize + 4;
+  const int n = kBlockSize - 2*kHeaderSize + 4;
   Write(BigString("foo", n));
   ASSERT_EQ(kBlockSize - kHeaderSize + 4, WrittenBytes());
   ASSERT_EQ(BigString("foo", n), Read());
@@ -360,7 +360,7 @@ TEST(LogTest, OpenForAppend) {
 }
 
 TEST(LogTest, RandomRead) {
-   int N = 500;
+  const int N = 500;
   Random write_rnd(301);
   for (int i = 0; i < N; i++) {
     Write(RandomSkewedString(i, &write_rnd));
@@ -402,7 +402,7 @@ TEST(LogTest, TruncatedTrailingRecordIsIgnored) {
 }
 
 TEST(LogTest, BadLength) {
-   int kPayloadSize = kBlockSize - kHeaderSize;
+  const int kPayloadSize = kBlockSize - kHeaderSize;
   Write(BigString("bar", kPayloadSize));
   Write("foo");
   // Least significant size byte is stored in header[4].
@@ -520,7 +520,7 @@ TEST(LogTest, ErrorJoinsRecords) {
 
   ASSERT_EQ("correct", Read());
   ASSERT_EQ("EOF", Read());
-   size_t dropped = DroppedBytes();
+  const size_t dropped = DroppedBytes();
   ASSERT_LE(dropped, 2*kBlockSize + 100);
   ASSERT_GE(dropped, 2*kBlockSize);
 }

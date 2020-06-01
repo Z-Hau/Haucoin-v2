@@ -17,7 +17,7 @@
 namespace {
 
 template <typename Stream, typename Data>
-bool SerializeDB(Stream& stream,  Data& data)
+bool SerializeDB(Stream& stream, const Data& data)
 {
     // Write and commit header, data
     try {
@@ -25,7 +25,7 @@ bool SerializeDB(Stream& stream,  Data& data)
         stream << FLATDATA(Params().MessageStart()) << data;
         hasher << FLATDATA(Params().MessageStart()) << data;
         stream << hasher.GetHash();
-    } catch ( std::exception& e) {
+    } catch (const std::exception& e) {
         return error("%s: Serialize or I/O error - %s", __func__, e.what());
     }
 
@@ -33,7 +33,7 @@ bool SerializeDB(Stream& stream,  Data& data)
 }
 
 template <typename Data>
-bool SerializeFileDB( std::string& prefix,  fs::path& path,  Data& data)
+bool SerializeFileDB(const std::string& prefix, const fs::path& path, const Data& data)
 {
     // Generate random temporary filename
     unsigned short randv = 0;
@@ -83,7 +83,7 @@ bool DeserializeDB(Stream& stream, Data& data, bool fCheckSum = true)
             }
         }
     }
-    catch ( std::exception& e) {
+    catch (const std::exception& e) {
         return error("%s: Deserialize or I/O error - %s", __func__, e.what());
     }
 
@@ -91,7 +91,7 @@ bool DeserializeDB(Stream& stream, Data& data, bool fCheckSum = true)
 }
 
 template <typename Data>
-bool DeserializeFileDB( fs::path& path, Data& data)
+bool DeserializeFileDB(const fs::path& path, Data& data)
 {
     // open input file, and associate with CAutoFile
     FILE *file = fsbridge::fopen(path, "rb");
@@ -109,7 +109,7 @@ CBanDB::CBanDB()
     pathBanlist = GetDataDir() / "banlist.dat";
 }
 
-bool CBanDB::Write( banmap_t& banSet)
+bool CBanDB::Write(const banmap_t& banSet)
 {
     return SerializeFileDB("banlist", pathBanlist, banSet);
 }
@@ -124,7 +124,7 @@ CAddrDB::CAddrDB()
     pathAddr = GetDataDir() / "peers.dat";
 }
 
-bool CAddrDB::Write( CAddrMan& addr)
+bool CAddrDB::Write(const CAddrMan& addr)
 {
     return SerializeFileDB("peers", pathAddr, addr);
 }

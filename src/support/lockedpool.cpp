@@ -66,7 +66,7 @@ void* Arena::alloc(size_t size)
 
     // Pick a large enough free-chunk
     auto it = std::find_if(chunks_free.begin(), chunks_free.end(),
-        [=]( std::map<char*, size_t>::value_type& chunk){ return chunk.second >= size; });
+        [=](const std::map<char*, size_t>::value_type& chunk){ return chunk.second >= size; });
     if (it == chunks_free.end())
         return nullptr;
 
@@ -78,7 +78,7 @@ void* Arena::alloc(size_t size)
 }
 
 /* extend the Iterator if other begins at its end */
-template <class Iterator, class Pair> bool extend(Iterator it,  Pair& other) {
+template <class Iterator, class Pair> bool extend(Iterator it, const Pair& other) {
     if (it->first + it->second == other.first) {
         it->second += other.second;
         return true;
@@ -110,12 +110,12 @@ void Arena::free(void *ptr)
         chunks_free.erase(next);
 }
 
-Arena::Stats Arena::stats() 
+Arena::Stats Arena::stats() const
 {
     Arena::Stats r{ 0, 0, 0, chunks_used.size(), chunks_free.size() };
-    for ( auto& chunk: chunks_used)
+    for (const auto& chunk: chunks_used)
         r.used += chunk.second;
-    for ( auto& chunk: chunks_free)
+    for (const auto& chunk: chunks_free)
         r.free += chunk.second;
     r.total = r.used + r.free;
     return r;
@@ -128,12 +128,12 @@ void printchunk(char* base, size_t sz, bool used) {
         " 0x" << std::hex << std::setw(16) << std::setfill('0') << sz <<
         " 0x" << used << std::endl;
 }
-void Arena::walk() 
+void Arena::walk() const
 {
-    for ( auto& chunk: chunks_used)
+    for (const auto& chunk: chunks_used)
         printchunk(chunk.first, chunk.second, true);
     std::cout << std::endl;
-    for ( auto& chunk: chunks_free)
+    for (const auto& chunk: chunks_free)
         printchunk(chunk.first, chunk.second, false);
     std::cout << std::endl;
 }
@@ -302,11 +302,11 @@ void LockedPool::free(void *ptr)
     throw std::runtime_error("LockedPool: invalid address not pointing to any arena");
 }
 
-LockedPool::Stats LockedPool::stats() 
+LockedPool::Stats LockedPool::stats() const
 {
     std::lock_guard<std::mutex> lock(mutex);
     LockedPool::Stats r{0, 0, 0, cumulative_bytes_locked, 0, 0};
-    for ( auto &arena: arenas) {
+    for (const auto &arena: arenas) {
         Arena::Stats i = arena.stats();
         r.used += i.used;
         r.free += i.free;

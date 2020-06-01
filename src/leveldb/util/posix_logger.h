@@ -25,8 +25,8 @@ class PosixLogger : public Logger {
   virtual ~PosixLogger() {
     fclose(file_);
   }
-  virtual void Logv( char* format, va_list ap) {
-     uint64_t thread_id = (*gettid_)();
+  virtual void Logv(const char* format, va_list ap) {
+    const uint64_t thread_id = (*gettid_)();
 
     // We try twice: the first time with a fixed-size stack allocated buffer,
     // and the second time with a much larger dynamically allocated buffer.
@@ -46,7 +46,7 @@ class PosixLogger : public Logger {
 
       struct timeval now_tv;
       gettimeofday(&now_tv, NULL);
-       time_t seconds = now_tv.tv_sec;
+      const time_t seconds = now_tv.tv_sec;
       struct tm t;
       localtime_r(&seconds, &t);
       p += snprintf(p, limit - p,

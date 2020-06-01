@@ -38,11 +38,11 @@ public:
         ForEditing  /**< Open address book for editing */
     };
 
-    explicit AddressBookPage( PlatformStyle *platformStyle, Mode mode, Tabs tab, QWidget *parent);
+    explicit AddressBookPage(const PlatformStyle *platformStyle, Mode mode, Tabs tab, QWidget *parent);
     ~AddressBookPage();
 
     void setModel(AddressTableModel *model);
-     QString &getReturnValue()  { return returnValue; }
+    const QString &getReturnValue() const { return returnValue; }
 
 public Q_SLOTS:
     void done(int retval);
@@ -75,9 +75,9 @@ private Q_SLOTS:
     /** Set button states based on selected tab and selection */
     void selectionChanged();
     /** Spawn contextual menu (right mouse menu) for address book entry */
-    void contextualMenu( QPoint &point);
+    void contextualMenu(const QPoint &point);
     /** New entry/entries were added to address table */
-    void selectNewAddress( QModelIndex &parent, int begin, int /*end*/);
+    void selectNewAddress(const QModelIndex &parent, int begin, int /*end*/);
 
 Q_SIGNALS:
     void sendCoins(QString addr);

@@ -10,9 +10,9 @@
 #include <cstdlib>
 
 // Earliest date that can be represented (far in the past)
- QDateTime TransactionFilterProxy::MIN_DATE = QDateTime::fromTime_t(0);
+const QDateTime TransactionFilterProxy::MIN_DATE = QDateTime::fromTime_t(0);
 // Last date that can be represented (far in the future)
- QDateTime TransactionFilterProxy::MAX_DATE = QDateTime::fromTime_t(0xFFFFFFFF);
+const QDateTime TransactionFilterProxy::MAX_DATE = QDateTime::fromTime_t(0xFFFFFFFF);
 
 TransactionFilterProxy::TransactionFilterProxy(QObject *parent) :
     QSortFilterProxyModel(parent),
@@ -27,7 +27,7 @@ TransactionFilterProxy::TransactionFilterProxy(QObject *parent) :
 {
 }
 
-bool TransactionFilterProxy::filterAcceptsRow(int sourceRow,  QModelIndex &sourceParent) 
+bool TransactionFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
 
@@ -61,14 +61,14 @@ bool TransactionFilterProxy::filterAcceptsRow(int sourceRow,  QModelIndex &sourc
     return true;
 }
 
-void TransactionFilterProxy::setDateRange( QDateTime &from,  QDateTime &to)
+void TransactionFilterProxy::setDateRange(const QDateTime &from, const QDateTime &to)
 {
     this->dateFrom = from;
     this->dateTo = to;
     invalidateFilter();
 }
 
-void TransactionFilterProxy::setSearchString( QString &search_string)
+void TransactionFilterProxy::setSearchString(const QString &search_string)
 {
     if (m_search_string == search_string) return;
     m_search_string = search_string;
@@ -81,7 +81,7 @@ void TransactionFilterProxy::setTypeFilter(quint32 modes)
     invalidateFilter();
 }
 
-void TransactionFilterProxy::setMinAmount( CAmount& minimum)
+void TransactionFilterProxy::setMinAmount(const CAmount& minimum)
 {
     this->minAmount = minimum;
     invalidateFilter();
@@ -104,7 +104,7 @@ void TransactionFilterProxy::setShowInactive(bool _showInactive)
     invalidateFilter();
 }
 
-int TransactionFilterProxy::rowCount( QModelIndex &parent) 
+int TransactionFilterProxy::rowCount(const QModelIndex &parent) const
 {
     if(limitRows != -1)
     {

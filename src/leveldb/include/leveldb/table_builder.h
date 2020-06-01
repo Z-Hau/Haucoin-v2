@@ -5,9 +5,9 @@
 // TableBuilder provides the interface used to build a Table
 // (an immutable and sorted map from keys to values).
 //
-// Multiple threads can invoke  methods on a TableBuilder without
+// Multiple threads can invoke const methods on a TableBuilder without
 // external synchronization, but if any of the threads may call a
-// non- method, all threads accessing the same TableBuilder must use
+// non-const method, all threads accessing the same TableBuilder must use
 // external synchronization.
 
 #ifndef STORAGE_LEVELDB_INCLUDE_TABLE_BUILDER_H_
@@ -28,7 +28,7 @@ class TableBuilder {
   // Create a builder that will store the contents of the table it is
   // building in *file.  Does not close the file.  It is up to the
   // caller to close the file after calling Finish().
-  TableBuilder( Options& options, WritableFile* file);
+  TableBuilder(const Options& options, WritableFile* file);
 
   // REQUIRES: Either Finish() or Abandon() has been called.
   ~TableBuilder();
@@ -39,12 +39,12 @@ class TableBuilder {
   // passed to the constructor is different from its value in the
   // structure passed to this method, this method will return an error
   // without changing any fields.
-  Status ChangeOptions( Options& options);
+  Status ChangeOptions(const Options& options);
 
   // Add key,value to the table being constructed.
   // REQUIRES: key is after any previously added key according to comparator.
   // REQUIRES: Finish(), Abandon() have not been called
-  void Add( Slice& key,  Slice& value);
+  void Add(const Slice& key, const Slice& value);
 
   // Advanced operation: flush any buffered key/value pairs to file.
   // Can be used to ensure that two adjacent entries never live in
@@ -53,7 +53,7 @@ class TableBuilder {
   void Flush();
 
   // Return non-ok iff some error has been detected.
-  Status status() ;
+  Status status() const;
 
   // Finish building the table.  Stops using the file passed to the
   // constructor after this function returns.
@@ -68,23 +68,23 @@ class TableBuilder {
   void Abandon();
 
   // Number of calls to Add() so far.
-  uint64_t NumEntries() ;
+  uint64_t NumEntries() const;
 
   // Size of the file generated so far.  If invoked after a successful
   // Finish() call, returns the size of the final generated file.
-  uint64_t FileSize() ;
+  uint64_t FileSize() const;
 
  private:
-  bool ok()  { return status().ok(); }
+  bool ok() const { return status().ok(); }
   void WriteBlock(BlockBuilder* block, BlockHandle* handle);
-  void WriteRawBlock( Slice& data, CompressionType, BlockHandle* handle);
+  void WriteRawBlock(const Slice& data, CompressionType, BlockHandle* handle);
 
   struct Rep;
   Rep* rep_;
 
   // No copying allowed
-  TableBuilder( TableBuilder&);
-  void operator=( TableBuilder&);
+  TableBuilder(const TableBuilder&);
+  void operator=(const TableBuilder&);
 };
 
 }  // namespace leveldb

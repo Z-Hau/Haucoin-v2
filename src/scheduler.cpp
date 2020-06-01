@@ -22,7 +22,7 @@ CScheduler::~CScheduler()
 
 
 #if BOOST_VERSION < 105000
-static boost::system_time toPosixTime( boost::chrono::system_clock::time_point& t)
+static boost::system_time toPosixTime(const boost::chrono::system_clock::time_point& t)
 {
     // Creating the posix_time using from_time_t loses sub-second precision. So rather than exporting the time_point to time_t,
     // start with a posix_time at the epoch (0) and add the milliseconds that have passed since then.
@@ -129,7 +129,7 @@ void CScheduler::scheduleEvery(CScheduler::Function f, int64_t deltaMilliSeconds
 }
 
 size_t CScheduler::getQueueInfo(boost::chrono::system_clock::time_point &first,
-                             boost::chrono::system_clock::time_point &last) 
+                             boost::chrono::system_clock::time_point &last) const
 {
     boost::unique_lock<boost::mutex> lock(newTaskMutex);
     size_t result = taskQueue.size();
@@ -140,7 +140,7 @@ size_t CScheduler::getQueueInfo(boost::chrono::system_clock::time_point &first,
     return result;
 }
 
-bool CScheduler::AreThreadsServicingQueue()  {
+bool CScheduler::AreThreadsServicingQueue() const {
     boost::unique_lock<boost::mutex> lock(newTaskMutex);
     return nThreadsServicingQueue;
 }
