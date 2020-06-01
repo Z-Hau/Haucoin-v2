@@ -270,7 +270,7 @@ CRIPEMD160& CRIPEMD160::Write( unsigned char* data, size_t len)
     return *this;
 }
 
-void CRIPEMD160::Finalize(unsigned const char hash[OUTPUT_SIZE])
+void CRIPEMD160::Finalize(unsigned char hash[OUTPUT_SIZE])
 {
     static  unsigned char pad[64] = {0x80};
     unsigned char sizedesc[8];

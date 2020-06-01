@@ -21,7 +21,7 @@ public:
 
     CSHA512();
     CSHA512& Write( unsigned char* data, size_t len);
-    void Finalize(unsigned const char hash[OUTPUT_SIZE]);
+    void Finalize(unsigned char hash[OUTPUT_SIZE]);
     CSHA512& Reset();
 };
 
