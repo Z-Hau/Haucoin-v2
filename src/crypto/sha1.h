@@ -17,7 +17,7 @@ private:
     uint64_t bytes;
 
 public:
-    static  size_t OUTPUT_SIZE = 20;
+    static  const size_t OUTPUT_SIZE = 20;
 
     CSHA1();
     CSHA1& Write( unsigned char* data, size_t len);
