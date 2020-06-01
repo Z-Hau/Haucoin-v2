@@ -1690,7 +1690,7 @@ void ThreadScriptCheck() {
 // Protected by cs_main
 VersionBitsCache versionbitscache;
 
-int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params& params)
+int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, Consensus::Params& params)
 {
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
@@ -1716,12 +1716,12 @@ private:
 public:
     explicit WarningBitsConditionChecker(int bitIn) : bit(bitIn) {}
 
-    int64_t BeginTime(const Consensus::Params& params) const override { return 0; }
-    int64_t EndTime(const Consensus::Params& params) const override { return std::numeric_limits<int64_t>::max(); }
-    int Period(const Consensus::Params& params) const override { return params.nMinerConfirmationWindow; }
-    int Threshold(const Consensus::Params& params) const override { return params.nRuleChangeActivationThreshold; }
+    int64_t BeginTime(Consensus::Params& params) const override { return 0; }
+    int64_t EndTime(Consensus::Params& params) const override { return std::numeric_limits<int64_t>::max(); }
+    int Period(Consensus::Params& params) const override { return params.nMinerConfirmationWindow; }
+    int Threshold(Consensus::Params& params) const override { return params.nRuleChangeActivationThreshold; }
 
-    bool Condition(const CBlockIndex* pindex, const Consensus::Params& params) const override
+    bool Condition(const CBlockIndex* pindex, Consensus::Params& params) const override
     {
         return ((pindex->nVersion & VERSIONBITS_TOP_MASK) == VERSIONBITS_TOP_BITS) &&
                ((pindex->nVersion >> bit) & 1) != 0 &&
@@ -3052,7 +3052,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     return true;
 }
 
-bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params)
+bool IsWitnessEnabled(const CBlockIndex* pindexPrev, Consensus::Params& params)
 {
     LOCK(cs_main);
     return (VersionBitsState(pindexPrev, params, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == THRESHOLD_ACTIVE);
@@ -4548,19 +4548,19 @@ CBlockFileInfo* GetBlockFileInfo(size_t n)
     return &vinfoBlockFile.at(n);
 }
 
-ThresholdState VersionBitsTipState(const Consensus::Params& params, Consensus::DeploymentPos pos)
+ThresholdState VersionBitsTipState(Consensus::Params& params, Consensus::DeploymentPos pos)
 {
     LOCK(cs_main);
     return VersionBitsState(chainActive.Tip(), params, pos, versionbitscache);
 }
 
-BIP9Stats VersionBitsTipStatistics(const Consensus::Params& params, Consensus::DeploymentPos pos)
+BIP9Stats VersionBitsTipStatistics(Consensus::Params& params, Consensus::DeploymentPos pos)
 {
     LOCK(cs_main);
     return VersionBitsStatistics(chainActive.Tip(), params, pos);
 }
 
-int VersionBitsTipStateSinceHeight(const Consensus::Params& params, Consensus::DeploymentPos pos)
+int VersionBitsTipStateSinceHeight(Consensus::Params& params, Consensus::DeploymentPos pos)
 {
     LOCK(cs_main);
     return VersionBitsStateSinceHeight(chainActive.Tip(), params, pos, versionbitscache);
