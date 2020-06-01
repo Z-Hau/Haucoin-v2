@@ -21,7 +21,7 @@ public:
 
     CRIPEMD160();
     CRIPEMD160& Write( unsigned char* data, size_t len);
-    void Finalize(unsigned char hash[OUTPUT_SIZE]);
+    void Finalize(unsigned const char hash[OUTPUT_SIZE]);
     CRIPEMD160& Reset();
 };
 

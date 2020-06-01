@@ -22,9 +22,9 @@ class CHash256 {
 private:
     CSHA256 sha;
 public:
-    static  size_t OUTPUT_SIZE = CSHA256::OUTPUT_SIZE;
+    static const  size_t OUTPUT_SIZE = CSHA256::OUTPUT_SIZE;
 
-    void Finalize(unsigned char hash[OUTPUT_SIZE]) {
+    void Finalize(unsigned const char hash[OUTPUT_SIZE]) {
         unsigned char buf[CSHA256::OUTPUT_SIZE];
         sha.Finalize(buf);
         sha.Reset().Write(buf, CSHA256::OUTPUT_SIZE).Finalize(hash);
@@ -48,7 +48,7 @@ private:
 public:
     static  size_t OUTPUT_SIZE = CRIPEMD160::OUTPUT_SIZE;
 
-    void Finalize(unsigned char hash[OUTPUT_SIZE]) {
+    void Finalize(unsigned const char hash[OUTPUT_SIZE]) {
         unsigned char buf[CSHA256::OUTPUT_SIZE];
         sha.Finalize(buf);
         CRIPEMD160().Write(buf, CSHA256::OUTPUT_SIZE).Finalize(hash);

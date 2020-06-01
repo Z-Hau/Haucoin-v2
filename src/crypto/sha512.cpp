@@ -182,7 +182,7 @@ CSHA512& CSHA512::Write( unsigned char* data, size_t len)
     return *this;
 }
 
-void CSHA512::Finalize(unsigned char hash[OUTPUT_SIZE])
+void CSHA512::Finalize(unsigned const char hash[OUTPUT_SIZE])
 {
     static  unsigned char pad[128] = {0x80};
     unsigned char sizedesc[16] = {0x00};
