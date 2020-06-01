@@ -24,8 +24,8 @@ public:
     }
 
 private:
-    reverse_lock(reverse_lock const&);
-    reverse_lock& operator=(reverse_lock const&);
+    reverse_lock(reverse_lock &);
+    reverse_lock& operator=(reverse_lock &);
 
     Lock& lock;
     Lock templock;

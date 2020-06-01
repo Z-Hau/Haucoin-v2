@@ -18,7 +18,7 @@
 class CAddrManSerializationMock : public CAddrMan
 {
 public:
-    virtual void Serialize(CDataStream& s) const = 0;
+    virtual void Serialize(CDataStream& s)  = 0;
 
     //! Ensure that bucket placement is always the same for testing purposes.
     void MakeDeterministic()
@@ -31,7 +31,7 @@ public:
 class CAddrManUncorrupted : public CAddrManSerializationMock
 {
 public:
-    void Serialize(CDataStream& s) const override
+    void Serialize(CDataStream& s)  override
     {
         CAddrMan::Serialize(s);
     }
@@ -40,7 +40,7 @@ public:
 class CAddrManCorrupted : public CAddrManSerializationMock
 {
 public:
-    void Serialize(CDataStream& s) const override
+    void Serialize(CDataStream& s)  override
     {
         // Produces corrupt output that claims addrman has 20 addrs when it only has one addr.
         unsigned char nVersion = 1;
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(caddrdb_read)
         unsigned char pchMsgTmp[4];
         ssPeers1 >> FLATDATA(pchMsgTmp);
         ssPeers1 >> addrman1;
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         exceptionThrown = true;
     }
 
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(caddrdb_read_corrupted)
         unsigned char pchMsgTmp[4];
         ssPeers1 >> FLATDATA(pchMsgTmp);
         ssPeers1 >> addrman1;
-    } catch (const std::exception& e) {
+    } catch ( std::exception& e) {
         exceptionThrown = true;
     }
     // Even through de-serialization failed addrman is not left in a clean state.

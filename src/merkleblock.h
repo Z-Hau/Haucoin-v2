@@ -63,15 +63,15 @@ protected:
     bool fBad;
 
     /** helper function to efficiently calculate the number of nodes at given height in the merkle tree */
-    unsigned int CalcTreeWidth(int height) const {
+    unsigned int CalcTreeWidth(int height)  {
         return (nTransactions+(1 << height)-1) >> height;
     }
 
     /** calculate the hash of a node in the merkle tree (at leaf level: the txid's themselves) */
-    uint256 CalcHash(int height, unsigned int pos, const std::vector<uint256> &vTxid);
+    uint256 CalcHash(int height, unsigned int pos,  std::vector<uint256> &vTxid);
 
     /** recursive function that traverses tree nodes, storing the data as bits and hashes */
-    void TraverseAndBuild(int height, unsigned int pos, const std::vector<uint256> &vTxid, const std::vector<bool> &vMatch);
+    void TraverseAndBuild(int height, unsigned int pos,  std::vector<uint256> &vTxid,  std::vector<bool> &vMatch);
 
     /**
      * recursive function that traverses tree nodes, consuming the bits and hashes produced by TraverseAndBuild.
@@ -105,7 +105,7 @@ public:
     }
 
     /** Construct a partial merkle tree from a list of transaction ids, and a mask that selects a subset of them */
-    CPartialMerkleTree(const std::vector<uint256> &vTxid, const std::vector<bool> &vMatch);
+    CPartialMerkleTree( std::vector<uint256> &vTxid,  std::vector<bool> &vMatch);
 
     CPartialMerkleTree();
 
@@ -119,7 +119,7 @@ public:
     /** Get number of transactions the merkle proof is indicating for cross-reference with
      * local blockchain knowledge.
      */
-    unsigned int GetNumTransactions() const { return nTransactions; };
+    unsigned int GetNumTransactions()  { return nTransactions; };
 
 };
 
@@ -150,10 +150,10 @@ public:
      * Note that this will call IsRelevantAndUpdate on the filter for each transaction,
      * thus the filter will likely be modified.
      */
-    CMerkleBlock(const CBlock& block, CBloomFilter& filter) : CMerkleBlock(block, &filter, nullptr) { }
+    CMerkleBlock( CBlock& block, CBloomFilter& filter) : CMerkleBlock(block, &filter, nullptr) { }
 
     // Create from a CBlock, matching the txids in the set
-    CMerkleBlock(const CBlock& block, const std::set<uint256>& txids) : CMerkleBlock(block, nullptr, &txids) { }
+    CMerkleBlock( CBlock& block,  std::set<uint256>& txids) : CMerkleBlock(block, nullptr, &txids) { }
 
     CMerkleBlock() {}
 
@@ -167,7 +167,7 @@ public:
 
 private:
     // Combined constructor to consolidate code
-    CMerkleBlock(const CBlock& block, CBloomFilter* filter, const std::set<uint256>* txids);
+    CMerkleBlock( CBlock& block, CBloomFilter* filter,  std::set<uint256>* txids);
 };
 
 #endif // BITCOIN_MERKLEBLOCK_H

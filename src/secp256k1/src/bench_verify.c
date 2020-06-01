@@ -60,7 +60,7 @@ static void benchmark_verify_openssl(void* arg) {
         data->sig[data->siglen - 3] ^= ((i >> 16) & 0xFF);
         {
             EC_KEY *pkey = EC_KEY_new();
-            const unsigned char *pubkey = &data->pubkey[0];
+             unsigned char *pubkey = &data->pubkey[0];
             int result;
 
             CHECK(pkey != NULL);

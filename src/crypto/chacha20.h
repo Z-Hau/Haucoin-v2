@@ -16,8 +16,8 @@ private:
 
 public:
     ChaCha20();
-    ChaCha20(const unsigned char* key, size_t keylen);
-    void SetKey(const unsigned char* key, size_t keylen);
+    ChaCha20( unsigned char* key, size_t keylen);
+    void SetKey( unsigned char* key, size_t keylen);
     void SetIV(uint64_t iv);
     void Seek(uint64_t pos);
     void Output(unsigned char* output, size_t bytes);

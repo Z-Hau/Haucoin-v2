@@ -25,7 +25,7 @@ class BannedNodeLessThan
 public:
     BannedNodeLessThan(int nColumn, Qt::SortOrder fOrder) :
         column(nColumn), order(fOrder) {}
-    bool operator()(const CCombinedBan& left, const CCombinedBan& right) const;
+    bool operator()( CCombinedBan& left,  CCombinedBan& right) ;
 
 private:
     int column;
@@ -53,12 +53,12 @@ public:
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    int rowCount( QModelIndex &parent) ;
+    int columnCount( QModelIndex &parent) ;
+    QVariant data( QModelIndex &index, int role) ;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) ;
+    QModelIndex index(int row, int column,  QModelIndex &parent) ;
+    Qt::ItemFlags flags( QModelIndex &index) ;
     void sort(int column, Qt::SortOrder order);
     bool shouldShow();
     /*@}*/

@@ -55,14 +55,14 @@ public:
         nNonce = 0;
     }
 
-    bool IsNull() const
+    bool IsNull() 
     {
         return (nBits == 0);
     }
 
-    uint256 GetHash() const;
+    uint256 GetHash() ;
 
-    int64_t GetBlockTime() const
+    int64_t GetBlockTime() 
     {
         return (int64_t)nTime;
     }
@@ -83,7 +83,7 @@ public:
         SetNull();
     }
 
-    CBlock(const CBlockHeader &header)
+    CBlock( CBlockHeader &header)
     {
         SetNull();
         *((CBlockHeader*)this) = header;
@@ -104,7 +104,7 @@ public:
         fChecked = false;
     }
 
-    CBlockHeader GetBlockHeader() const
+    CBlockHeader GetBlockHeader() 
     {
         CBlockHeader block;
         block.nVersion       = nVersion;
@@ -116,7 +116,7 @@ public:
         return block;
     }
 
-    std::string ToString() const;
+    std::string ToString() ;
 };
 
 /** Describes a place in the block chain to another node such that if the
@@ -129,7 +129,7 @@ struct CBlockLocator
 
     CBlockLocator() {}
 
-    explicit CBlockLocator(const std::vector<uint256>& vHaveIn) : vHave(vHaveIn) {}
+    explicit CBlockLocator( std::vector<uint256>& vHaveIn) : vHave(vHaveIn) {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -146,7 +146,7 @@ struct CBlockLocator
         vHave.clear();
     }
 
-    bool IsNull() const
+    bool IsNull() 
     {
         return vHave.empty();
     }

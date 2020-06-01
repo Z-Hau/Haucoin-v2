@@ -14,33 +14,21 @@
 
 #include <compat/endian.h>
 
-<<<<<<< HEAD
 uint16_t static inline ReadLE16( unsigned const char* ptr)
-=======
-uint16_t static inline ReadLE16(const unsigned char* ptr)
->>>>>>> parent of ec20ff778... Removed const
 {
     uint16_t x;
     memcpy((char*)&x, ptr, 2);
     return le16toh(x);
 }
 
-<<<<<<< HEAD
 uint32_t static inline ReadLE32( unsigned const char* ptr)
-=======
-uint32_t static inline ReadLE32(const unsigned char* ptr)
->>>>>>> parent of ec20ff778... Removed const
 {
     uint32_t x;
     memcpy((char*)&x, ptr, 4);
     return le32toh(x);
 }
 
-<<<<<<< HEAD
 uint64_t static inline ReadLE64( unsigned const char* ptr)
-=======
-uint64_t static inline ReadLE64(const unsigned char* ptr)
->>>>>>> parent of ec20ff778... Removed const
 {
     uint64_t x;
     memcpy((char*)&x, ptr, 8);
@@ -65,22 +53,14 @@ void static inline WriteLE64(unsigned const char* ptr, uint64_t x)
     memcpy(ptr, (char*)&v, 8);
 }
 
-<<<<<<< HEAD
 uint32_t static inline ReadBE32( unsigned const char* ptr)
-=======
-uint32_t static inline ReadBE32(const unsigned char* ptr)
->>>>>>> parent of ec20ff778... Removed const
 {
     uint32_t x;
     memcpy((char*)&x, ptr, 4);
     return be32toh(x);
 }
 
-<<<<<<< HEAD
 uint64_t static inline ReadBE64( unsigned const char* ptr)
-=======
-uint64_t static inline ReadBE64(const unsigned char* ptr)
->>>>>>> parent of ec20ff778... Removed const
 {
     uint64_t x;
     memcpy((char*)&x, ptr, 8);

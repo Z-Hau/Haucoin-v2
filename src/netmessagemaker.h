@@ -15,7 +15,7 @@ public:
     explicit CNetMsgMaker(int nVersionIn) : nVersion(nVersionIn){}
 
     template <typename... Args>
-    CSerializedNetMsg Make(int nFlags, std::string sCommand, Args&&... args) const
+    CSerializedNetMsg Make(int nFlags, std::string sCommand, Args&&... args) 
     {
         CSerializedNetMsg msg;
         msg.command = std::move(sCommand);
@@ -24,13 +24,13 @@ public:
     }
 
     template <typename... Args>
-    CSerializedNetMsg Make(std::string sCommand, Args&&... args) const
+    CSerializedNetMsg Make(std::string sCommand, Args&&... args) 
     {
         return Make(0, std::move(sCommand), std::forward<Args>(args)...);
     }
 
 private:
-    const int nVersion;
+     int nVersion;
 };
 
 #endif // BITCOIN_NETMESSAGEMAKER_H

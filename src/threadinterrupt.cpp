@@ -5,7 +5,7 @@
 
 #include <threadinterrupt.h>
 
-CThreadInterrupt::operator bool() const
+CThreadInterrupt::operator bool() 
 {
     return flag.load(std::memory_order_acquire);
 }

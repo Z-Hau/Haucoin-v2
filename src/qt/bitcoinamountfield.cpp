@@ -32,7 +32,7 @@ public:
         connect(lineEdit(), SIGNAL(textEdited(QString)), this, SIGNAL(valueChanged()));
     }
 
-    QValidator::State validate(QString &text, int &pos) const
+    QValidator::State validate(QString &text, int &pos) 
     {
         if(text.isEmpty())
             return QValidator::Intermediate;
@@ -42,7 +42,7 @@ public:
         return valid ? QValidator::Intermediate : QValidator::Invalid;
     }
 
-    void fixup(QString &input) const
+    void fixup(QString &input) 
     {
         bool valid = false;
         CAmount val = parse(input, &valid);
@@ -53,12 +53,12 @@ public:
         }
     }
 
-    CAmount value(bool *valid_out=0) const
+    CAmount value(bool *valid_out=0) 
     {
         return parse(text(), valid_out);
     }
 
-    void setValue(const CAmount& value)
+    void setValue( CAmount& value)
     {
         lineEdit()->setText(BitcoinUnits::format(currentUnit, value, false, BitcoinUnits::separatorAlways));
         Q_EMIT valueChanged();
@@ -86,18 +86,18 @@ public:
             clear();
     }
 
-    void setSingleStep(const CAmount& step)
+    void setSingleStep( CAmount& step)
     {
         singleStep = step;
     }
 
-    QSize minimumSizeHint() const
+    QSize minimumSizeHint() 
     {
         if(cachedMinimumSizeHint.isEmpty())
         {
             ensurePolished();
 
-            const QFontMetrics fm(fontMetrics());
+             QFontMetrics fm(fontMetrics());
             int h = lineEdit()->minimumSizeHint().height();
             int w = fm.width(BitcoinUnits::format(BitcoinUnits::BTC, BitcoinUnits::maxMoney(), false, BitcoinUnits::separatorAlways));
             w += 2; // cursor blinking space
@@ -134,7 +134,7 @@ private:
      * return validity.
      * @note Must return 0 if !valid.
      */
-    CAmount parse(const QString &text, bool *valid_out=0) const
+    CAmount parse( QString &text, bool *valid_out=0) 
     {
         CAmount val = 0;
         bool valid = BitcoinUnits::parse(currentUnit, text, &val);
@@ -164,7 +164,7 @@ protected:
         return QAbstractSpinBox::event(event);
     }
 
-    StepEnabled stepEnabled() const
+    StepEnabled stepEnabled() 
     {
         if (isReadOnly()) // Disable steps when AmountSpinBox is read-only
             return StepNone;
@@ -265,12 +265,12 @@ QWidget *BitcoinAmountField::setupTabChain(QWidget *prev)
     return unit;
 }
 
-CAmount BitcoinAmountField::value(bool *valid_out) const
+CAmount BitcoinAmountField::value(bool *valid_out) 
 {
     return amount->value(valid_out);
 }
 
-void BitcoinAmountField::setValue(const CAmount& value)
+void BitcoinAmountField::setValue( CAmount& value)
 {
     amount->setValue(value);
 }
@@ -296,7 +296,7 @@ void BitcoinAmountField::setDisplayUnit(int newUnit)
     unit->setValue(newUnit);
 }
 
-void BitcoinAmountField::setSingleStep(const CAmount& step)
+void BitcoinAmountField::setSingleStep( CAmount& step)
 {
     amount->setSingleStep(step);
 }

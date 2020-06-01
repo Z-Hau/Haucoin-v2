@@ -75,7 +75,7 @@ void MilliSleep(int64_t n)
 #endif
 }
 
-std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
+std::string DateTimeStrFormat( char* pszFormat, int64_t nTime)
 {
     static std::locale classic(std::locale::classic());
     // std::locale takes ownership of the pointer

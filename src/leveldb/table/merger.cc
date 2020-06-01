@@ -13,7 +13,7 @@ namespace leveldb {
 namespace {
 class MergingIterator : public Iterator {
  public:
-  MergingIterator(const Comparator* comparator, Iterator** children, int n)
+  MergingIterator( Comparator* comparator, Iterator** children, int n)
       : comparator_(comparator),
         children_(new IteratorWrapper[n]),
         n_(n),
@@ -28,7 +28,7 @@ class MergingIterator : public Iterator {
     delete[] children_;
   }
 
-  virtual bool Valid() const {
+  virtual bool Valid()  {
     return (current_ != NULL);
   }
 
@@ -48,7 +48,7 @@ class MergingIterator : public Iterator {
     direction_ = kReverse;
   }
 
-  virtual void Seek(const Slice& target) {
+  virtual void Seek( Slice& target) {
     for (int i = 0; i < n_; i++) {
       children_[i].Seek(target);
     }
@@ -111,17 +111,17 @@ class MergingIterator : public Iterator {
     FindLargest();
   }
 
-  virtual Slice key() const {
+  virtual Slice key()  {
     assert(Valid());
     return current_->key();
   }
 
-  virtual Slice value() const {
+  virtual Slice value()  {
     assert(Valid());
     return current_->value();
   }
 
-  virtual Status status() const {
+  virtual Status status()  {
     Status status;
     for (int i = 0; i < n_; i++) {
       status = children_[i].status();
@@ -139,7 +139,7 @@ class MergingIterator : public Iterator {
   // We might want to use a heap in case there are lots of children.
   // For now we use a simple array since we expect a very small number
   // of children in leveldb.
-  const Comparator* comparator_;
+   Comparator* comparator_;
   IteratorWrapper* children_;
   int n_;
   IteratorWrapper* current_;
@@ -183,7 +183,7 @@ void MergingIterator::FindLargest() {
 }
 }  // namespace
 
-Iterator* NewMergingIterator(const Comparator* cmp, Iterator** list, int n) {
+Iterator* NewMergingIterator( Comparator* cmp, Iterator** list, int n) {
   assert(n >= 0);
   if (n == 0) {
     return NewEmptyIterator();

@@ -36,13 +36,13 @@ public:
     }
 
     void
-    ComputeEntry(uint256& entry, const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubkey)
+    ComputeEntry(uint256& entry,  uint256 &hash,  std::vector<unsigned char>& vchSig,  CPubKey& pubkey)
     {
         CSHA256().Write(nonce.begin(), 32).Write(hash.begin(), 32).Write(&pubkey[0], pubkey.size()).Write(&vchSig[0], vchSig.size()).Finalize(entry.begin());
     }
 
     bool
-    Get(const uint256& entry, const bool erase)
+    Get( uint256& entry,  bool erase)
     {
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
         return setValid.contains(entry, erase);
@@ -80,7 +80,7 @@ void InitSignatureCache()
             (nElems*sizeof(uint256)) >>20, (nMaxCacheSize*2)>>20, nElems);
 }
 
-bool CachingTransactionSignatureChecker::VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& pubkey, const uint256& sighash) const
+bool CachingTransactionSignatureChecker::VerifySignature( std::vector<unsigned char>& vchSig,  CPubKey& pubkey,  uint256& sighash) 
 {
     uint256 entry;
     signatureCache.ComputeEntry(entry, sighash, vchSig, pubkey);

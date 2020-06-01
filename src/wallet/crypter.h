@@ -11,9 +11,9 @@
 
 #include <atomic>
 
-const unsigned int WALLET_CRYPTO_KEY_SIZE = 32;
-const unsigned int WALLET_CRYPTO_SALT_SIZE = 8;
-const unsigned int WALLET_CRYPTO_IV_SIZE = 16;
+ unsigned int WALLET_CRYPTO_KEY_SIZE = 32;
+ unsigned int WALLET_CRYPTO_SALT_SIZE = 8;
+ unsigned int WALLET_CRYPTO_IV_SIZE = 16;
 
 /**
  * Private key encryption is done based on a CMasterKey,
@@ -81,13 +81,13 @@ private:
     std::vector<unsigned char, secure_allocator<unsigned char>> vchIV;
     bool fKeySet;
 
-    int BytesToKeySHA512AES(const std::vector<unsigned char>& chSalt, const SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) const;
+    int BytesToKeySHA512AES( std::vector<unsigned char>& chSalt,  SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) ;
 
 public:
-    bool SetKeyFromPassphrase(const SecureString &strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod);
-    bool Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) const;
-    bool Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) const;
-    bool SetKey(const CKeyingMaterial& chNewKey, const std::vector<unsigned char>& chNewIV);
+    bool SetKeyFromPassphrase( SecureString &strKeyData,  std::vector<unsigned char>& chSalt,  unsigned int nRounds,  unsigned int nDerivationMethod);
+    bool Encrypt( CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) ;
+    bool Decrypt( std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) ;
+    bool SetKey( CKeyingMaterial& chNewKey,  std::vector<unsigned char>& chNewIV);
 
     void CleanKey()
     {
@@ -131,7 +131,7 @@ protected:
     //! will encrypt previously unencrypted keys
     bool EncryptKeys(CKeyingMaterial& vMasterKeyIn);
 
-    bool Unlock(const CKeyingMaterial& vMasterKeyIn);
+    bool Unlock( CKeyingMaterial& vMasterKeyIn);
     CryptedKeyMap mapCryptedKeys;
 
 public:
@@ -139,16 +139,16 @@ public:
     {
     }
 
-    bool IsCrypted() const { return fUseCrypto; }
-    bool IsLocked() const;
+    bool IsCrypted()  { return fUseCrypto; }
+    bool IsLocked() ;
     bool Lock();
 
-    virtual bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
-    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
-    bool HaveKey(const CKeyID &address) const override;
-    bool GetKey(const CKeyID &address, CKey& keyOut) const override;
-    bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
-    std::set<CKeyID> GetKeys() const override;
+    virtual bool AddCryptedKey( CPubKey &vchPubKey,  std::vector<unsigned char> &vchCryptedSecret);
+    bool AddKeyPubKey( CKey& key,  CPubKey &pubkey) override;
+    bool HaveKey( CKeyID &address)  override;
+    bool GetKey( CKeyID &address, CKey& keyOut)  override;
+    bool GetPubKey( CKeyID &address, CPubKey& vchPubKeyOut)  override;
+    std::set<CKeyID> GetKeys()  override;
 
     /**
      * Wallet status (encrypted, locked) changed.

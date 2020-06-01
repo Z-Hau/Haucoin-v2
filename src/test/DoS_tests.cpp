@@ -21,7 +21,7 @@
 #include <boost/test/unit_test.hpp>
 
 // Tests these internal-to-net_processing.cpp methods:
-extern bool AddOrphanTx(const CTransactionRef& tx, NodeId peer);
+extern bool AddOrphanTx( CTransactionRef& tx, NodeId peer);
 extern void EraseOrphansFor(NodeId peer);
 extern unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans);
 struct COrphanTx {
@@ -108,7 +108,7 @@ void AddRandomOutboundPeer(std::vector<CNode *> &vNodes, PeerLogicValidation &pe
 
 BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
 {
-    const Consensus::Params& consensusParams = Params().GetConsensus();
+     Consensus::Params& consensusParams = Params().GetConsensus();
     constexpr int nMaxOutbound = 8;
     CConnman::Options options;
     options.nMaxConnections = 125;
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
     peerLogic->CheckForStaleTipAndEvictPeers(consensusParams);
 
     // No nodes should be marked for disconnection while we have no extra peers
-    for (const CNode *node : vNodes) {
+    for ( CNode *node : vNodes) {
         BOOST_CHECK(node->fDisconnect == false);
     }
 
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
     BOOST_CHECK(connman->GetTryNewOutboundPeer());
 
     // Still no peers should be marked for disconnection
-    for (const CNode *node : vNodes) {
+    for ( CNode *node : vNodes) {
         BOOST_CHECK(node->fDisconnect == false);
     }
 
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
     BOOST_CHECK(vNodes.back()->fDisconnect == false);
 
     bool dummy;
-    for (const CNode *node : vNodes) {
+    for ( CNode *node : vNodes) {
         peerLogic->FinalizeNode(node->GetId(), dummy);
     }
 

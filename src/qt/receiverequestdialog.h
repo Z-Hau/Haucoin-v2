@@ -54,7 +54,7 @@ public:
     ~ReceiveRequestDialog();
 
     void setModel(OptionsModel *model);
-    void setInfo(const SendCoinsRecipient &info);
+    void setInfo( SendCoinsRecipient &info);
 
 private Q_SLOTS:
     void on_btnCopyURI_clicked();

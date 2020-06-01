@@ -14,7 +14,7 @@
 /* Define a virtual block time, one block per 10 minutes after Nov 14 2014, 0:55:36am */
 int32_t TestTime(int nHeight) { return 1415926536 + 600 * nHeight; }
 
-static const Consensus::Params paramsDummy = Consensus::Params();
+static  Consensus::Params paramsDummy = Consensus::Params();
 
 class TestConditionChecker : public AbstractThresholdConditionChecker
 {
@@ -22,20 +22,20 @@ private:
     mutable ThresholdConditionCache cache;
 
 public:
-    int64_t BeginTime(Consensus::Params& params) const override { return TestTime(10000); }
-    int64_t EndTime(Consensus::Params& params) const override { return TestTime(20000); }
-    int Period(Consensus::Params& params) const override { return 1000; }
-    int Threshold(Consensus::Params& params) const override { return 900; }
-    bool Condition(const CBlockIndex* pindex, Consensus::Params& params) const override { return (pindex->nVersion & 0x100); }
+    int64_t BeginTime(Consensus::Params& params)  override { return TestTime(10000); }
+    int64_t EndTime(Consensus::Params& params)  override { return TestTime(20000); }
+    int Period(Consensus::Params& params)  override { return 1000; }
+    int Threshold(Consensus::Params& params)  override { return 900; }
+    bool Condition( CBlockIndex* pindex, Consensus::Params& params)  override { return (pindex->nVersion & 0x100); }
 
-    ThresholdState GetStateFor(const CBlockIndex* pindexPrev) const { return AbstractThresholdConditionChecker::GetStateFor(pindexPrev, paramsDummy, cache); }
-    int GetStateSinceHeightFor(const CBlockIndex* pindexPrev) const { return AbstractThresholdConditionChecker::GetStateSinceHeightFor(pindexPrev, paramsDummy, cache); }
+    ThresholdState GetStateFor( CBlockIndex* pindexPrev)  { return AbstractThresholdConditionChecker::GetStateFor(pindexPrev, paramsDummy, cache); }
+    int GetStateSinceHeightFor( CBlockIndex* pindexPrev)  { return AbstractThresholdConditionChecker::GetStateSinceHeightFor(pindexPrev, paramsDummy, cache); }
 };
 
 class TestAlwaysActiveConditionChecker : public TestConditionChecker
 {
 public:
-    int64_t BeginTime(Consensus::Params& params) const override { return Consensus::BIP9Deployment::ALWAYS_ACTIVE; }
+    int64_t BeginTime(Consensus::Params& params)  override { return Consensus::BIP9Deployment::ALWAYS_ACTIVE; }
 };
 
 #define CHECKERS 6
@@ -223,8 +223,8 @@ BOOST_AUTO_TEST_CASE(versionbits_test)
     }
 
     // Sanity checks of version bit deployments
-    const auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
-    const Consensus::Params &mainnetParams = chainParams->GetConsensus();
+     auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
+     Consensus::Params &mainnetParams = chainParams->GetConsensus();
     for (int i=0; i<(int) Consensus::MAX_VERSION_BITS_DEPLOYMENTS; i++) {
         uint32_t bitmask = VersionBitsMask(mainnetParams, (Consensus::DeploymentPos)i);
         // Make sure that no deployment tries to set an invalid bit.
@@ -250,8 +250,8 @@ BOOST_AUTO_TEST_CASE(versionbits_computeblockversion)
 {
     // Check that ComputeBlockVersion will set the appropriate bit correctly
     // on mainnet.
-    const auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
-    const Consensus::Params &mainnetParams = chainParams->GetConsensus();
+     auto chainParams = CreateChainParams(CBaseChainParams::MAIN);
+     Consensus::Params &mainnetParams = chainParams->GetConsensus();
 
     // Use the TESTDUMMY deployment for testing purposes.
     int64_t bit = mainnetParams.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit;

@@ -38,12 +38,12 @@ public:
         return (unsigned int)(state % nMax);
     }
 
-    CAddrInfo* Find(const CNetAddr& addr, int* pnId = nullptr)
+    CAddrInfo* Find( CNetAddr& addr, int* pnId = nullptr)
     {
         return CAddrMan::Find(addr, pnId);
     }
 
-    CAddrInfo* Create(const CAddress& addr, const CNetAddr& addrSource, int* pnId = nullptr)
+    CAddrInfo* Create( CAddress& addr,  CNetAddr& addrSource, int* pnId = nullptr)
     {
         return CAddrMan::Create(addr, addrSource, pnId);
     }
@@ -54,7 +54,7 @@ public:
     }
 };
 
-static CNetAddr ResolveIP(const char* ip)
+static CNetAddr ResolveIP( char* ip)
 {
     CNetAddr addr;
     BOOST_CHECK_MESSAGE(LookupHost(ip, addr, false), strprintf("failed to resolve: %s", ip));
@@ -66,7 +66,7 @@ static CNetAddr ResolveIP(std::string ip)
     return ResolveIP(ip.c_str());
 }
 
-static CService ResolveService(const char* ip, int port = 0)
+static CService ResolveService( char* ip, int port = 0)
 {
     CService serv;
     BOOST_CHECK_MESSAGE(Lookup(ip, serv, port, false), strprintf("failed to resolve: %s:%i", ip, port));

@@ -40,7 +40,7 @@ void TrafficGraphWidget::setClientModel(ClientModel *model)
     }
 }
 
-int TrafficGraphWidget::getGraphRangeMins() const
+int TrafficGraphWidget::getGraphRangeMins() 
 {
     return nMins;
 }
@@ -77,8 +77,8 @@ void TrafficGraphWidget::paintEvent(QPaintEvent *)
     int base = floor(log10(fMax));
     float val = pow(10.0f, base);
 
-    const QString units     = tr("KB/s");
-    const float yMarginText = 2.0;
+     QString units     = tr("KB/s");
+     float yMarginText = 2.0;
     
     // draw lines
     painter.setPen(axisCol);

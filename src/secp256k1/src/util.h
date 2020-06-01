@@ -16,11 +16,11 @@
 #include <stdio.h>
 
 typedef struct {
-    void (*fn)(const char *text, void* data);
-    const void* data;
+    void (*fn)( char *text, void* data);
+     void* data;
 } secp256k1_callback;
 
-static SECP256K1_INLINE void secp256k1_callback_call(const secp256k1_callback * const cb, const char * const text) {
+static SECP256K1_INLINE void secp256k1_callback_call( secp256k1_callback *  cb,  char *  text) {
     cb->fn(text, (void*)cb->data);
 }
 
@@ -68,7 +68,7 @@ static SECP256K1_INLINE void secp256k1_callback_call(const secp256k1_callback * 
 #define VERIFY_SETUP(stmt)
 #endif
 
-static SECP256K1_INLINE void *checked_malloc(const secp256k1_callback* cb, size_t size) {
+static SECP256K1_INLINE void *checked_malloc( secp256k1_callback* cb, size_t size) {
     void *ret = malloc(size);
     if (ret == NULL) {
         secp256k1_callback_call(cb, "Out of memory");

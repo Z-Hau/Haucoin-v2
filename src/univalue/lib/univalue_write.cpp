@@ -10,14 +10,14 @@
 
 using namespace std;
 
-static string json_escape(const string& inS)
+static string json_escape( string& inS)
 {
     string outS;
     outS.reserve(inS.size() * 2);
 
     for (unsigned int i = 0; i < inS.size(); i++) {
         unsigned char ch = inS[i];
-        const char *escStr = escapes[ch];
+         char *escStr = escapes[ch];
 
         if (escStr)
             outS += escStr;
@@ -29,7 +29,7 @@ static string json_escape(const string& inS)
 }
 
 string UniValue::write(unsigned int prettyIndent,
-                       unsigned int indentLevel) const
+                       unsigned int indentLevel) 
 {
     string s;
     s.reserve(1024);
@@ -67,7 +67,7 @@ static void indentStr(unsigned int prettyIndent, unsigned int indentLevel, strin
     s.append(prettyIndent * indentLevel, ' ');
 }
 
-void UniValue::writeArray(unsigned int prettyIndent, unsigned int indentLevel, string& s) const
+void UniValue::writeArray(unsigned int prettyIndent, unsigned int indentLevel, string& s) 
 {
     s += "[";
     if (prettyIndent)
@@ -89,7 +89,7 @@ void UniValue::writeArray(unsigned int prettyIndent, unsigned int indentLevel, s
     s += "]";
 }
 
-void UniValue::writeObject(unsigned int prettyIndent, unsigned int indentLevel, string& s) const
+void UniValue::writeObject(unsigned int prettyIndent, unsigned int indentLevel, string& s) 
 {
     s += "{";
     if (prettyIndent)

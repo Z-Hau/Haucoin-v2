@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const UniValue NullUniValue;
+ UniValue NullUniValue;
 
 void UniValue::clear()
 {
@@ -37,7 +37,7 @@ bool UniValue::setBool(bool val_)
     return true;
 }
 
-static bool validNumStr(const string& s)
+static bool validNumStr( string& s)
 {
     string tokenVal;
     unsigned int consumed;
@@ -45,7 +45,7 @@ static bool validNumStr(const string& s)
     return (tt == JTOK_NUMBER);
 }
 
-bool UniValue::setNumStr(const string& val_)
+bool UniValue::setNumStr( string& val_)
 {
     if (!validNumStr(val_))
         return false;
@@ -85,7 +85,7 @@ bool UniValue::setFloat(double val_)
     return ret;
 }
 
-bool UniValue::setStr(const string& val_)
+bool UniValue::setStr( string& val_)
 {
     clear();
     typ = VSTR;
@@ -107,7 +107,7 @@ bool UniValue::setObject()
     return true;
 }
 
-bool UniValue::push_back(const UniValue& val_)
+bool UniValue::push_back( UniValue& val_)
 {
     if (typ != VARR)
         return false;
@@ -116,7 +116,7 @@ bool UniValue::push_back(const UniValue& val_)
     return true;
 }
 
-bool UniValue::push_backV(const std::vector<UniValue>& vec)
+bool UniValue::push_backV( std::vector<UniValue>& vec)
 {
     if (typ != VARR)
         return false;
@@ -126,13 +126,13 @@ bool UniValue::push_backV(const std::vector<UniValue>& vec)
     return true;
 }
 
-void UniValue::__pushKV(const std::string& key, const UniValue& val_)
+void UniValue::__pushKV( std::string& key,  UniValue& val_)
 {
     keys.push_back(key);
     values.push_back(val_);
 }
 
-bool UniValue::pushKV(const std::string& key, const UniValue& val_)
+bool UniValue::pushKV( std::string& key,  UniValue& val_)
 {
     if (typ != VOBJ)
         return false;
@@ -145,7 +145,7 @@ bool UniValue::pushKV(const std::string& key, const UniValue& val_)
     return true;
 }
 
-bool UniValue::pushKVs(const UniValue& obj)
+bool UniValue::pushKVs( UniValue& obj)
 {
     if (typ != VOBJ || obj.typ != VOBJ)
         return false;
@@ -156,7 +156,7 @@ bool UniValue::pushKVs(const UniValue& obj)
     return true;
 }
 
-void UniValue::getObjMap(std::map<std::string,UniValue>& kv) const
+void UniValue::getObjMap(std::map<std::string,UniValue>& kv) 
 {
     if (typ != VOBJ)
         return;
@@ -166,7 +166,7 @@ void UniValue::getObjMap(std::map<std::string,UniValue>& kv) const
         kv[keys[i]] = values[i];
 }
 
-bool UniValue::findKey(const std::string& key, size_t& retIdx) const
+bool UniValue::findKey( std::string& key, size_t& retIdx) 
 {
     for (size_t i = 0; i < keys.size(); i++) {
         if (keys[i] == key) {
@@ -178,7 +178,7 @@ bool UniValue::findKey(const std::string& key, size_t& retIdx) const
     return false;
 }
 
-bool UniValue::checkObject(const std::map<std::string,UniValue::VType>& t) const
+bool UniValue::checkObject( std::map<std::string,UniValue::VType>& t) 
 {
     if (typ != VOBJ)
         return false;
@@ -196,7 +196,7 @@ bool UniValue::checkObject(const std::map<std::string,UniValue::VType>& t) const
     return true;
 }
 
-const UniValue& UniValue::operator[](const std::string& key) const
+ UniValue& UniValue::operator[]( std::string& key) 
 {
     if (typ != VOBJ)
         return NullUniValue;
@@ -208,7 +208,7 @@ const UniValue& UniValue::operator[](const std::string& key) const
     return values.at(index);
 }
 
-const UniValue& UniValue::operator[](size_t index) const
+ UniValue& UniValue::operator[](size_t index) 
 {
     if (typ != VOBJ && typ != VARR)
         return NullUniValue;
@@ -218,7 +218,7 @@ const UniValue& UniValue::operator[](size_t index) const
     return values.at(index);
 }
 
-const char *uvTypeName(UniValue::VType t)
+ char *uvTypeName(UniValue::VType t)
 {
     switch (t) {
     case UniValue::VNULL: return "null";
@@ -233,7 +233,7 @@ const char *uvTypeName(UniValue::VType t)
     return NULL;
 }
 
-const UniValue& find_value(const UniValue& obj, const std::string& name)
+ UniValue& find_value( UniValue& obj,  std::string& name)
 {
     for (unsigned int i = 0; i < obj.keys.size(); i++)
         if (obj.keys[i] == name)

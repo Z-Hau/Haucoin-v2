@@ -38,7 +38,7 @@ struct Options {
   // REQUIRES: The client must ensure that the comparator supplied
   // here has the same name and orders keys *exactly* the same as the
   // comparator provided to previous open calls on the same DB.
-  const Comparator* comparator;
+   Comparator* comparator;
 
   // If true, the database will be created if it is missing.
   // Default: false
@@ -151,7 +151,7 @@ struct Options {
   // NewBloomFilterPolicy() here.
   //
   // Default: NULL
-  const FilterPolicy* filter_policy;
+   FilterPolicy* filter_policy;
 
   // Create an Options object with default values for all fields.
   Options();
@@ -174,7 +174,7 @@ struct ReadOptions {
   // not have been released).  If "snapshot" is NULL, use an implicit
   // snapshot of the state at the beginning of this read operation.
   // Default: NULL
-  const Snapshot* snapshot;
+   Snapshot* snapshot;
 
   ReadOptions()
       : verify_checksums(false),

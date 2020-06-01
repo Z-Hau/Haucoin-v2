@@ -33,11 +33,11 @@ class RPCConsole: public QWidget
     Q_OBJECT
 
 public:
-    explicit RPCConsole(const PlatformStyle *platformStyle, QWidget *parent);
+    explicit RPCConsole( PlatformStyle *platformStyle, QWidget *parent);
     ~RPCConsole();
 
-    static bool RPCParseCommandLine(std::string &strResult, const std::string &strCommand, bool fExecute, std::string * const pstrFilteredOut = nullptr);
-    static bool RPCExecuteCommandLine(std::string &strResult, const std::string &strCommand, std::string * const pstrFilteredOut = nullptr) {
+    static bool RPCParseCommandLine(std::string &strResult,  std::string &strCommand, bool fExecute, std::string *  pstrFilteredOut = nullptr);
+    static bool RPCExecuteCommandLine(std::string &strResult,  std::string &strCommand, std::string *  pstrFilteredOut = nullptr) {
         return RPCParseCommandLine(strResult, strCommand, true, pstrFilteredOut);
     }
 
@@ -75,9 +75,9 @@ private Q_SLOTS:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
     /** Show custom context menu on Peers tab */
-    void showPeersTableContextMenu(const QPoint& point);
+    void showPeersTableContextMenu( QPoint& point);
     /** Show custom context menu on Bans tab */
-    void showBanTableContextMenu(const QPoint& point);
+    void showBanTableContextMenu( QPoint& point);
     /** Hides ban table if no bans are present */
     void showOrHideBanTableIfRequired();
     /** clear the selected node */
@@ -89,13 +89,13 @@ public Q_SLOTS:
     void fontSmaller();
     void setFontSize(int newSize);
     /** Append the message to the message widget */
-    void message(int category, const QString &message, bool html = false);
+    void message(int category,  QString &message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
     /** Set number of blocks and last block date shown in the UI */
-    void setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool headers);
+    void setNumBlocks(int count,  QDateTime& blockDate, double nVerificationProgress, bool headers);
     /** Set size (number of transactions and memory usage) of the mempool in the UI */
     void setMempoolSize(long numberOfTxs, size_t dynUsage);
     /** Go forward or back in history */
@@ -103,7 +103,7 @@ public Q_SLOTS:
     /** Scroll console view to end */
     void scrollToEnd();
     /** Handle selection of peer in peers list */
-    void peerSelected(const QItemSelection &selected, const QItemSelection &deselected);
+    void peerSelected( QItemSelection &selected,  QItemSelection &deselected);
     /** Handle selection caching before update */
     void peerLayoutAboutToChange();
     /** Handle updated peer information */
@@ -120,13 +120,13 @@ public Q_SLOTS:
 Q_SIGNALS:
     // For RPC command executor
     void stopExecutor();
-    void cmdRequest(const QString &command);
+    void cmdRequest( QString &command);
 
 private:
     void startExecutor();
     void setTrafficGraphRange(int mins);
     /** show detailed information on ui about selected node */
-    void updateNodeDetail(const CNodeCombinedStats *stats);
+    void updateNodeDetail( CNodeCombinedStats *stats);
 
     enum ColumnWidths
     {
@@ -144,7 +144,7 @@ private:
     int historyPtr;
     QString cmdBeforeBrowsing;
     QList<NodeId> cachedNodeids;
-    const PlatformStyle *platformStyle;
+     PlatformStyle *platformStyle;
     RPCTimerInterface *rpcTimerInterface;
     QMenu *peersTableContextMenu;
     QMenu *banTableContextMenu;

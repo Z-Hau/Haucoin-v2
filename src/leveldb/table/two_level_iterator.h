@@ -24,10 +24,10 @@ extern Iterator* NewTwoLevelIterator(
     Iterator* index_iter,
     Iterator* (*block_function)(
         void* arg,
-        const ReadOptions& options,
-        const Slice& index_value),
+         ReadOptions& options,
+         Slice& index_value),
     void* arg,
-    const ReadOptions& options);
+     ReadOptions& options);
 
 }  // namespace leveldb
 

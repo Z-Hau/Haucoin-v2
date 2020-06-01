@@ -35,7 +35,7 @@ namespace {
 static int open_read_only_file_limit = -1;
 static int mmap_limit = -1;
 
-static Status IOError(const std::string& context, int err_number) {
+static Status IOError( std::string& context, int err_number) {
   return Status::IOError(context, strerror(err_number));
 }
 
@@ -77,7 +77,7 @@ class Limiter {
   port::Mutex mu_;
   port::AtomicPointer allowed_;
 
-  intptr_t GetAllowed() const {
+  intptr_t GetAllowed()  {
     return reinterpret_cast<intptr_t>(allowed_.Acquire_Load());
   }
 
@@ -86,8 +86,8 @@ class Limiter {
     allowed_.Release_Store(reinterpret_cast<void*>(v));
   }
 
-  Limiter(const Limiter&);
-  void operator=(const Limiter&);
+  Limiter( Limiter&);
+  void operator=( Limiter&);
 };
 
 class PosixSequentialFile: public SequentialFile {
@@ -96,7 +96,7 @@ class PosixSequentialFile: public SequentialFile {
   FILE* file_;
 
  public:
-  PosixSequentialFile(const std::string& fname, FILE* f)
+  PosixSequentialFile( std::string& fname, FILE* f)
       : filename_(fname), file_(f) { }
   virtual ~PosixSequentialFile() { fclose(file_); }
 
@@ -122,7 +122,7 @@ class PosixSequentialFile: public SequentialFile {
     return Status::OK();
   }
 
-  virtual std::string GetName() const { return filename_; }
+  virtual std::string GetName()  { return filename_; }
 };
 
 // pread() based random-access
@@ -134,7 +134,7 @@ class PosixRandomAccessFile: public RandomAccessFile {
   Limiter* limiter_;
 
  public:
-  PosixRandomAccessFile(const std::string& fname, int fd, Limiter* limiter)
+  PosixRandomAccessFile( std::string& fname, int fd, Limiter* limiter)
       : filename_(fname), fd_(fd), limiter_(limiter) {
     temporary_fd_ = !limiter->Acquire();
     if (temporary_fd_) {
@@ -152,7 +152,7 @@ class PosixRandomAccessFile: public RandomAccessFile {
   }
 
   virtual Status Read(uint64_t offset, size_t n, Slice* result,
-                      char* scratch) const {
+                      char* scratch)  {
     int fd = fd_;
     if (temporary_fd_) {
       fd = open(filename_.c_str(), O_RDONLY);
@@ -175,7 +175,7 @@ class PosixRandomAccessFile: public RandomAccessFile {
     return s;
   }
 
-  virtual std::string GetName() const { return filename_; }
+  virtual std::string GetName()  { return filename_; }
 };
 
 // mmap() based random-access
@@ -188,7 +188,7 @@ class PosixMmapReadableFile: public RandomAccessFile {
 
  public:
   // base[0,length-1] contains the mmapped contents of the file.
-  PosixMmapReadableFile(const std::string& fname, void* base, size_t length,
+  PosixMmapReadableFile( std::string& fname, void* base, size_t length,
                         Limiter* limiter)
       : filename_(fname), mmapped_region_(base), length_(length),
         limiter_(limiter) {
@@ -200,7 +200,7 @@ class PosixMmapReadableFile: public RandomAccessFile {
   }
 
   virtual Status Read(uint64_t offset, size_t n, Slice* result,
-                      char* scratch) const {
+                      char* scratch)  {
     Status s;
     if (offset + n > length_) {
       *result = Slice();
@@ -211,7 +211,7 @@ class PosixMmapReadableFile: public RandomAccessFile {
     return s;
   }
 
-  virtual std::string GetName() const { return filename_; }
+  virtual std::string GetName()  { return filename_; }
 };
 
 class PosixWritableFile : public WritableFile {
@@ -220,7 +220,7 @@ class PosixWritableFile : public WritableFile {
   FILE* file_;
 
  public:
-  PosixWritableFile(const std::string& fname, FILE* f)
+  PosixWritableFile( std::string& fname, FILE* f)
       : filename_(fname), file_(f) { }
 
   ~PosixWritableFile() {
@@ -230,7 +230,7 @@ class PosixWritableFile : public WritableFile {
     }
   }
 
-  virtual Status Append(const Slice& data) {
+  virtual Status Append( Slice& data) {
     size_t r = fwrite_unlocked(data.data(), 1, data.size(), file_);
     if (r != data.size()) {
       return IOError(filename_, errno);
@@ -255,8 +255,8 @@ class PosixWritableFile : public WritableFile {
   }
 
   Status SyncDirIfManifest() {
-    const char* f = filename_.c_str();
-    const char* sep = strrchr(f, '/');
+     char* f = filename_.c_str();
+     char* sep = strrchr(f, '/');
     Slice basename;
     std::string dir;
     if (sep == NULL) {
@@ -294,7 +294,7 @@ class PosixWritableFile : public WritableFile {
     return s;
   }
 
-  virtual std::string GetName() const { return filename_; }
+  virtual std::string GetName()  { return filename_; }
 };
 
 static int LockOrUnlock(int fd, bool lock) {
@@ -322,11 +322,11 @@ class PosixLockTable {
   port::Mutex mu_;
   std::set<std::string> locked_files_;
  public:
-  bool Insert(const std::string& fname) {
+  bool Insert( std::string& fname) {
     MutexLock l(&mu_);
     return locked_files_.insert(fname).second;
   }
-  void Remove(const std::string& fname) {
+  void Remove( std::string& fname) {
     MutexLock l(&mu_);
     locked_files_.erase(fname);
   }
@@ -341,7 +341,7 @@ class PosixEnv : public Env {
     abort();
   }
 
-  virtual Status NewSequentialFile(const std::string& fname,
+  virtual Status NewSequentialFile( std::string& fname,
                                    SequentialFile** result) {
     FILE* f = fopen(fname.c_str(), "r");
     if (f == NULL) {
@@ -353,7 +353,7 @@ class PosixEnv : public Env {
     }
   }
 
-  virtual Status NewRandomAccessFile(const std::string& fname,
+  virtual Status NewRandomAccessFile( std::string& fname,
                                      RandomAccessFile** result) {
     *result = NULL;
     Status s;
@@ -381,7 +381,7 @@ class PosixEnv : public Env {
     return s;
   }
 
-  virtual Status NewWritableFile(const std::string& fname,
+  virtual Status NewWritableFile( std::string& fname,
                                  WritableFile** result) {
     Status s;
     FILE* f = fopen(fname.c_str(), "w");
@@ -394,7 +394,7 @@ class PosixEnv : public Env {
     return s;
   }
 
-  virtual Status NewAppendableFile(const std::string& fname,
+  virtual Status NewAppendableFile( std::string& fname,
                                    WritableFile** result) {
     Status s;
     FILE* f = fopen(fname.c_str(), "a");
@@ -407,11 +407,11 @@ class PosixEnv : public Env {
     return s;
   }
 
-  virtual bool FileExists(const std::string& fname) {
+  virtual bool FileExists( std::string& fname) {
     return access(fname.c_str(), F_OK) == 0;
   }
 
-  virtual Status GetChildren(const std::string& dir,
+  virtual Status GetChildren( std::string& dir,
                              std::vector<std::string>* result) {
     result->clear();
     DIR* d = opendir(dir.c_str());
@@ -426,7 +426,7 @@ class PosixEnv : public Env {
     return Status::OK();
   }
 
-  virtual Status DeleteFile(const std::string& fname) {
+  virtual Status DeleteFile( std::string& fname) {
     Status result;
     if (unlink(fname.c_str()) != 0) {
       result = IOError(fname, errno);
@@ -434,7 +434,7 @@ class PosixEnv : public Env {
     return result;
   }
 
-  virtual Status CreateDir(const std::string& name) {
+  virtual Status CreateDir( std::string& name) {
     Status result;
     if (mkdir(name.c_str(), 0755) != 0) {
       result = IOError(name, errno);
@@ -442,7 +442,7 @@ class PosixEnv : public Env {
     return result;
   }
 
-  virtual Status DeleteDir(const std::string& name) {
+  virtual Status DeleteDir( std::string& name) {
     Status result;
     if (rmdir(name.c_str()) != 0) {
       result = IOError(name, errno);
@@ -450,7 +450,7 @@ class PosixEnv : public Env {
     return result;
   }
 
-  virtual Status GetFileSize(const std::string& fname, uint64_t* size) {
+  virtual Status GetFileSize( std::string& fname, uint64_t* size) {
     Status s;
     struct stat sbuf;
     if (stat(fname.c_str(), &sbuf) != 0) {
@@ -462,7 +462,7 @@ class PosixEnv : public Env {
     return s;
   }
 
-  virtual Status RenameFile(const std::string& src, const std::string& target) {
+  virtual Status RenameFile( std::string& src,  std::string& target) {
     Status result;
     if (rename(src.c_str(), target.c_str()) != 0) {
       result = IOError(src, errno);
@@ -470,7 +470,7 @@ class PosixEnv : public Env {
     return result;
   }
 
-  virtual Status LockFile(const std::string& fname, FileLock** lock) {
+  virtual Status LockFile( std::string& fname, FileLock** lock) {
     *lock = NULL;
     Status result;
     int fd = open(fname.c_str(), O_RDWR | O_CREAT, 0644);
@@ -509,7 +509,7 @@ class PosixEnv : public Env {
   virtual void StartThread(void (*function)(void* arg), void* arg);
 
   virtual Status GetTestDirectory(std::string* result) {
-    const char* env = getenv("TEST_TMPDIR");
+     char* env = getenv("TEST_TMPDIR");
     if (env && env[0] != '\0') {
       *result = env;
     } else {
@@ -529,7 +529,7 @@ class PosixEnv : public Env {
     return thread_id;
   }
 
-  virtual Status NewLogger(const std::string& fname, Logger** result) {
+  virtual Status NewLogger( std::string& fname, Logger** result) {
     FILE* f = fopen(fname.c_str(), "w");
     if (f == NULL) {
       *result = NULL;
@@ -551,7 +551,7 @@ class PosixEnv : public Env {
   }
 
  private:
-  void PthreadCall(const char* label, int result) {
+  void PthreadCall( char* label, int result) {
     if (result != 0) {
       fprintf(stderr, "pthread %s: %s\n", label, strerror(result));
       abort();

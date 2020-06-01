@@ -32,7 +32,7 @@ UniValue CallRPC(std::string args)
         UniValue result = (*method)(request);
         return result;
     }
-    catch (const UniValue& objError) {
+    catch ( UniValue& objError) {
         throw std::runtime_error(find_value(objError, "message").get_str());
     }
 }
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(rpc_format_monetary_values)
     BOOST_CHECK_EQUAL(ValueFromAmount(COIN/100000000).write(), "0.00000001");
 }
 
-static UniValue ValueFromString(const std::string &str)
+static UniValue ValueFromString( std::string &str)
 {
     UniValue value;
     BOOST_CHECK(value.setNumStr(str));

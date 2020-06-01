@@ -13,14 +13,14 @@
 #include <primitives/block.h>
 
 /** "reject" message codes */
-static const unsigned char REJECT_MALFORMED = 0x01;
-static const unsigned char REJECT_INVALID = 0x10;
-static const unsigned char REJECT_OBSOLETE = 0x11;
-static const unsigned char REJECT_DUPLICATE = 0x12;
-static const unsigned char REJECT_NONSTANDARD = 0x40;
-// static const unsigned char REJECT_DUST = 0x41; // part of BIP 61
-static const unsigned char REJECT_INSUFFICIENTFEE = 0x42;
-static const unsigned char REJECT_CHECKPOINT = 0x43;
+static  unsigned char REJECT_MALFORMED = 0x01;
+static  unsigned char REJECT_INVALID = 0x10;
+static  unsigned char REJECT_OBSOLETE = 0x11;
+static  unsigned char REJECT_DUPLICATE = 0x12;
+static  unsigned char REJECT_NONSTANDARD = 0x40;
+// static  unsigned char REJECT_DUST = 0x41; // part of BIP 61
+static  unsigned char REJECT_INSUFFICIENTFEE = 0x42;
+static  unsigned char REJECT_CHECKPOINT = 0x43;
 
 /** Capture information about block/transaction validation */
 class CValidationState {
@@ -38,9 +38,9 @@ private:
 public:
     CValidationState() : mode(MODE_VALID), nDoS(0), chRejectCode(0), corruptionPossible(false) {}
     bool DoS(int level, bool ret = false,
-             unsigned int chRejectCodeIn=0, const std::string &strRejectReasonIn="",
+             unsigned int chRejectCodeIn=0,  std::string &strRejectReasonIn="",
              bool corruptionIn=false,
-             const std::string &strDebugMessageIn="") {
+              std::string &strDebugMessageIn="") {
         chRejectCode = chRejectCodeIn;
         strRejectReason = strRejectReasonIn;
         corruptionPossible = corruptionIn;
@@ -52,52 +52,52 @@ public:
         return ret;
     }
     bool Invalid(bool ret = false,
-                 unsigned int _chRejectCode=0, const std::string &_strRejectReason="",
-                 const std::string &_strDebugMessage="") {
+                 unsigned int _chRejectCode=0,  std::string &_strRejectReason="",
+                  std::string &_strDebugMessage="") {
         return DoS(0, ret, _chRejectCode, _strRejectReason, false, _strDebugMessage);
     }
-    bool Error(const std::string& strRejectReasonIn) {
+    bool Error( std::string& strRejectReasonIn) {
         if (mode == MODE_VALID)
             strRejectReason = strRejectReasonIn;
         mode = MODE_ERROR;
         return false;
     }
-    bool IsValid() const {
+    bool IsValid()  {
         return mode == MODE_VALID;
     }
-    bool IsInvalid() const {
+    bool IsInvalid()  {
         return mode == MODE_INVALID;
     }
-    bool IsError() const {
+    bool IsError()  {
         return mode == MODE_ERROR;
     }
-    bool IsInvalid(int &nDoSOut) const {
+    bool IsInvalid(int &nDoSOut)  {
         if (IsInvalid()) {
             nDoSOut = nDoS;
             return true;
         }
         return false;
     }
-    bool CorruptionPossible() const {
+    bool CorruptionPossible()  {
         return corruptionPossible;
     }
     void SetCorruptionPossible() {
         corruptionPossible = true;
     }
-    unsigned int GetRejectCode() const { return chRejectCode; }
-    std::string GetRejectReason() const { return strRejectReason; }
-    std::string GetDebugMessage() const { return strDebugMessage; }
+    unsigned int GetRejectCode()  { return chRejectCode; }
+    std::string GetRejectReason()  { return strRejectReason; }
+    std::string GetDebugMessage()  { return strDebugMessage; }
 };
 
 // These implement the weight = (stripped_size * 4) + witness_size formula,
 // using only serialization with and without witness data. As witness_size
 // is equal to total_size - stripped_size, this formula is identical to:
 // weight = (stripped_size * 3) + total_size.
-static inline int64_t GetTransactionWeight(const CTransaction& tx)
+static inline int64_t GetTransactionWeight( CTransaction& tx)
 {
     return ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * (WITNESS_SCALE_FACTOR - 1) + ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
 }
-static inline int64_t GetBlockWeight(const CBlock& block)
+static inline int64_t GetBlockWeight( CBlock& block)
 {
     return ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * (WITNESS_SCALE_FACTOR - 1) + ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION);
 }

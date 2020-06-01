@@ -25,12 +25,12 @@ struct TestSubscriber : public CValidationInterface {
 
     TestSubscriber(uint256 tip) : m_expected_tip(tip) {}
 
-    void UpdatedBlockTip(const CBlockIndex* pindexNew, const CBlockIndex* pindexFork, bool fInitialDownload)
+    void UpdatedBlockTip( CBlockIndex* pindexNew,  CBlockIndex* pindexFork, bool fInitialDownload)
     {
         BOOST_CHECK_EQUAL(m_expected_tip, pindexNew->GetBlockHash());
     }
 
-    void BlockConnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* pindex, const std::vector<CTransactionRef>& txnConflicted)
+    void BlockConnected( std::shared_ptr< CBlock>& block,  CBlockIndex* pindex,  std::vector<CTransactionRef>& txnConflicted)
     {
         BOOST_CHECK_EQUAL(m_expected_tip, block->hashPrevBlock);
         BOOST_CHECK_EQUAL(m_expected_tip, pindex->pprev->GetBlockHash());
@@ -38,7 +38,7 @@ struct TestSubscriber : public CValidationInterface {
         m_expected_tip = block->GetHash();
     }
 
-    void BlockDisconnected(const std::shared_ptr<const CBlock>& block)
+    void BlockDisconnected( std::shared_ptr< CBlock>& block)
     {
         BOOST_CHECK_EQUAL(m_expected_tip, block->GetHash());
 
@@ -46,7 +46,7 @@ struct TestSubscriber : public CValidationInterface {
     }
 };
 
-std::shared_ptr<CBlock> Block(const uint256& prev_hash)
+std::shared_ptr<CBlock> Block( uint256& prev_hash)
 {
     static int i = 0;
     static uint64_t time = Params().GenesisBlock().nTime;
@@ -79,13 +79,13 @@ std::shared_ptr<CBlock> FinalizeBlock(std::shared_ptr<CBlock> pblock)
 }
 
 // construct a valid block
-const std::shared_ptr<const CBlock> GoodBlock(const uint256& prev_hash)
+ std::shared_ptr< CBlock> GoodBlock( uint256& prev_hash)
 {
     return FinalizeBlock(Block(prev_hash));
 }
 
 // construct an invalid block (but with a valid header)
-const std::shared_ptr<const CBlock> BadBlock(const uint256& prev_hash)
+ std::shared_ptr< CBlock> BadBlock( uint256& prev_hash)
 {
     auto pblock = Block(prev_hash);
 
@@ -100,14 +100,14 @@ const std::shared_ptr<const CBlock> BadBlock(const uint256& prev_hash)
     return ret;
 }
 
-void BuildChain(const uint256& root, int height, const unsigned int invalid_rate, const unsigned int branch_rate, const unsigned int max_size, std::vector<std::shared_ptr<const CBlock>>& blocks)
+void BuildChain( uint256& root, int height,  unsigned int invalid_rate,  unsigned int branch_rate,  unsigned int max_size, std::vector<std::shared_ptr< CBlock>>& blocks)
 {
     if (height <= 0 || blocks.size() >= max_size) return;
 
     bool gen_invalid = GetRand(100) < invalid_rate;
     bool gen_fork = GetRand(100) < branch_rate;
 
-    const std::shared_ptr<const CBlock> pblock = gen_invalid ? BadBlock(root) : GoodBlock(root);
+     std::shared_ptr< CBlock> pblock = gen_invalid ? BadBlock(root) : GoodBlock(root);
     blocks.push_back(pblock);
     if (!gen_invalid) {
         BuildChain(pblock->GetHash(), height - 1, invalid_rate, branch_rate, max_size, blocks);
@@ -122,7 +122,7 @@ void BuildChain(const uint256& root, int height, const unsigned int invalid_rate
 BOOST_AUTO_TEST_CASE(processnewblock_signals_ordering)
 {
     // build a large-ish chain that's likely to have some forks
-    std::vector<std::shared_ptr<const CBlock>> blocks;
+    std::vector<std::shared_ptr< CBlock>> blocks;
     while (blocks.size() < 50) {
         blocks.clear();
         BuildChain(Params().GenesisBlock().GetHash(), 100, 15, 10, 500, blocks);
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(processnewblock_signals_ordering)
     bool ignored;
     CValidationState state;
     std::vector<CBlockHeader> headers;
-    std::transform(blocks.begin(), blocks.end(), std::back_inserter(headers), [](std::shared_ptr<const CBlock> b) { return b->GetBlockHeader(); });
+    std::transform(blocks.begin(), blocks.end(), std::back_inserter(headers), [](std::shared_ptr< CBlock> b) { return b->GetBlockHeader(); });
 
     // Process all the headers so we understand the toplogy of the chain
     BOOST_CHECK(ProcessNewBlockHeaders(headers, state, Params()));
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(processnewblock_signals_ordering)
     SyncWithValidationInterfaceQueue();
 
     // subscribe to events (this subscriber will validate event ordering)
-    const CBlockIndex* initial_tip = nullptr;
+     CBlockIndex* initial_tip = nullptr;
     {
         LOCK(cs_main);
         initial_tip = chainActive.Tip();

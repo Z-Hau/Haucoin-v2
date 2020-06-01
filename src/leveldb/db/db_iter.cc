@@ -48,7 +48,7 @@ class DBIter: public Iterator {
     kReverse
   };
 
-  DBIter(DBImpl* db, const Comparator* cmp, Iterator* iter, SequenceNumber s,
+  DBIter(DBImpl* db,  Comparator* cmp, Iterator* iter, SequenceNumber s,
          uint32_t seed)
       : db_(db),
         user_comparator_(cmp),
@@ -62,16 +62,16 @@ class DBIter: public Iterator {
   virtual ~DBIter() {
     delete iter_;
   }
-  virtual bool Valid() const { return valid_; }
-  virtual Slice key() const {
+  virtual bool Valid()  { return valid_; }
+  virtual Slice key()  {
     assert(valid_);
     return (direction_ == kForward) ? ExtractUserKey(iter_->key()) : saved_key_;
   }
-  virtual Slice value() const {
+  virtual Slice value()  {
     assert(valid_);
     return (direction_ == kForward) ? iter_->value() : saved_value_;
   }
-  virtual Status status() const {
+  virtual Status status()  {
     if (status_.ok()) {
       return iter_->status();
     } else {
@@ -81,7 +81,7 @@ class DBIter: public Iterator {
 
   virtual void Next();
   virtual void Prev();
-  virtual void Seek(const Slice& target);
+  virtual void Seek( Slice& target);
   virtual void SeekToFirst();
   virtual void SeekToLast();
 
@@ -90,7 +90,7 @@ class DBIter: public Iterator {
   void FindPrevUserEntry();
   bool ParseKey(ParsedInternalKey* key);
 
-  inline void SaveKey(const Slice& k, std::string* dst) {
+  inline void SaveKey( Slice& k, std::string* dst) {
     dst->assign(k.data(), k.size());
   }
 
@@ -109,9 +109,9 @@ class DBIter: public Iterator {
   }
 
   DBImpl* db_;
-  const Comparator* const user_comparator_;
-  Iterator* const iter_;
-  SequenceNumber const sequence_;
+   Comparator*  user_comparator_;
+  Iterator*  iter_;
+  SequenceNumber  sequence_;
 
   Status status_;
   std::string saved_key_;     // == current key when direction_==kReverse
@@ -123,8 +123,8 @@ class DBIter: public Iterator {
   ssize_t bytes_counter_;
 
   // No copying allowed
-  DBIter(const DBIter&);
-  void operator=(const DBIter&);
+  DBIter( DBIter&);
+  void operator=( DBIter&);
 };
 
 inline bool DBIter::ParseKey(ParsedInternalKey* ikey) {
@@ -271,7 +271,7 @@ void DBIter::FindPrevUserEntry() {
   }
 }
 
-void DBIter::Seek(const Slice& target) {
+void DBIter::Seek( Slice& target) {
   direction_ = kForward;
   ClearSavedValue();
   saved_key_.clear();
@@ -307,7 +307,7 @@ void DBIter::SeekToLast() {
 
 Iterator* NewDBIterator(
     DBImpl* db,
-    const Comparator* user_key_comparator,
+     Comparator* user_key_comparator,
     Iterator* internal_iter,
     SequenceNumber sequence,
     uint32_t seed) {

@@ -11,7 +11,7 @@
 
 #include <string>
 
-extern const std::string CURRENCY_UNIT;
+extern  std::string CURRENCY_UNIT;
 
 /**
  * Fee rate in satoshis per kilobyte: CAmount / kB
@@ -25,28 +25,28 @@ public:
     /** Fee rate of 0 satoshis per kB */
     CFeeRate() : nSatoshisPerK(0) { }
     template<typename I>
-    CFeeRate(const I _nSatoshisPerK): nSatoshisPerK(_nSatoshisPerK) {
+    CFeeRate( I _nSatoshisPerK): nSatoshisPerK(_nSatoshisPerK) {
         // We've previously had bugs creep in from silent double->int conversion...
         static_assert(std::is_integral<I>::value, "CFeeRate should be used without floats");
     }
     /** Constructor for a fee rate in satoshis per kB. The size in bytes must not exceed (2^63 - 1)*/
-    CFeeRate(const CAmount& nFeePaid, size_t nBytes);
+    CFeeRate( CAmount& nFeePaid, size_t nBytes);
     /**
      * Return the fee in satoshis for the given size in bytes.
      */
-    CAmount GetFee(size_t nBytes) const;
+    CAmount GetFee(size_t nBytes) ;
     /**
      * Return the fee in satoshis for a size of 1000 bytes
      */
-    CAmount GetFeePerK() const { return GetFee(1000); }
-    friend bool operator<(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK < b.nSatoshisPerK; }
-    friend bool operator>(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK > b.nSatoshisPerK; }
-    friend bool operator==(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK == b.nSatoshisPerK; }
-    friend bool operator<=(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK <= b.nSatoshisPerK; }
-    friend bool operator>=(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK >= b.nSatoshisPerK; }
-    friend bool operator!=(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK != b.nSatoshisPerK; }
-    CFeeRate& operator+=(const CFeeRate& a) { nSatoshisPerK += a.nSatoshisPerK; return *this; }
-    std::string ToString() const;
+    CAmount GetFeePerK()  { return GetFee(1000); }
+    friend bool operator<( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK < b.nSatoshisPerK; }
+    friend bool operator>( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK > b.nSatoshisPerK; }
+    friend bool operator==( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK == b.nSatoshisPerK; }
+    friend bool operator<=( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK <= b.nSatoshisPerK; }
+    friend bool operator>=( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK >= b.nSatoshisPerK; }
+    friend bool operator!=( CFeeRate& a,  CFeeRate& b) { return a.nSatoshisPerK != b.nSatoshisPerK; }
+    CFeeRate& operator+=( CFeeRate& a) { nSatoshisPerK += a.nSatoshisPerK; return *this; }
+    std::string ToString() ;
 
     ADD_SERIALIZE_METHODS;
 

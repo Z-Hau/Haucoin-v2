@@ -11,16 +11,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-const char* phase = "";
+ char* phase = "";
 static char dbname[200];
 
-static void StartPhase(const char* name) {
+static void StartPhase( char* name) {
   fprintf(stderr, "=== Test %s\n", name);
   phase = name;
 }
 
-static const char* GetTempDir(void) {
-    const char* ret = getenv("TEST_TMPDIR");
+static  char* GetTempDir(void) {
+     char* ret = getenv("TEST_TMPDIR");
     if (ret == NULL || ret[0] == '\0')
         ret = "/tmp";
     return ret;
@@ -38,7 +38,7 @@ static const char* GetTempDir(void) {
     abort();                                                            \
   }
 
-static void CheckEqual(const char* expected, const char* v, size_t n) {
+static void CheckEqual( char* expected,  char* v, size_t n) {
   if (expected == NULL && v == NULL) {
     // ok
   } else if (expected != NULL && v != NULL && n == strlen(expected) &&
@@ -63,9 +63,9 @@ static void Free(char** ptr) {
 
 static void CheckGet(
     leveldb_t* db,
-    const leveldb_readoptions_t* options,
-    const char* key,
-    const char* expected) {
+     leveldb_readoptions_t* options,
+     char* key,
+     char* expected) {
   char* err = NULL;
   size_t val_len;
   char* val;
@@ -76,9 +76,9 @@ static void CheckGet(
 }
 
 static void CheckIter(leveldb_iterator_t* iter,
-                      const char* key, const char* val) {
+                       char* key,  char* val) {
   size_t len;
-  const char* str;
+   char* str;
   str = leveldb_iter_key(iter, &len);
   CheckEqual(key, str, len);
   str = leveldb_iter_value(iter, &len);
@@ -87,8 +87,8 @@ static void CheckIter(leveldb_iterator_t* iter,
 
 // Callback from leveldb_writebatch_iterate()
 static void CheckPut(void* ptr,
-                     const char* k, size_t klen,
-                     const char* v, size_t vlen) {
+                      char* k, size_t klen,
+                      char* v, size_t vlen) {
   int* state = (int*) ptr;
   CheckCondition(*state < 2);
   switch (*state) {
@@ -105,7 +105,7 @@ static void CheckPut(void* ptr,
 }
 
 // Callback from leveldb_writebatch_iterate()
-static void CheckDel(void* ptr, const char* k, size_t klen) {
+static void CheckDel(void* ptr,  char* k, size_t klen) {
   int* state = (int*) ptr;
   CheckCondition(*state == 2);
   CheckEqual("bar", k, klen);
@@ -114,8 +114,8 @@ static void CheckDel(void* ptr, const char* k, size_t klen) {
 
 static void CmpDestroy(void* arg) { }
 
-static int CmpCompare(void* arg, const char* a, size_t alen,
-                      const char* b, size_t blen) {
+static int CmpCompare(void* arg,  char* a, size_t alen,
+                       char* b, size_t blen) {
   int n = (alen < blen) ? alen : blen;
   int r = memcmp(a, b, n);
   if (r == 0) {
@@ -125,19 +125,19 @@ static int CmpCompare(void* arg, const char* a, size_t alen,
   return r;
 }
 
-static const char* CmpName(void* arg) {
+static  char* CmpName(void* arg) {
   return "foo";
 }
 
 // Custom filter policy
 static unsigned char fake_filter_result = 1;
 static void FilterDestroy(void* arg) { }
-static const char* FilterName(void* arg) {
+static  char* FilterName(void* arg) {
   return "TestFilter";
 }
 static char* FilterCreate(
     void* arg,
-    const char* const* key_array, const size_t* key_length_array,
+     char* * key_array,  size_t* key_length_array,
     int num_keys,
     size_t* filter_length) {
   *filter_length = 4;
@@ -147,8 +147,8 @@ static char* FilterCreate(
 }
 unsigned char FilterKeyMatch(
     void* arg,
-    const char* key, size_t length,
-    const char* filter, size_t filter_length) {
+     char* key, size_t length,
+     char* filter, size_t filter_length) {
   CheckCondition(filter_length == 4);
   CheckCondition(memcmp(filter, "fake", 4) == 0);
   return fake_filter_result;
@@ -280,9 +280,9 @@ int main(int argc, char** argv) {
     char keybuf[100];
     char valbuf[100];
     uint64_t sizes[2];
-    const char* start[2] = { "a", "k00000000000000010000" };
+     char* start[2] = { "a", "k00000000000000010000" };
     size_t start_len[2] = { 1, 21 };
-    const char* limit[2] = { "k00000000000000010000", "z" };
+     char* limit[2] = { "k00000000000000010000", "z" };
     size_t limit_len[2] = { 21, 1 };
     leveldb_writeoptions_set_sync(woptions, 0);
     for (i = 0; i < n; i++) {
@@ -308,7 +308,7 @@ int main(int argc, char** argv) {
 
   StartPhase("snapshot");
   {
-    const leveldb_snapshot_t* snap;
+     leveldb_snapshot_t* snap;
     snap = leveldb_create_snapshot(db);
     leveldb_delete(db, woptions, "foo", 3, &err);
     CheckNoError(err);

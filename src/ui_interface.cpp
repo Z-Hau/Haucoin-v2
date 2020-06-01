@@ -7,23 +7,23 @@
 
 CClientUIInterface uiInterface;
 
-bool InitError(const std::string& str)
+bool InitError( std::string& str)
 {
     uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_ERROR);
     return false;
 }
 
-void InitWarning(const std::string& str)
+void InitWarning( std::string& str)
 {
     uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_WARNING);
 }
 
-std::string AmountHighWarn(const std::string& optname)
+std::string AmountHighWarn( std::string& optname)
 {
     return strprintf(_("%s is set very high!"), optname);
 }
 
-std::string AmountErrMsg(const char* const optname, const std::string& strValue)
+std::string AmountErrMsg( char*  optname,  std::string& strValue)
 {
     return strprintf(_("Invalid amount for -%s=<amount>: '%s'"), optname, strValue);
 }

@@ -135,12 +135,12 @@ void EditAddressDialog::accept()
     QDialog::accept();
 }
 
-QString EditAddressDialog::getAddress() const
+QString EditAddressDialog::getAddress() 
 {
     return address;
 }
 
-void EditAddressDialog::setAddress(const QString &_address)
+void EditAddressDialog::setAddress( QString &_address)
 {
     this->address = _address;
     ui->addressEdit->setText(_address);

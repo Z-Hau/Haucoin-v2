@@ -44,7 +44,7 @@ static int64_t abs64(int64_t n)
 
 #define BITCOIN_TIMEDATA_MAX_SAMPLES 200
 
-void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
+void AddTimeData( CNetAddr& ip, int64_t nOffsetSample)
 {
     LOCK(cs_nTimeOffset);
     // Ignore duplicates

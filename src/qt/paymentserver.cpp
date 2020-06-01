@@ -47,15 +47,15 @@
 #include <QUrlQuery>
 #endif
 
-const int BITCOIN_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
-const QString BITCOIN_IPC_PREFIX("bitcoin:");
+ int BITCOIN_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
+ QString BITCOIN_IPC_PREFIX("bitcoin:");
 // BIP70 payment protocol messages
-const char* BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
-const char* BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
+ char* BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
+ char* BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
 // BIP71 payment protocol media types
-const char* BIP71_MIMETYPE_PAYMENT = "application/bitcoin-payment";
-const char* BIP71_MIMETYPE_PAYMENTACK = "application/bitcoin-paymentack";
-const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/bitcoin-paymentrequest";
+ char* BIP71_MIMETYPE_PAYMENT = "application/bitcoin-payment";
+ char* BIP71_MIMETYPE_PAYMENTACK = "application/bitcoin-paymentack";
+ char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/bitcoin-paymentrequest";
 
 struct X509StoreDeleter {
       void operator()(X509_STORE* b) {
@@ -97,7 +97,7 @@ static QString ipcServerName()
 
 static QList<QString> savedPaymentRequests;
 
-static void ReportInvalidCertificate(const QSslCertificate& cert)
+static void ReportInvalidCertificate( QSslCertificate& cert)
 {
 #if QT_VERSION < 0x050000
     qDebug() << QString("%1: Payment server found an invalid certificate: ").arg(__func__) << cert.serialNumber() << cert.subjectInfo(QSslCertificate::CommonName) << cert.subjectInfo(QSslCertificate::OrganizationalUnitName);
@@ -143,9 +143,9 @@ void PaymentServer::LoadRootCAs(X509_STORE* _store)
         certList = QSslSocket::systemCaCertificates();
 
     int nRootCerts = 0;
-    const QDateTime currentTime = QDateTime::currentDateTime();
+     QDateTime currentTime = QDateTime::currentDateTime();
 
-    for (const QSslCertificate& cert : certList) {
+    for ( QSslCertificate& cert : certList) {
         // Don't log NULL certificates
         if (cert.isNull())
             continue;
@@ -164,7 +164,7 @@ void PaymentServer::LoadRootCAs(X509_STORE* _store)
         }
 #endif
         QByteArray certData = cert.toDer();
-        const unsigned char *data = (const unsigned char *)certData.data();
+         unsigned char *data = ( unsigned char *)certData.data();
 
         std::unique_ptr<X509, X509Deleter> x509(d2i_X509(0, &data, certData.size()));
         if (x509 && X509_STORE_add_cert(certStore.get(), x509.get()))
@@ -266,7 +266,7 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
 bool PaymentServer::ipcSendCommandLine()
 {
     bool fResult = false;
-    for (const QString& r : savedPaymentRequests)
+    for ( QString& r : savedPaymentRequests)
     {
         QLocalSocket* socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
@@ -381,8 +381,8 @@ void PaymentServer::initNetManager()
 
     connect(netManager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(netRequestFinished(QNetworkReply*)));
-    connect(netManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)),
-            this, SLOT(reportSslErrors(QNetworkReply*, const QList<QSslError> &)));
+    connect(netManager, SIGNAL(sslErrors(QNetworkReply*,  QList<QSslError> &)),
+            this, SLOT(reportSslErrors(QNetworkReply*,  QList<QSslError> &)));
 }
 
 void PaymentServer::uiReady()
@@ -390,14 +390,14 @@ void PaymentServer::uiReady()
     initNetManager();
 
     saveURIs = false;
-    for (const QString& s : savedPaymentRequests)
+    for ( QString& s : savedPaymentRequests)
     {
         handleURIOrFile(s);
     }
     savedPaymentRequests.clear();
 }
 
-void PaymentServer::handleURIOrFile(const QString& s)
+void PaymentServer::handleURIOrFile( QString& s)
 {
     if (saveURIs)
     {
@@ -497,7 +497,7 @@ void PaymentServer::handleURIConnection()
 // Warning: readPaymentRequestFromFile() is used in ipcSendCommandLine()
 // so don't use "Q_EMIT message()", but "QMessageBox::"!
 //
-bool PaymentServer::readPaymentRequestFromFile(const QString& filename, PaymentRequestPlus& request)
+bool PaymentServer::readPaymentRequestFromFile( QString& filename, PaymentRequestPlus& request)
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -515,7 +515,7 @@ bool PaymentServer::readPaymentRequestFromFile(const QString& filename, PaymentR
     return request.parse(data);
 }
 
-bool PaymentServer::processPaymentRequest(const PaymentRequestPlus& request, SendCoinsRecipient& recipient)
+bool PaymentServer::processPaymentRequest( PaymentRequestPlus& request, SendCoinsRecipient& recipient)
 {
     if (!optionsModel)
         return false;
@@ -552,7 +552,7 @@ bool PaymentServer::processPaymentRequest(const PaymentRequestPlus& request, Sen
     QList<std::pair<CScript, CAmount> > sendingTos = request.getPayTo();
     QStringList addresses;
 
-    for (const std::pair<CScript, CAmount>& sendingTo : sendingTos) {
+    for ( std::pair<CScript, CAmount>& sendingTo : sendingTos) {
         // Extract and check destination addresses
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest)) {
@@ -607,7 +607,7 @@ bool PaymentServer::processPaymentRequest(const PaymentRequestPlus& request, Sen
     return true;
 }
 
-void PaymentServer::fetchRequest(const QUrl& url)
+void PaymentServer::fetchRequest( QUrl& url)
 {
     QNetworkRequest netRequest;
     netRequest.setAttribute(QNetworkRequest::User, BIP70_MESSAGE_PAYMENTREQUEST);
@@ -617,9 +617,9 @@ void PaymentServer::fetchRequest(const QUrl& url)
     netManager->get(netRequest);
 }
 
-void PaymentServer::fetchPaymentACK(CWallet* wallet, const SendCoinsRecipient& recipient, QByteArray transaction)
+void PaymentServer::fetchPaymentACK(CWallet* wallet,  SendCoinsRecipient& recipient, QByteArray transaction)
 {
-    const payments::PaymentDetails& details = recipient.paymentRequest.getDetails();
+     payments::PaymentDetails& details = recipient.paymentRequest.getDetails();
     if (!details.has_payment_url())
         return;
 
@@ -644,7 +644,7 @@ void PaymentServer::fetchPaymentACK(CWallet* wallet, const SendCoinsRecipient& r
         // use for change. Despite an actual payment and not change, this is a close match:
         // it's the output type we use subject to privacy issues, but not restricted by what
         // other software supports.
-        const OutputType change_type = g_change_type != OUTPUT_TYPE_NONE ? g_change_type : g_address_type;
+         OutputType change_type = g_change_type != OUTPUT_TYPE_NONE ? g_change_type : g_address_type;
         wallet->LearnRelatedScripts(newKey, change_type);
         CTxDestination dest = GetDestinationForKey(newKey, change_type);
         wallet->SetAddressBook(dest, strAccount, "refund");
@@ -732,12 +732,12 @@ void PaymentServer::netRequestFinished(QNetworkReply* reply)
     }
 }
 
-void PaymentServer::reportSslErrors(QNetworkReply* reply, const QList<QSslError> &errs)
+void PaymentServer::reportSslErrors(QNetworkReply* reply,  QList<QSslError> &errs)
 {
     Q_UNUSED(reply);
 
     QString errString;
-    for (const QSslError& err : errs) {
+    for ( QSslError& err : errs) {
         qWarning() << "PaymentServer::reportSslErrors: " << err;
         errString += err.errorString() + "\n";
     }
@@ -749,13 +749,13 @@ void PaymentServer::setOptionsModel(OptionsModel *_optionsModel)
     this->optionsModel = _optionsModel;
 }
 
-void PaymentServer::handlePaymentACK(const QString& paymentACKMsg)
+void PaymentServer::handlePaymentACK( QString& paymentACKMsg)
 {
     // currently we don't further process or store the paymentACK message
     Q_EMIT message(tr("Payment acknowledged"), paymentACKMsg, CClientUIInterface::ICON_INFORMATION | CClientUIInterface::MODAL);
 }
 
-bool PaymentServer::verifyNetwork(const payments::PaymentDetails& requestDetails)
+bool PaymentServer::verifyNetwork( payments::PaymentDetails& requestDetails)
 {
     bool fVerified = requestDetails.network() == Params().NetworkIDString();
     if (!fVerified) {
@@ -767,11 +767,11 @@ bool PaymentServer::verifyNetwork(const payments::PaymentDetails& requestDetails
     return fVerified;
 }
 
-bool PaymentServer::verifyExpired(const payments::PaymentDetails& requestDetails)
+bool PaymentServer::verifyExpired( payments::PaymentDetails& requestDetails)
 {
     bool fVerified = (requestDetails.has_expires() && (int64_t)requestDetails.expires() < GetTime());
     if (fVerified) {
-        const QString requestExpires = QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", (int64_t)requestDetails.expires()));
+         QString requestExpires = QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", (int64_t)requestDetails.expires()));
         qWarning() << QString("PaymentServer::%1: Payment request expired \"%2\".")
             .arg(__func__)
             .arg(requestExpires);
@@ -791,7 +791,7 @@ bool PaymentServer::verifySize(qint64 requestSize)
     return fVerified;
 }
 
-bool PaymentServer::verifyAmount(const CAmount& requestAmount)
+bool PaymentServer::verifyAmount( CAmount& requestAmount)
 {
     bool fVerified = MoneyRange(requestAmount);
     if (!fVerified) {

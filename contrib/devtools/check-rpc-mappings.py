@@ -48,7 +48,7 @@ def process_commands(fname):
         for line in f:
             line = line.rstrip()
             if not in_rpcs:
-                if re.match("static const CRPCCommand .*\[\] =", line):
+                if re.match("static  CRPCCommand .*\[\] =", line):
                     in_rpcs = True
             else:
                 if line.startswith('};'):
@@ -74,7 +74,7 @@ def process_mapping(fname):
         for line in f:
             line = line.rstrip()
             if not in_rpcs:
-                if line == 'static const CRPCConvertParam vRPCConvertParams[] =':
+                if line == 'static  CRPCConvertParam vRPCConvertParams[] =':
                     in_rpcs = True
             else:
                 if line.startswith('};'):

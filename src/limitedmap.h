@@ -15,7 +15,7 @@ class limitedmap
 public:
     typedef K key_type;
     typedef V mapped_type;
-    typedef std::pair<const key_type, mapped_type> value_type;
+    typedef std::pair< key_type, mapped_type> value_type;
     typedef typename std::map<K, V>::const_iterator const_iterator;
     typedef typename std::map<K, V>::size_type size_type;
 
@@ -32,13 +32,13 @@ public:
         assert(nMaxSizeIn > 0);
         nMaxSize = nMaxSizeIn;
     }
-    const_iterator begin() const { return map.begin(); }
-    const_iterator end() const { return map.end(); }
-    size_type size() const { return map.size(); }
-    bool empty() const { return map.empty(); }
-    const_iterator find(const key_type& k) const { return map.find(k); }
-    size_type count(const key_type& k) const { return map.count(k); }
-    void insert(const value_type& x)
+    const_iterator begin()  { return map.begin(); }
+    const_iterator end()  { return map.end(); }
+    size_type size()  { return map.size(); }
+    bool empty()  { return map.empty(); }
+    const_iterator find( key_type& k)  { return map.find(k); }
+    size_type count( key_type& k)  { return map.count(k); }
+    void insert( value_type& x)
     {
         std::pair<iterator, bool> ret = map.insert(x);
         if (ret.second) {
@@ -49,7 +49,7 @@ public:
             rmap.insert(make_pair(x.second, ret.first));
         }
     }
-    void erase(const key_type& k)
+    void erase( key_type& k)
     {
         iterator itTarget = map.find(k);
         if (itTarget == map.end())
@@ -64,11 +64,11 @@ public:
         // Shouldn't ever get here
         assert(0);
     }
-    void update(const_iterator itIn, const mapped_type& v)
+    void update(const_iterator itIn,  mapped_type& v)
     {
-        // Using map::erase() with empty range instead of map::find() to get a non-const iterator,
+        // Using map::erase() with empty range instead of map::find() to get a non- iterator,
         // since it is a constant time operation in C++11. For more details, see
-        // https://stackoverflow.com/questions/765148/how-to-remove-constness-of-const-iterator
+        // https://stackoverflow.com/questions/765148/how-to-remove-constness-of--iterator
         iterator itTarget = map.erase(itIn, itIn);
         
         if (itTarget == map.end())
@@ -84,7 +84,7 @@ public:
         // Shouldn't ever get here
         assert(0);
     }
-    size_type max_size() const { return nMaxSize; }
+    size_type max_size()  { return nMaxSize; }
     size_type max_size(size_type s)
     {
         assert(s > 0);

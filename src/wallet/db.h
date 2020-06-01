@@ -21,8 +21,8 @@
 
 #include <db_cxx.h>
 
-static const unsigned int DEFAULT_WALLET_DBLOGSIZE = 100;
-static const bool DEFAULT_WALLET_PRIVDB = true;
+static  unsigned int DEFAULT_WALLET_DBLOGSIZE = 100;
+static  bool DEFAULT_WALLET_PRIVDB = true;
 
 class CDBEnv
 {
@@ -46,7 +46,7 @@ public:
     void Reset();
 
     void MakeMock();
-    bool IsMock() const { return fMockDb; }
+    bool IsMock()  { return fMockDb; }
 
     /**
      * Verify that database file strFile is OK. If it is not,
@@ -57,8 +57,8 @@ public:
     enum VerifyResult { VERIFY_OK,
                         RECOVER_OK,
                         RECOVER_FAIL };
-    typedef bool (*recoverFunc_type)(const std::string& strFile, std::string& out_backup_filename);
-    VerifyResult Verify(const std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename);
+    typedef bool (*recoverFunc_type)( std::string& strFile, std::string& out_backup_filename);
+    VerifyResult Verify( std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename);
     /**
      * Salvage data from a file that Verify says is bad.
      * fAggressive sets the DB_AGGRESSIVE flag (see berkeley DB->verify() method documentation).
@@ -67,14 +67,14 @@ public:
      * for huge databases.
      */
     typedef std::pair<std::vector<unsigned char>, std::vector<unsigned char> > KeyValPair;
-    bool Salvage(const std::string& strFile, bool fAggressive, std::vector<KeyValPair>& vResult);
+    bool Salvage( std::string& strFile, bool fAggressive, std::vector<KeyValPair>& vResult);
 
-    bool Open(const fs::path& path, bool retry = 0);
+    bool Open( fs::path& path, bool retry = 0);
     void Close();
     void Flush(bool fShutdown);
-    void CheckpointLSN(const std::string& strFile);
+    void CheckpointLSN( std::string& strFile);
 
-    void CloseDb(const std::string& strFile);
+    void CloseDb( std::string& strFile);
 
     DbTxn* TxnBegin(int flags = DB_TXN_WRITE_NOSYNC)
     {
@@ -101,22 +101,22 @@ public:
     }
 
     /** Create DB handle to real database */
-    CWalletDBWrapper(CDBEnv *env_in, const std::string &strFile_in) :
+    CWalletDBWrapper(CDBEnv *env_in,  std::string &strFile_in) :
         nUpdateCounter(0), nLastSeen(0), nLastFlushed(0), nLastWalletUpdate(0), env(env_in), strFile(strFile_in)
     {
     }
 
     /** Rewrite the entire database on disk, with the exception of key pszSkip if non-zero
      */
-    bool Rewrite(const char* pszSkip=nullptr);
+    bool Rewrite( char* pszSkip=nullptr);
 
     /** Back up the entire database to a file.
      */
-    bool Backup(const std::string& strDest);
+    bool Backup( std::string& strDest);
 
     /** Get a name for this database, for debugging etc.
      */
-    std::string GetName() const { return strFile; }
+    std::string GetName()  { return strFile; }
 
     /** Make sure all changes are flushed to disk.
      */
@@ -154,27 +154,27 @@ protected:
     CDBEnv *env;
 
 public:
-    explicit CDB(CWalletDBWrapper& dbw, const char* pszMode = "r+", bool fFlushOnCloseIn=true);
+    explicit CDB(CWalletDBWrapper& dbw,  char* pszMode = "r+", bool fFlushOnCloseIn=true);
     ~CDB() { Close(); }
 
-    CDB(const CDB&) = delete;
-    CDB& operator=(const CDB&) = delete;
+    CDB( CDB&) = delete;
+    CDB& operator=( CDB&) = delete;
 
     void Flush();
     void Close();
-    static bool Recover(const std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& out_backup_filename);
+    static bool Recover( std::string& filename, void *callbackDataIn, bool (*recoverKVcallback)(void* callbackData, CDataStream ssKey, CDataStream ssValue), std::string& out_backup_filename);
 
     /* flush the wallet passively (TRY_LOCK)
        ideal to be called periodically */
     static bool PeriodicFlush(CWalletDBWrapper& dbw);
     /* verifies the database environment */
-    static bool VerifyEnvironment(const std::string& walletFile, const fs::path& walletDir, std::string& errorStr);
+    static bool VerifyEnvironment( std::string& walletFile,  fs::path& walletDir, std::string& errorStr);
     /* verifies the database file */
-    static bool VerifyDatabaseFile(const std::string& walletFile, const fs::path& walletDir, std::string& warningStr, std::string& errorStr, CDBEnv::recoverFunc_type recoverFunc);
+    static bool VerifyDatabaseFile( std::string& walletFile,  fs::path& walletDir, std::string& warningStr, std::string& errorStr, CDBEnv::recoverFunc_type recoverFunc);
 
 public:
     template <typename K, typename T>
-    bool Read(const K& key, T& value)
+    bool Read( K& key, T& value)
     {
         if (!pdb)
             return false;
@@ -197,7 +197,7 @@ public:
                 CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, CLIENT_VERSION);
                 ssValue >> value;
                 success = true;
-            } catch (const std::exception&) {
+            } catch ( std::exception&) {
                 // In this case success remains 'false'
             }
 
@@ -209,7 +209,7 @@ public:
     }
 
     template <typename K, typename T>
-    bool Write(const K& key, const T& value, bool fOverwrite = true)
+    bool Write( K& key,  T& value, bool fOverwrite = true)
     {
         if (!pdb)
             return true;
@@ -238,7 +238,7 @@ public:
     }
 
     template <typename K>
-    bool Erase(const K& key)
+    bool Erase( K& key)
     {
         if (!pdb)
             return false;
@@ -260,7 +260,7 @@ public:
     }
 
     template <typename K>
-    bool Exists(const K& key)
+    bool Exists( K& key)
     {
         if (!pdb)
             return false;
@@ -366,7 +366,7 @@ public:
         return Write(std::string("version"), nVersion);
     }
 
-    bool static Rewrite(CWalletDBWrapper& dbw, const char* pszSkip = nullptr);
+    bool static Rewrite(CWalletDBWrapper& dbw,  char* pszSkip = nullptr);
 };
 
 #endif // BITCOIN_WALLET_DB_H

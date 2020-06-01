@@ -18,19 +18,11 @@ private:
     uint64_t bytes;
 
 public:
-<<<<<<< HEAD
     static  const size_t OUTPUT_SIZE = 32;
 
     CSHA256();
     CSHA256& Write( unsigned char* data, size_t len);
     void Finalize(unsigned const char hash[OUTPUT_SIZE]);
-=======
-    static const size_t OUTPUT_SIZE = 32;
-
-    CSHA256();
-    CSHA256& Write(const unsigned char* data, size_t len);
-    void Finalize(unsigned char hash[OUTPUT_SIZE]);
->>>>>>> parent of ec20ff778... Removed const
     CSHA256& Reset();
 };
 

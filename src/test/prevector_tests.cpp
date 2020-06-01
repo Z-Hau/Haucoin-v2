@@ -41,7 +41,7 @@ class prevector_tester {
         passed &= b;
     }
     void test() {
-        const pretype& const_pre_vector = pre_vector;
+         pretype& const_pre_vector = pre_vector;
         local_check_equal(real_vector.size(), pre_vector.size());
         local_check_equal(real_vector.empty(), pre_vector.empty());
         for (Size s = 0; s < real_vector.size(); s++) {
@@ -54,16 +54,16 @@ class prevector_tester {
         local_check(pretype(real_vector.begin(), real_vector.end()) == pre_vector);
         local_check(pretype(pre_vector.begin(), pre_vector.end()) == pre_vector);
         size_t pos = 0;
-        for (const T& v : pre_vector) {
+        for ( T& v : pre_vector) {
              local_check(v == real_vector[pos++]);
         }
-        for (const T& v : reverse_iterate(pre_vector)) {
+        for ( T& v : reverse_iterate(pre_vector)) {
              local_check(v == real_vector[--pos]);
         }
-        for (const T& v : const_pre_vector) {
+        for ( T& v : const_pre_vector) {
              local_check(v == real_vector[pos++]);
         }
-        for (const T& v : reverse_iterate(const_pre_vector)) {
+        for ( T& v : reverse_iterate(const_pre_vector)) {
              local_check(v == real_vector[--pos]);
         }
         CDataStream ss1(SER_DISK, 0);
@@ -93,13 +93,13 @@ public:
         test();
     }
 
-    void insert(Size position, const T& value) {
+    void insert(Size position,  T& value) {
         real_vector.insert(real_vector.begin() + position, value);
         pre_vector.insert(pre_vector.begin() + position, value);
         test();
     }
 
-    void insert(Size position, Size count, const T& value) {
+    void insert(Size position, Size count,  T& value) {
         real_vector.insert(real_vector.begin() + position, count, value);
         pre_vector.insert(pre_vector.begin() + position, count, value);
         test();
@@ -124,13 +124,13 @@ public:
         test();
     }
 
-    void update(Size pos, const T& value) {
+    void update(Size pos,  T& value) {
         real_vector[pos] = value;
         pre_vector[pos] = value;
         test();
     }
 
-    void push_back(const T& value) {
+    void push_back( T& value) {
         real_vector.push_back(value);
         pre_vector.push_back(value);
         test();
@@ -147,16 +147,16 @@ public:
         pre_vector.clear();
     }
 
-    void assign(Size n, const T& value) {
+    void assign(Size n,  T& value) {
         real_vector.assign(n, value);
         pre_vector.assign(n, value);
     }
 
-    Size size() const {
+    Size size()  {
         return real_vector.size();
     }
 
-    Size capacity() const {
+    Size capacity()  {
         return pre_vector.capacity();
     }
 

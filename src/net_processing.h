@@ -11,13 +11,13 @@
 #include <consensus/params.h>
 
 /** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
-static const unsigned int DEFAULT_MAX_ORPHAN_TRANSACTIONS = 100;
+static  unsigned int DEFAULT_MAX_ORPHAN_TRANSACTIONS = 100;
 /** Expiration time for orphan transactions in seconds */
-static const int64_t ORPHAN_TX_EXPIRE_TIME = 20 * 60;
+static  int64_t ORPHAN_TX_EXPIRE_TIME = 20 * 60;
 /** Minimum time between orphan transactions expire time checks in seconds */
-static const int64_t ORPHAN_TX_EXPIRE_INTERVAL = 5 * 60;
+static  int64_t ORPHAN_TX_EXPIRE_INTERVAL = 5 * 60;
 /** Default number of orphan+recently-replaced txn to keep around for block reconstruction */
-static const unsigned int DEFAULT_BLOCK_RECONSTRUCTION_EXTRA_TXN = 100;
+static  unsigned int DEFAULT_BLOCK_RECONSTRUCTION_EXTRA_TXN = 100;
 /** Headers download timeout expressed in microseconds
  *  Timeout = base + per_header * (expected number of headers) */
 static constexpr int64_t HEADERS_DOWNLOAD_TIMEOUT_BASE = 15 * 60 * 1000000; // 15 minutes
@@ -37,15 +37,15 @@ static constexpr int64_t MINIMUM_CONNECT_TIME = 30;
 
 class PeerLogicValidation : public CValidationInterface, public NetEventsInterface {
 private:
-    CConnman* const connman;
+    CConnman*  connman;
 
 public:
     explicit PeerLogicValidation(CConnman* connman, CScheduler &scheduler);
 
-    void BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindexConnected, const std::vector<CTransactionRef>& vtxConflicted) override;
-    void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) override;
-    void BlockChecked(const CBlock& block, const CValidationState& state) override;
-    void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& pblock) override;
+    void BlockConnected( std::shared_ptr< CBlock>& pblock,  CBlockIndex* pindexConnected,  std::vector<CTransactionRef>& vtxConflicted) override;
+    void UpdatedBlockTip( CBlockIndex *pindexNew,  CBlockIndex *pindexFork, bool fInitialDownload) override;
+    void BlockChecked( CBlock& block,  CValidationState& state) override;
+    void NewPoWValidBlock( CBlockIndex *pindex,  std::shared_ptr< CBlock>& pblock) override;
 
 
     void InitializeNode(CNode* pnode) override;
@@ -62,7 +62,7 @@ public:
     bool SendMessages(CNode* pto, std::atomic<bool>& interrupt) override;
 
     void ConsiderEviction(CNode *pto, int64_t time_in_seconds);
-    void CheckForStaleTipAndEvictPeers(const Consensus::Params &consensusParams);
+    void CheckForStaleTipAndEvictPeers( Consensus::Params &consensusParams);
     void EvictExtraOutboundPeers(int64_t time_in_seconds);
 
 private:

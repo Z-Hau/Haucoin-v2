@@ -20,7 +20,7 @@
 }
 @end
 
-void MacNotificationHandler::showNotification(const QString &title, const QString &text)
+void MacNotificationHandler::showNotification( QString &title,  QString &text)
 {
     // check if users OS has support for NSUserNotification
     if(this->hasUserNotificationCenterSupport()) {

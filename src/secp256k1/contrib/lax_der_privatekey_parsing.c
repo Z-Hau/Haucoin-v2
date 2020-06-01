@@ -9,8 +9,8 @@
 
 #include "lax_der_privatekey_parsing.h"
 
-int ec_privkey_import_der(const secp256k1_context* ctx, unsigned char *out32, const unsigned char *privkey, size_t privkeylen) {
-    const unsigned char *end = privkey + privkeylen;
+int ec_privkey_import_der( secp256k1_context* ctx, unsigned char *out32,  unsigned char *privkey, size_t privkeylen) {
+     unsigned char *end = privkey + privkeylen;
     int lenb = 0;
     int len = 0;
     memset(out32, 0, 32);
@@ -53,7 +53,7 @@ int ec_privkey_import_der(const secp256k1_context* ctx, unsigned char *out32, co
     return 1;
 }
 
-int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *privkey, size_t *privkeylen, const unsigned char *key32, int compressed) {
+int ec_privkey_export_der( secp256k1_context *ctx, unsigned char *privkey, size_t *privkeylen,  unsigned char *key32, int compressed) {
     secp256k1_pubkey pubkey;
     size_t pubkeylen = 0;
     if (!secp256k1_ec_pubkey_create(ctx, &pubkey, key32)) {
@@ -61,10 +61,10 @@ int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *privkey, 
         return 0;
     }
     if (compressed) {
-        static const unsigned char begin[] = {
+        static  unsigned char begin[] = {
             0x30,0x81,0xD3,0x02,0x01,0x01,0x04,0x20
         };
-        static const unsigned char middle[] = {
+        static  unsigned char middle[] = {
             0xA0,0x81,0x85,0x30,0x81,0x82,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,
             0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
             0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
@@ -84,10 +84,10 @@ int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *privkey, 
         ptr += pubkeylen;
         *privkeylen = ptr - privkey;
     } else {
-        static const unsigned char begin[] = {
+        static  unsigned char begin[] = {
             0x30,0x82,0x01,0x13,0x02,0x01,0x01,0x04,0x20
         };
-        static const unsigned char middle[] = {
+        static  unsigned char middle[] = {
             0xA0,0x81,0xA5,0x30,0x81,0xA2,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,
             0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
             0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,

@@ -34,7 +34,7 @@ private:
      * transactions, in which case this value becomes dependent on nVersion
      * and nHeight of the enclosing transaction.
      */
-    static const unsigned int nSpecialScripts = 6;
+    static  unsigned int nSpecialScripts = 6;
 
     CScript &script;
 protected:
@@ -45,18 +45,18 @@ protected:
      * whether the public key is valid (as invalid ones cannot be represented in compressed
      * form).
      */
-    bool IsToKeyID(CKeyID &hash) const;
-    bool IsToScriptID(CScriptID &hash) const;
-    bool IsToPubKey(CPubKey &pubkey) const;
+    bool IsToKeyID(CKeyID &hash) ;
+    bool IsToScriptID(CScriptID &hash) ;
+    bool IsToPubKey(CPubKey &pubkey) ;
 
-    bool Compress(std::vector<unsigned char> &out) const;
-    unsigned int GetSpecialSize(unsigned int nSize) const;
-    bool Decompress(unsigned int nSize, const std::vector<unsigned char> &out);
+    bool Compress(std::vector<unsigned char> &out) ;
+    unsigned int GetSpecialSize(unsigned int nSize) ;
+    bool Decompress(unsigned int nSize,  std::vector<unsigned char> &out);
 public:
     explicit CScriptCompressor(CScript &scriptIn) : script(scriptIn) { }
 
     template<typename Stream>
-    void Serialize(Stream &s) const {
+    void Serialize(Stream &s)  {
         std::vector<unsigned char> compr;
         if (Compress(compr)) {
             s << CFlatData(compr);

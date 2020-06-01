@@ -11,9 +11,9 @@
 #include <assert.h>
 #include <memory>
 
-const std::string CBaseChainParams::MAIN = "main";
-const std::string CBaseChainParams::TESTNET = "test";
-const std::string CBaseChainParams::REGTEST = "regtest";
+ std::string CBaseChainParams::MAIN = "main";
+ std::string CBaseChainParams::TESTNET = "test";
+ std::string CBaseChainParams::REGTEST = "regtest";
 
 void AppendParamsHelpMessages(std::string& strUsage, bool debugHelp)
 {
@@ -65,13 +65,13 @@ public:
 
 static std::unique_ptr<CBaseChainParams> globalChainBaseParams;
 
-const CBaseChainParams& BaseParams()
+ CBaseChainParams& BaseParams()
 {
     assert(globalChainBaseParams);
     return *globalChainBaseParams;
 }
 
-std::unique_ptr<CBaseChainParams> CreateBaseChainParams(const std::string& chain)
+std::unique_ptr<CBaseChainParams> CreateBaseChainParams( std::string& chain)
 {
     if (chain == CBaseChainParams::MAIN)
         return std::unique_ptr<CBaseChainParams>(new CBaseMainParams());
@@ -83,7 +83,7 @@ std::unique_ptr<CBaseChainParams> CreateBaseChainParams(const std::string& chain
         throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
 
-void SelectBaseParams(const std::string& chain)
+void SelectBaseParams( std::string& chain)
 {
     globalChainBaseParams = CreateBaseChainParams(chain);
 }

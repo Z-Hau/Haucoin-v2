@@ -18,14 +18,10 @@ private:
     CSHA512 inner;
 
 public:
-<<<<<<< HEAD
     static  const size_t OUTPUT_SIZE = 64;
-=======
-    static const size_t OUTPUT_SIZE = 64;
->>>>>>> parent of ec20ff778... Removed const
 
-    CHMAC_SHA512(const unsigned char* key, size_t keylen);
-    CHMAC_SHA512& Write(const unsigned char* data, size_t len)
+    CHMAC_SHA512( unsigned char* key, size_t keylen);
+    CHMAC_SHA512& Write( unsigned char* data, size_t len)
     {
         inner.Write(data, len);
         return *this;

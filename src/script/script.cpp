@@ -8,7 +8,7 @@
 #include <tinyformat.h>
 #include <utilstrencodings.h>
 
-const char* GetOpName(opcodetype opcode)
+ char* GetOpName(opcodetype opcode)
 {
     switch (opcode)
     {
@@ -151,7 +151,7 @@ const char* GetOpName(opcodetype opcode)
     }
 }
 
-unsigned int CScript::GetSigOpCount(bool fAccurate) const
+unsigned int CScript::GetSigOpCount(bool fAccurate) 
 {
     unsigned int n = 0;
     const_iterator pc = begin();
@@ -175,7 +175,7 @@ unsigned int CScript::GetSigOpCount(bool fAccurate) const
     return n;
 }
 
-unsigned int CScript::GetSigOpCount(const CScript& scriptSig) const
+unsigned int CScript::GetSigOpCount( CScript& scriptSig) 
 {
     if (!IsPayToScriptHash())
         return GetSigOpCount(true);
@@ -199,7 +199,7 @@ unsigned int CScript::GetSigOpCount(const CScript& scriptSig) const
     return subscript.GetSigOpCount(true);
 }
 
-bool CScript::IsPayToScriptHash() const
+bool CScript::IsPayToScriptHash() 
 {
     // Extra-fast test for pay-to-script-hash CScripts:
     return (this->size() == 23 &&
@@ -208,7 +208,7 @@ bool CScript::IsPayToScriptHash() const
             (*this)[22] == OP_EQUAL);
 }
 
-bool CScript::IsPayToWitnessScriptHash() const
+bool CScript::IsPayToWitnessScriptHash() 
 {
     // Extra-fast test for pay-to-witness-script-hash CScripts:
     return (this->size() == 34 &&
@@ -218,7 +218,7 @@ bool CScript::IsPayToWitnessScriptHash() const
 
 // A witness program is any valid CScript that consists of a 1-byte push opcode
 // followed by a data push between 2 and 40 bytes.
-bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program) const
+bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program) 
 {
     if (this->size() < 4 || this->size() > 42) {
         return false;
@@ -234,7 +234,7 @@ bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program
     return false;
 }
 
-bool CScript::IsPushOnly(const_iterator pc) const
+bool CScript::IsPushOnly(const_iterator pc) 
 {
     while (pc < end())
     {
@@ -251,12 +251,12 @@ bool CScript::IsPushOnly(const_iterator pc) const
     return true;
 }
 
-bool CScript::IsPushOnly() const
+bool CScript::IsPushOnly() 
 {
     return this->IsPushOnly(begin());
 }
 
-std::string CScriptWitness::ToString() const
+std::string CScriptWitness::ToString() 
 {
     std::string ret = "CScriptWitness(";
     for (unsigned int i = 0; i < stack.size(); i++) {
@@ -268,7 +268,7 @@ std::string CScriptWitness::ToString() const
     return ret + ")";
 }
 
-bool CScript::HasValidOps() const
+bool CScript::HasValidOps() 
 {
     CScript::const_iterator it = begin();
     while (it < end()) {

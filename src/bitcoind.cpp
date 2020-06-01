@@ -96,14 +96,14 @@ bool AppInit(int argc, char* argv[])
         try
         {
             gArgs.ReadConfigFile(gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME));
-        } catch (const std::exception& e) {
+        } catch ( std::exception& e) {
             fprintf(stderr,"Error reading configuration file: %s\n", e.what());
             return false;
         }
         // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
         try {
             SelectParams(ChainNameFromCommandLine());
-        } catch (const std::exception& e) {
+        } catch ( std::exception& e) {
             fprintf(stderr, "Error: %s\n", e.what());
             return false;
         }
@@ -159,7 +159,7 @@ bool AppInit(int argc, char* argv[])
         }
         fRet = AppInitMain();
     }
-    catch (const std::exception& e) {
+    catch ( std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
         PrintExceptionContinue(nullptr, "AppInit()");

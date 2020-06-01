@@ -66,7 +66,7 @@ bool ModalOverlay::event(QEvent* ev) {
     return QWidget::event(ev);
 }
 
-void ModalOverlay::setKnownBestHeight(int count, const QDateTime& blockDate)
+void ModalOverlay::setKnownBestHeight(int count,  QDateTime& blockDate)
 {
     if (count > bestHeaderHeight) {
         bestHeaderHeight = count;
@@ -74,7 +74,7 @@ void ModalOverlay::setKnownBestHeight(int count, const QDateTime& blockDate)
     }
 }
 
-void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVerificationProgress)
+void ModalOverlay::tipUpdate(int count,  QDateTime& blockDate, double nVerificationProgress)
 {
     QDateTime currentDate = QDateTime::currentDateTime();
 
@@ -110,7 +110,7 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
             ui->expectedTimeLeft->setText(QObject::tr("unknown"));
         }
 
-        static const int MAX_SAMPLES = 5000;
+        static  int MAX_SAMPLES = 5000;
         if (blockProcessTime.count() > MAX_SAMPLES) {
             blockProcessTime.remove(MAX_SAMPLES, blockProcessTime.count() - MAX_SAMPLES);
         }

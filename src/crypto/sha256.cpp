@@ -14,7 +14,7 @@
 #include <cpuid.h>
 namespace sha256_sse4
 {
-void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks);
+void Transform(uint32_t* s,  unsigned char* chunk, size_t blocks);
 }
 #endif
 #endif
@@ -55,7 +55,7 @@ void inline Initialize(uint32_t* s)
 }
 
 /** Perform a number of SHA-256 transformations, processing 64-byte chunks. */
-void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks)
+void Transform(uint32_t* s,  unsigned char* chunk, size_t blocks)
 {
     while (blocks--) {
         uint32_t a = s[0], b = s[1], c = s[2], d = s[3], e = s[4], f = s[5], g = s[6], h = s[7];
@@ -143,20 +143,20 @@ void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks)
 
 } // namespace sha256
 
-typedef void (*TransformType)(uint32_t*, const unsigned char*, size_t);
+typedef void (*TransformType)(uint32_t*,  unsigned char*, size_t);
 
 bool SelfTest(TransformType tr) {
-    static const unsigned char in1[65] = {0, 0x80};
-    static const unsigned char in2[129] = {
+    static  unsigned char in1[65] = {0, 0x80};
+    static  unsigned char in2[129] = {
         0,
         32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 
         32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 
         0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0
     };
-    static const uint32_t init[8] = {0x6a09e667ul, 0xbb67ae85ul, 0x3c6ef372ul, 0xa54ff53aul, 0x510e527ful, 0x9b05688cul, 0x1f83d9abul, 0x5be0cd19ul};
-    static const uint32_t out1[8] = {0xe3b0c442ul, 0x98fc1c14ul, 0x9afbf4c8ul, 0x996fb924ul, 0x27ae41e4ul, 0x649b934cul, 0xa495991bul, 0x7852b855ul};
-    static const uint32_t out2[8] = {0xce4153b0ul, 0x147c2a86ul, 0x3ed4298eul, 0xe0676bc8ul, 0x79fc77a1ul, 0x2abe1f49ul, 0xb2b055dful, 0x1069523eul};
+    static  uint32_t init[8] = {0x6a09e667ul, 0xbb67ae85ul, 0x3c6ef372ul, 0xa54ff53aul, 0x510e527ful, 0x9b05688cul, 0x1f83d9abul, 0x5be0cd19ul};
+    static  uint32_t out1[8] = {0xe3b0c442ul, 0x98fc1c14ul, 0x9afbf4c8ul, 0x996fb924ul, 0x27ae41e4ul, 0x649b934cul, 0xa495991bul, 0x7852b855ul};
+    static  uint32_t out2[8] = {0xce4153b0ul, 0x147c2a86ul, 0x3ed4298eul, 0xe0676bc8ul, 0x79fc77a1ul, 0x2abe1f49ul, 0xb2b055dful, 0x1069523eul};
     uint32_t buf[8];
     memcpy(buf, init, sizeof(buf));
     // Process nothing, and check we remain in the initial state.
@@ -198,9 +198,9 @@ CSHA256::CSHA256() : bytes(0)
     sha256::Initialize(s);
 }
 
-CSHA256& CSHA256::Write(const unsigned char* data, size_t len)
+CSHA256& CSHA256::Write( unsigned char* data, size_t len)
 {
-    const unsigned char* end = data + len;
+     unsigned char* end = data + len;
     size_t bufsize = bytes % 64;
     if (bufsize && bufsize + len >= 64) {
         // Fill the buffer, and process it.
@@ -226,7 +226,7 @@ CSHA256& CSHA256::Write(const unsigned char* data, size_t len)
 
 void CSHA256::Finalize(unsigned const char hash[OUTPUT_SIZE])
 {
-    static const unsigned char pad[64] = {0x80};
+    static  unsigned char pad[64] = {0x80};
     unsigned char sizedesc[8];
     WriteBE64(sizedesc, bytes << 3);
     Write(pad, 1 + ((119 - (bytes % 64)) % 64));

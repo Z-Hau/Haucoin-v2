@@ -68,9 +68,9 @@
 #endif
 
 bool fFeeEstimatesInitialized = false;
-static const bool DEFAULT_PROXYRANDOMIZE = true;
-static const bool DEFAULT_REST_ENABLE = false;
-static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
+static  bool DEFAULT_PROXYRANDOMIZE = true;
+static  bool DEFAULT_REST_ENABLE = false;
+static  bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
 
 std::unique_ptr<CConnman> g_connman;
 std::unique_ptr<PeerLogicValidation> peerLogic;
@@ -88,7 +88,7 @@ static CZMQNotificationInterface* pzmqNotificationInterface = nullptr;
 #define MIN_CORE_FILEDESCRIPTORS 150
 #endif
 
-static const char* FEE_ESTIMATES_FILENAME="fee_estimates.dat";
+static  char* FEE_ESTIMATES_FILENAME="fee_estimates.dat";
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -136,10 +136,10 @@ class CCoinsViewErrorCatcher final : public CCoinsViewBacked
 {
 public:
     explicit CCoinsViewErrorCatcher(CCoinsView* view) : CCoinsViewBacked(view) {}
-    bool GetCoin(const COutPoint &outpoint, Coin &coin) const override {
+    bool GetCoin( COutPoint &outpoint, Coin &coin)  override {
         try {
             return CCoinsViewBacked::GetCoin(outpoint, coin);
-        } catch(const std::runtime_error& e) {
+        } catch( std::runtime_error& e) {
             uiInterface.ThreadSafeMessageBox(_("Error reading from database, shutting down."), "", CClientUIInterface::MSG_ERROR);
             LogPrintf("Error reading from database: %s\n", e.what());
             // Starting the shutdown sequence and returning false to the caller would be
@@ -263,7 +263,7 @@ void Shutdown()
 #ifndef WIN32
     try {
         fs::remove(GetPidFile());
-    } catch (const fs::filesystem_error& e) {
+    } catch ( fs::filesystem_error& e) {
         LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
     }
 #endif
@@ -328,11 +328,11 @@ void OnRPCStopped()
 
 std::string HelpMessage(HelpMessageMode mode)
 {
-    const auto defaultBaseParams = CreateBaseChainParams(CBaseChainParams::MAIN);
-    const auto testnetBaseParams = CreateBaseChainParams(CBaseChainParams::TESTNET);
-    const auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
-    const auto testnetChainParams = CreateChainParams(CBaseChainParams::TESTNET);
-    const bool showDebug = gArgs.GetBoolArg("-help-debug", false);
+     auto defaultBaseParams = CreateBaseChainParams(CBaseChainParams::MAIN);
+     auto testnetBaseParams = CreateBaseChainParams(CBaseChainParams::TESTNET);
+     auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
+     auto testnetChainParams = CreateChainParams(CBaseChainParams::TESTNET);
+     bool showDebug = gArgs.GetBoolArg("-help-debug", false);
 
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
     // Do not translate _(...) -help-debug options, Many technical terms, and only a very small audience, so is unnecessary stress to translators.
@@ -525,8 +525,8 @@ std::string HelpMessage(HelpMessageMode mode)
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/bitcoin/bitcoin>";
-    const std::string URL_WEBSITE = "<https://bitcoincore.org>";
+     std::string URL_SOURCE_CODE = "<https://github.com/bitcoin/bitcoin>";
+     std::string URL_WEBSITE = "<https://bitcoincore.org>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2009, COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +
@@ -545,7 +545,7 @@ std::string LicenseInfo()
            "\n";
 }
 
-static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex)
+static void BlockNotifyCallback(bool initialSync,  CBlockIndex *pBlockIndex)
 {
     if (initialSync || !pBlockIndex)
         return;
@@ -561,7 +561,7 @@ static bool fHaveGenesis = false;
 static CWaitableCriticalSection cs_GenesisWait;
 static CConditionVariable condvar_GenesisWait;
 
-static void BlockNotifyGenesisWait(bool, const CBlockIndex *pBlockIndex)
+static void BlockNotifyGenesisWait(bool,  CBlockIndex *pBlockIndex)
 {
     if (pBlockIndex != nullptr) {
         {
@@ -618,7 +618,7 @@ void CleanupBlockRevFiles()
     // keeping a separate counter.  Once we hit a gap (or if 0 doesn't exist)
     // start removing block files.
     int nContigCounter = 0;
-    for (const std::pair<std::string, fs::path>& item : mapBlockFiles) {
+    for ( std::pair<std::string, fs::path>& item : mapBlockFiles) {
         if (atoi(item.first) == nContigCounter) {
             nContigCounter++;
             continue;
@@ -629,7 +629,7 @@ void CleanupBlockRevFiles()
 
 void ThreadImport(std::vector<fs::path> vImportFiles)
 {
-    const CChainParams& chainparams = Params();
+     CChainParams& chainparams = Params();
     RenameThread("bitcoin-loadblk");
 
     {
@@ -671,7 +671,7 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
     }
 
     // -loadblock=
-    for (const fs::path& path : vImportFiles) {
+    for ( fs::path& path : vImportFiles) {
         FILE *file = fsbridge::fopen(path, "rb");
         if (file) {
             LogPrintf("Importing blocks file %s...\n", path.string());
@@ -804,7 +804,7 @@ void InitParameterInteraction()
     }
 }
 
-static std::string ResolveErrMsg(const char * const optname, const std::string& strBind)
+static std::string ResolveErrMsg( char *  optname,  std::string& strBind)
 {
     return strprintf(_("Cannot resolve -%s address: '%s'"), optname, strBind);
 }
@@ -900,7 +900,7 @@ bool AppInitBasicSetup()
 
 bool AppInitParameterInteraction()
 {
-    const CChainParams& chainparams = Params();
+     CChainParams& chainparams = Params();
     // ********************************************************* Step 2: parameter interactions
 
     // also see: InitParameterInteraction()
@@ -935,11 +935,11 @@ bool AppInitParameterInteraction()
     // ********************************************************* Step 3: parameter-to-internal-flags
     if (gArgs.IsArgSet("-debug")) {
         // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
-        const std::vector<std::string> categories = gArgs.GetArgs("-debug");
+         std::vector<std::string> categories = gArgs.GetArgs("-debug");
 
         if (std::none_of(categories.begin(), categories.end(),
             [](std::string cat){return cat == "0" || cat == "none";})) {
-            for (const auto& cat : categories) {
+            for ( auto& cat : categories) {
                 uint32_t flag = 0;
                 if (!GetLogCategory(&flag, &cat)) {
                     InitWarning(strprintf(_("Unsupported logging category %s=%s."), "-debug", cat));
@@ -951,7 +951,7 @@ bool AppInitParameterInteraction()
     }
 
     // Now remove the logging categories which were explicitly excluded
-    for (const std::string& cat : gArgs.GetArgs("-debugexclude")) {
+    for ( std::string& cat : gArgs.GetArgs("-debugexclude")) {
         uint32_t flag = 0;
         if (!GetLogCategory(&flag, &cat)) {
             InitWarning(strprintf(_("Unsupported logging category %s=%s."), "-debugexclude", cat));
@@ -994,7 +994,7 @@ bool AppInitParameterInteraction()
         LogPrintf("Validating signatures for all blocks.\n");
 
     if (gArgs.IsArgSet("-minimumchainwork")) {
-        const std::string minChainWorkStr = gArgs.GetArg("-minimumchainwork", "");
+         std::string minChainWorkStr = gArgs.GetArg("-minimumchainwork", "");
         if (!IsHexNumber(minChainWorkStr)) {
             return InitError(strprintf("Invalid non-hex (%s) minimum chain work value specified", minChainWorkStr));
         }
@@ -1127,7 +1127,7 @@ bool AppInitParameterInteraction()
         if (!chainparams.MineBlocksOnDemand()) {
             return InitError("Version bits parameters may only be overridden on regtest.");
         }
-        for (const std::string& strDeployment : gArgs.GetArgs("-vbparams")) {
+        for ( std::string& strDeployment : gArgs.GetArgs("-vbparams")) {
             std::vector<std::string> vDeploymentParams;
             boost::split(vDeploymentParams, strDeployment, boost::is_any_of(":"));
             if (vDeploymentParams.size() != 3) {
@@ -1203,7 +1203,7 @@ bool AppInitLockDataDirectory()
 
 bool AppInitMain()
 {
-    const CChainParams& chainparams = Params();
+     CChainParams& chainparams = Params();
     // ********************************************************* Step 4a: application initialization
 #ifndef WIN32
     CreatePidFile(GetPidFile(), getpid());
@@ -1294,7 +1294,7 @@ bool AppInitMain()
 
     // sanitize comments per BIP-0014, format user agent and check total size
     std::vector<std::string> uacomments;
-    for (const std::string& cmt : gArgs.GetArgs("-uacomment")) {
+    for ( std::string& cmt : gArgs.GetArgs("-uacomment")) {
         if (cmt != SanitizeString(cmt, SAFE_CHARS_UA_COMMENT))
             return InitError(strprintf(_("User Agent comment (%s) contains unsafe characters."), cmt));
         uacomments.push_back(cmt);
@@ -1307,7 +1307,7 @@ bool AppInitMain()
 
     if (gArgs.IsArgSet("-onlynet")) {
         std::set<enum Network> nets;
-        for (const std::string& snet : gArgs.GetArgs("-onlynet")) {
+        for ( std::string& snet : gArgs.GetArgs("-onlynet")) {
             enum Network net = ParseNetwork(snet);
             if (net == NET_UNROUTABLE)
                 return InitError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet));
@@ -1370,7 +1370,7 @@ bool AppInitMain()
     fDiscover = gArgs.GetBoolArg("-discover", true);
     fRelayTxes = !gArgs.GetBoolArg("-blocksonly", DEFAULT_BLOCKSONLY);
 
-    for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
+    for ( std::string& strAddr : gArgs.GetArgs("-externalip")) {
         CService addrLocal;
         if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
             AddLocal(addrLocal, LOCAL_MANUAL);
@@ -1547,7 +1547,7 @@ bool AppInitMain()
                         break;
                     }
                 }
-            } catch (const std::exception& e) {
+            } catch ( std::exception& e) {
                 LogPrintf("%s\n", e.what());
                 strLoadError = _("Error opening block database");
                 break;
@@ -1642,7 +1642,7 @@ bool AppInitMain()
         uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
 
     std::vector<fs::path> vImportFiles;
-    for (const std::string& strFile : gArgs.GetArgs("-loadblock")) {
+    for ( std::string& strFile : gArgs.GetArgs("-loadblock")) {
         vImportFiles.push_back(strFile);
     }
 
@@ -1700,14 +1700,14 @@ bool AppInitMain()
     connOptions.nMaxOutboundTimeframe = nMaxOutboundTimeframe;
     connOptions.nMaxOutboundLimit = nMaxOutboundLimit;
 
-    for (const std::string& strBind : gArgs.GetArgs("-bind")) {
+    for ( std::string& strBind : gArgs.GetArgs("-bind")) {
         CService addrBind;
         if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false)) {
             return InitError(ResolveErrMsg("bind", strBind));
         }
         connOptions.vBinds.push_back(addrBind);
     }
-    for (const std::string& strBind : gArgs.GetArgs("-whitebind")) {
+    for ( std::string& strBind : gArgs.GetArgs("-whitebind")) {
         CService addrBind;
         if (!Lookup(strBind.c_str(), addrBind, 0, false)) {
             return InitError(ResolveErrMsg("whitebind", strBind));
@@ -1718,7 +1718,7 @@ bool AppInitMain()
         connOptions.vWhiteBinds.push_back(addrBind);
     }
 
-    for (const auto& net : gArgs.GetArgs("-whitelist")) {
+    for ( auto& net : gArgs.GetArgs("-whitelist")) {
         CSubNet subnet;
         LookupSubNet(net.c_str(), subnet);
         if (!subnet.IsValid())
@@ -1731,7 +1731,7 @@ bool AppInitMain()
     // Initiate outbound connections unless connect=0
     connOptions.m_use_addrman_outgoing = !gArgs.IsArgSet("-connect");
     if (!connOptions.m_use_addrman_outgoing) {
-        const auto connect = gArgs.GetArgs("-connect");
+         auto connect = gArgs.GetArgs("-connect");
         if (connect.size() != 1 || connect[0] != "0") {
             connOptions.m_specified_outgoing = connect;
         }

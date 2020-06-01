@@ -45,36 +45,36 @@ public:
         KEY_GENERATION_FAILURE  /**< Generating a new public key for a receiving address failed */
     };
 
-    static const QString Send;      /**< Specifies send address */
-    static const QString Receive;   /**< Specifies receive address */
+    static  QString Send;      /**< Specifies send address */
+    static  QString Receive;   /**< Specifies receive address */
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    int rowCount( QModelIndex &parent) ;
+    int columnCount( QModelIndex &parent) ;
+    QVariant data( QModelIndex &index, int role) ;
+    bool setData( QModelIndex &index,  QVariant &value, int role);
+    QVariant headerData(int section, Qt::Orientation orientation, int role) ;
+    QModelIndex index(int row, int column,  QModelIndex &parent) ;
+    bool removeRows(int row, int count,  QModelIndex &parent = QModelIndex());
+    Qt::ItemFlags flags( QModelIndex &index) ;
     /*@}*/
 
     /* Add an address to the model.
        Returns the added address on success, and an empty string otherwise.
      */
-    QString addRow(const QString &type, const QString &label, const QString &address, const OutputType address_type);
+    QString addRow( QString &type,  QString &label,  QString &address,  OutputType address_type);
 
     /* Look up label for address in address book, if not found return empty string.
      */
-    QString labelForAddress(const QString &address) const;
+    QString labelForAddress( QString &address) ;
 
     /* Look up row index of an address in the model.
        Return -1 if not found.
      */
-    int lookupAddress(const QString &address) const;
+    int lookupAddress( QString &address) ;
 
-    EditStatus getEditStatus() const { return editStatus; }
+    EditStatus getEditStatus()  { return editStatus; }
 
 private:
     WalletModel *walletModel;
@@ -89,7 +89,7 @@ private:
 public Q_SLOTS:
     /* Update address list from core.
      */
-    void updateEntry(const QString &address, const QString &label, bool isMine, const QString &purpose, int status);
+    void updateEntry( QString &address,  QString &label, bool isMine,  QString &purpose, int status);
 
     friend class AddressTablePriv;
 };

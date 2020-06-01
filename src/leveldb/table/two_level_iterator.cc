@@ -13,7 +13,7 @@ namespace leveldb {
 
 namespace {
 
-typedef Iterator* (*BlockFunction)(void*, const ReadOptions&, const Slice&);
+typedef Iterator* (*BlockFunction)(void*,  ReadOptions&,  Slice&);
 
 class TwoLevelIterator: public Iterator {
  public:
@@ -21,29 +21,29 @@ class TwoLevelIterator: public Iterator {
     Iterator* index_iter,
     BlockFunction block_function,
     void* arg,
-    const ReadOptions& options);
+     ReadOptions& options);
 
   virtual ~TwoLevelIterator();
 
-  virtual void Seek(const Slice& target);
+  virtual void Seek( Slice& target);
   virtual void SeekToFirst();
   virtual void SeekToLast();
   virtual void Next();
   virtual void Prev();
 
-  virtual bool Valid() const {
+  virtual bool Valid()  {
     return data_iter_.Valid();
   }
-  virtual Slice key() const {
+  virtual Slice key()  {
     assert(Valid());
     return data_iter_.key();
   }
-  virtual Slice value() const {
+  virtual Slice value()  {
     assert(Valid());
     return data_iter_.value();
   }
-  virtual Status status() const {
-    // It'd be nice if status() returned a const Status& instead of a Status
+  virtual Status status()  {
+    // It'd be nice if status() returned a  Status& instead of a Status
     if (!index_iter_.status().ok()) {
       return index_iter_.status();
     } else if (data_iter_.iter() != NULL && !data_iter_.status().ok()) {
@@ -54,7 +54,7 @@ class TwoLevelIterator: public Iterator {
   }
 
  private:
-  void SaveError(const Status& s) {
+  void SaveError( Status& s) {
     if (status_.ok() && !s.ok()) status_ = s;
   }
   void SkipEmptyDataBlocksForward();
@@ -64,7 +64,7 @@ class TwoLevelIterator: public Iterator {
 
   BlockFunction block_function_;
   void* arg_;
-  const ReadOptions options_;
+   ReadOptions options_;
   Status status_;
   IteratorWrapper index_iter_;
   IteratorWrapper data_iter_; // May be NULL
@@ -77,7 +77,7 @@ TwoLevelIterator::TwoLevelIterator(
     Iterator* index_iter,
     BlockFunction block_function,
     void* arg,
-    const ReadOptions& options)
+     ReadOptions& options)
     : block_function_(block_function),
       arg_(arg),
       options_(options),
@@ -88,7 +88,7 @@ TwoLevelIterator::TwoLevelIterator(
 TwoLevelIterator::~TwoLevelIterator() {
 }
 
-void TwoLevelIterator::Seek(const Slice& target) {
+void TwoLevelIterator::Seek( Slice& target) {
   index_iter_.Seek(target);
   InitDataBlock();
   if (data_iter_.iter() != NULL) data_iter_.Seek(target);
@@ -175,7 +175,7 @@ Iterator* NewTwoLevelIterator(
     Iterator* index_iter,
     BlockFunction block_function,
     void* arg,
-    const ReadOptions& options) {
+     ReadOptions& options) {
   return new TwoLevelIterator(index_iter, block_function, arg, options);
 }
 

@@ -25,14 +25,14 @@ public:
     ~ModalOverlay();
 
 public Q_SLOTS:
-    void tipUpdate(int count, const QDateTime& blockDate, double nVerificationProgress);
-    void setKnownBestHeight(int count, const QDateTime& blockDate);
+    void tipUpdate(int count,  QDateTime& blockDate, double nVerificationProgress);
+    void setKnownBestHeight(int count,  QDateTime& blockDate);
 
     void toggleVisibility();
     // will show or hide the modal layer
     void showHide(bool hide = false, bool userRequested = false);
     void closeClicked();
-    bool isLayerVisible() const { return layerIsVisible; }
+    bool isLayerVisible()  { return layerIsVisible; }
 
 protected:
     bool eventFilter(QObject * obj, QEvent * ev);

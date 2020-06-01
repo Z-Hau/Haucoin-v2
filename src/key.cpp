@@ -32,8 +32,8 @@ static secp256k1_context* secp256k1_context_sign = nullptr;
  *
  * out32 must point to an output buffer of length at least 32 bytes.
  */
-static int ec_privkey_import_der(const secp256k1_context* ctx, unsigned char *out32, const unsigned char *privkey, size_t privkeylen) {
-    const unsigned char *end = privkey + privkeylen;
+static int ec_privkey_import_der( secp256k1_context* ctx, unsigned char *out32,  unsigned char *privkey, size_t privkeylen) {
+     unsigned char *end = privkey + privkeylen;
     memset(out32, 0, 32);
     /* sequence header */
     if (end - privkey < 1 || *privkey != 0x30u) {
@@ -89,7 +89,7 @@ static int ec_privkey_import_der(const secp256k1_context* ctx, unsigned char *ou
  * will be set to the number of bytes used in the buffer.
  * key32 must point to a 32-byte raw private key.
  */
-static int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *privkey, size_t *privkeylen, const unsigned char *key32, int compressed) {
+static int ec_privkey_export_der( secp256k1_context *ctx, unsigned char *privkey, size_t *privkeylen,  unsigned char *key32, int compressed) {
     assert(*privkeylen >= CKey::PRIVATE_KEY_SIZE);
     secp256k1_pubkey pubkey;
     size_t pubkeylen = 0;
@@ -98,10 +98,10 @@ static int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *pr
         return 0;
     }
     if (compressed) {
-        static const unsigned char begin[] = {
+        static  unsigned char begin[] = {
             0x30,0x81,0xD3,0x02,0x01,0x01,0x04,0x20
         };
-        static const unsigned char middle[] = {
+        static  unsigned char middle[] = {
             0xA0,0x81,0x85,0x30,0x81,0x82,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,
             0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
             0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
@@ -122,10 +122,10 @@ static int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *pr
         *privkeylen = ptr - privkey;
         assert(*privkeylen == CKey::COMPRESSED_PRIVATE_KEY_SIZE);
     } else {
-        static const unsigned char begin[] = {
+        static  unsigned char begin[] = {
             0x30,0x82,0x01,0x13,0x02,0x01,0x01,0x04,0x20
         };
-        static const unsigned char middle[] = {
+        static  unsigned char middle[] = {
             0xA0,0x81,0xA5,0x30,0x81,0xA2,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,
             0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
             0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
@@ -151,7 +151,7 @@ static int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *pr
     return 1;
 }
 
-bool CKey::Check(const unsigned char *vch) {
+bool CKey::Check( unsigned char *vch) {
     return secp256k1_ec_seckey_verify(secp256k1_context_sign, vch);
 }
 
@@ -163,7 +163,7 @@ void CKey::MakeNewKey(bool fCompressedIn) {
     fCompressed = fCompressedIn;
 }
 
-CPrivKey CKey::GetPrivKey() const {
+CPrivKey CKey::GetPrivKey()  {
     assert(fValid);
     CPrivKey privkey;
     int ret;
@@ -176,7 +176,7 @@ CPrivKey CKey::GetPrivKey() const {
     return privkey;
 }
 
-CPubKey CKey::GetPubKey() const {
+CPubKey CKey::GetPubKey()  {
     assert(fValid);
     secp256k1_pubkey pubkey;
     size_t clen = CPubKey::PUBLIC_KEY_SIZE;
@@ -189,7 +189,7 @@ CPubKey CKey::GetPubKey() const {
     return result;
 }
 
-bool CKey::Sign(const uint256 &hash, std::vector<unsigned char>& vchSig, uint32_t test_case) const {
+bool CKey::Sign( uint256 &hash, std::vector<unsigned char>& vchSig, uint32_t test_case)  {
     if (!fValid)
         return false;
     vchSig.resize(CPubKey::SIGNATURE_SIZE);
@@ -204,7 +204,7 @@ bool CKey::Sign(const uint256 &hash, std::vector<unsigned char>& vchSig, uint32_
     return true;
 }
 
-bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
+bool CKey::VerifyPubKey( CPubKey& pubkey)  {
     if (pubkey.IsCompressed() != fCompressed) {
         return false;
     }
@@ -218,7 +218,7 @@ bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
     return pubkey.Verify(hash, vchSig);
 }
 
-bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig) const {
+bool CKey::SignCompact( uint256 &hash, std::vector<unsigned char>& vchSig)  {
     if (!fValid)
         return false;
     vchSig.resize(CPubKey::COMPACT_SIGNATURE_SIZE);
@@ -233,7 +233,7 @@ bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig) 
     return true;
 }
 
-bool CKey::Load(const CPrivKey &privkey, const CPubKey &vchPubKey, bool fSkipCheck=false) {
+bool CKey::Load( CPrivKey &privkey,  CPubKey &vchPubKey, bool fSkipCheck=false) {
     if (!ec_privkey_import_der(secp256k1_context_sign, (unsigned char*)begin(), privkey.data(), privkey.size()))
         return false;
     fCompressed = vchPubKey.IsCompressed();
@@ -245,7 +245,7 @@ bool CKey::Load(const CPrivKey &privkey, const CPubKey &vchPubKey, bool fSkipChe
     return VerifyPubKey(vchPubKey);
 }
 
-bool CKey::Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const {
+bool CKey::Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild,  ChainCode& cc)  {
     assert(IsValid());
     assert(IsCompressed());
     std::vector<unsigned char, secure_allocator<unsigned char>> vout(64);
@@ -265,7 +265,7 @@ bool CKey::Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild, const
     return ret;
 }
 
-bool CExtKey::Derive(CExtKey &out, unsigned int _nChild) const {
+bool CExtKey::Derive(CExtKey &out, unsigned int _nChild)  {
     out.nDepth = nDepth + 1;
     CKeyID id = key.GetPubKey().GetID();
     memcpy(&out.vchFingerprint[0], &id, 4);
@@ -273,13 +273,8 @@ bool CExtKey::Derive(CExtKey &out, unsigned int _nChild) const {
     return key.Derive(out.key, out.chaincode, _nChild, chaincode);
 }
 
-<<<<<<< HEAD
 void CExtKey::SetMaster( unsigned char *seed, unsigned int nSeedLen) {
     static  unsigned const char hashkey[] = {'B','i','t','c','o','i','n',' ','s','e','e','d'};
-=======
-void CExtKey::SetMaster(const unsigned char *seed, unsigned int nSeedLen) {
-    static const unsigned char hashkey[] = {'B','i','t','c','o','i','n',' ','s','e','e','d'};
->>>>>>> parent of ec20ff778... Removed const
     std::vector<unsigned char, secure_allocator<unsigned char>> vout(64);
     CHMAC_SHA512(hashkey, sizeof(hashkey)).Write(seed, nSeedLen).Finalize(vout.data());
     key.Set(vout.data(), vout.data() + 32, true);
@@ -289,7 +284,7 @@ void CExtKey::SetMaster(const unsigned char *seed, unsigned int nSeedLen) {
     memset(vchFingerprint, 0, sizeof(vchFingerprint));
 }
 
-CExtPubKey CExtKey::Neuter() const {
+CExtPubKey CExtKey::Neuter()  {
     CExtPubKey ret;
     ret.nDepth = nDepth;
     memcpy(&ret.vchFingerprint[0], &vchFingerprint[0], 4);
@@ -299,7 +294,7 @@ CExtPubKey CExtKey::Neuter() const {
     return ret;
 }
 
-void CExtKey::Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const {
+void CExtKey::Encode(unsigned char code[BIP32_EXTKEY_SIZE])  {
     code[0] = nDepth;
     memcpy(code+1, vchFingerprint, 4);
     code[5] = (nChild >> 24) & 0xFF; code[6] = (nChild >> 16) & 0xFF;
@@ -310,7 +305,7 @@ void CExtKey::Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const {
     memcpy(code+42, key.begin(), 32);
 }
 
-void CExtKey::Decode(const unsigned char code[BIP32_EXTKEY_SIZE]) {
+void CExtKey::Decode( unsigned char code[BIP32_EXTKEY_SIZE]) {
     nDepth = code[0];
     memcpy(vchFingerprint, code+1, 4);
     nChild = (code[5] << 24) | (code[6] << 16) | (code[7] << 8) | code[8];

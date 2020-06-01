@@ -34,7 +34,7 @@ QT_END_NAMESPACE
 namespace GUIUtil
 {
     // Create human-readable string from date
-    QString dateTimeStr(const QDateTime &datetime);
+    QString dateTimeStr( QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);
 
     // Return a monospace font
@@ -45,16 +45,16 @@ namespace GUIUtil
     void setupAmountWidget(QLineEdit *widget, QWidget *parent);
 
     // Parse "bitcoin:" URI into recipient object, return true on successful parsing
-    bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out);
+    bool parseBitcoinURI( QUrl &uri, SendCoinsRecipient *out);
     bool parseBitcoinURI(QString uri, SendCoinsRecipient *out);
-    QString formatBitcoinURI(const SendCoinsRecipient &info);
+    QString formatBitcoinURI( SendCoinsRecipient &info);
 
     // Returns true if given address+amount meets "dust" definition
-    bool isDust(const QString& address, const CAmount& amount);
+    bool isDust( QString& address,  CAmount& amount);
 
     // HTML escaping for rich text controls
-    QString HtmlEscape(const QString& str, bool fMultiLine=false);
-    QString HtmlEscape(const std::string& str, bool fMultiLine=false);
+    QString HtmlEscape( QString& str, bool fMultiLine=false);
+    QString HtmlEscape( std::string& str, bool fMultiLine=false);
 
     /** Copy a field of the currently selected entry of a view to the clipboard. Does nothing if nothing
         is selected.
@@ -71,7 +71,7 @@ namespace GUIUtil
      */
     QList<QModelIndex> getEntryData(QAbstractItemView *view, int column);
 
-    void setClipboard(const QString& str);
+    void setClipboard( QString& str);
 
     /** Get save filename, mimics QFileDialog::getSaveFileName, except that it appends a default suffix
         when no suffix is provided by the user.
@@ -83,8 +83,8 @@ namespace GUIUtil
       @param[out] selectedSuffixOut  Pointer to return the suffix (file type) that was selected (or 0).
                   Can be useful when choosing the save file format based on suffix.
      */
-    QString getSaveFileName(QWidget *parent, const QString &caption, const QString &dir,
-        const QString &filter,
+    QString getSaveFileName(QWidget *parent,  QString &caption,  QString &dir,
+         QString &filter,
         QString *selectedSuffixOut);
 
     /** Get open filename, convenience wrapper for QFileDialog::getOpenFileName.
@@ -96,8 +96,8 @@ namespace GUIUtil
       @param[out] selectedSuffixOut  Pointer to return the suffix (file type) that was selected (or 0).
                   Can be useful when choosing the save file format based on suffix.
      */
-    QString getOpenFileName(QWidget *parent, const QString &caption, const QString &dir,
-        const QString &filter,
+    QString getOpenFileName(QWidget *parent,  QString &caption,  QString &dir,
+         QString &filter,
         QString *selectedSuffixOut);
 
     /** Get connection type to call object slot in GUI thread with invokeMethod. The call will be blocking.
@@ -117,7 +117,7 @@ namespace GUIUtil
     bool openBitcoinConf();
 
     // Replace invalid default fonts with known good ones
-    void SubstituteFonts(const QString& language);
+    void SubstituteFonts( QString& language);
 
     /** Qt event filter that intercepts ToolTipChange events, and replaces the tooltip with a rich text
       representation if needed. This assures that Qt can word-wrap long tooltip messages.
@@ -180,10 +180,10 @@ namespace GUIUtil
     bool SetStartOnSystemStartup(bool fAutoStart);
 
     /* Convert QString to OS specific boost path through UTF-8 */
-    fs::path qstringToBoostPath(const QString &path);
+    fs::path qstringToBoostPath( QString &path);
 
     /* Convert OS specific boost path to QString through UTF-8 */
-    QString boostPathToQString(const fs::path &path);
+    QString boostPathToQString( fs::path &path);
 
     /* Convert seconds into a QString with days, hours, mins, secs */
     QString formatDurationStr(int secs);
@@ -201,7 +201,7 @@ namespace GUIUtil
 
     QString formatBytes(uint64_t bytes);
 
-    qreal calculateIdealFontSize(int width, const QString& text, QFont font, qreal minPointSize = 4, qreal startPointSize = 14);
+    qreal calculateIdealFontSize(int width,  QString& text, QFont font, qreal minPointSize = 4, qreal startPointSize = 14);
 
     class ClickableLabel : public QLabel
     {
@@ -211,7 +211,7 @@ namespace GUIUtil
         /** Emitted when the label is clicked. The relative mouse coordinates of the click are
          * passed to the signal.
          */
-        void clicked(const QPoint& point);
+        void clicked( QPoint& point);
     protected:
         void mouseReleaseEvent(QMouseEvent *event);
     };
@@ -224,7 +224,7 @@ namespace GUIUtil
         /** Emitted when the progressbar is clicked. The relative mouse coordinates of the click are
          * passed to the signal.
          */
-        void clicked(const QPoint& point);
+        void clicked( QPoint& point);
     protected:
         void mouseReleaseEvent(QMouseEvent *event);
     };

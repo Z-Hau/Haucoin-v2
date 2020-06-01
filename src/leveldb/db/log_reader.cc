@@ -73,7 +73,7 @@ bool Reader::ReadRecord(Slice* record, std::string* scratch) {
 
   Slice fragment;
   while (true) {
-    const unsigned int record_type = ReadPhysicalRecord(&fragment);
+     unsigned int record_type = ReadPhysicalRecord(&fragment);
 
     // ReadPhysicalRecord may have only had an empty trailer remaining in its
     // internal buffer. Calculate the offset of the next physical record now
@@ -185,11 +185,11 @@ uint64_t Reader::LastRecordOffset() {
   return last_record_offset_;
 }
 
-void Reader::ReportCorruption(uint64_t bytes, const char* reason) {
+void Reader::ReportCorruption(uint64_t bytes,  char* reason) {
   ReportDrop(bytes, Status::Corruption(reason, file_->GetName()));
 }
 
-void Reader::ReportDrop(uint64_t bytes, const Status& reason) {
+void Reader::ReportDrop(uint64_t bytes,  Status& reason) {
   if (reporter_ != NULL &&
       end_of_buffer_offset_ - buffer_.size() - bytes >= initial_offset_) {
     reporter_->Corruption(static_cast<size_t>(bytes), reason);
@@ -224,11 +224,11 @@ unsigned int Reader::ReadPhysicalRecord(Slice* result) {
     }
 
     // Parse the header
-    const char* header = buffer_.data();
-    const uint32_t a = static_cast<uint32_t>(header[4]) & 0xff;
-    const uint32_t b = static_cast<uint32_t>(header[5]) & 0xff;
-    const unsigned int type = header[6];
-    const uint32_t length = a | (b << 8);
+     char* header = buffer_.data();
+     uint32_t a = static_cast<uint32_t>(header[4]) & 0xff;
+     uint32_t b = static_cast<uint32_t>(header[5]) & 0xff;
+     unsigned int type = header[6];
+     uint32_t length = a | (b << 8);
     if (kHeaderSize + length > buffer_.size()) {
       size_t drop_size = buffer_.size();
       buffer_.clear();
