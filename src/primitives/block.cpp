@@ -15,7 +15,7 @@ uint256 CBlockHeader::GetHash() const
     return SerializeHash(*this);
 }
 
-std::string CBlock::ToString() const
+std::string CBlock::ToString()
 {
     std::stringstream s;
     s << strprintf("CBlock(hash=%s, ver=0x%08x, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
